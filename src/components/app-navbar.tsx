@@ -1,8 +1,8 @@
 "use client";
 
 import * as React from "react";
-import { Search, LogOut } from "lucide-react";
-import { Link } from "@tanstack/react-router";
+import { Search, LogOut, PenLine } from "lucide-react";
+import { Link, useLocation } from "@tanstack/react-router";
 import { Button } from "#/components/ui/button.tsx";
 import { Input } from "#/components/ui/input.tsx";
 import { SidebarTrigger } from "#/components/ui/sidebar.tsx";
@@ -22,11 +22,15 @@ import {
 } from "#/components/ui/dropdown-menu.tsx";
 import { cn } from "#/lib/utils.ts";
 import { authClient } from "#/lib/auth-client.ts";
+import { useHasContent } from "#/components/editor-context";
 
 export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {}
 
 export const Navbar = ({ className, ...props }: NavbarProps) => {
   const { data: session, isPending } = authClient.useSession();
+  const location = useLocation();
+  const isWriteRoute = location.pathname === "/write";
+  const hasContent = useHasContent();
 
   return (
     <nav
@@ -57,6 +61,18 @@ export const Navbar = ({ className, ...props }: NavbarProps) => {
 
         {/* Right */}
         <div className="flex items-center gap-3">
+          {isWriteRoute ? (
+            <Button size="sm" disabled={!hasContent}>
+              发布
+            </Button>
+          ) : (
+            <Button size="sm" asChild>
+              <Link to="/write">
+                <PenLine className="size-4 mr-1" />
+                写作
+              </Link>
+            </Button>
+          )}
           <ModeToggle />
           {isPending ? (
             <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />

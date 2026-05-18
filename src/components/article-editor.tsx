@@ -1,8 +1,9 @@
-import { useEffect, useState } from "react"
+import { useEffect } from "react"
 import type { Content } from "@tiptap/react"
 import { MinimalTiptapEditor } from "#/components/ui/minimal-tiptap"
 import { useIsBreakpoint } from "#/hooks/use-is-breakpoint"
 import { useThrottledCallback } from "#/hooks/use-throttled-callback"
+import { useEditorContent } from "#/components/editor-context"
 
 const DRAFT_KEY = "cedium_draft"
 
@@ -26,7 +27,7 @@ function saveDraft(content: Content): void {
 }
 
 export function ArticleEditor() {
-  const [content, setContent] = useState<Content>(loadDraft)
+  const [content, setContent] = useEditorContent()
   const isLargeScreen = useIsBreakpoint("min", 1024)
 
   const throttledSave = useThrottledCallback(
@@ -34,6 +35,14 @@ export function ArticleEditor() {
     500,
     []
   )
+
+  useEffect(() => {
+    // Load draft on mount
+    const draft = loadDraft()
+    if (draft) {
+      setContent(draft)
+    }
+  }, [setContent])
 
   useEffect(() => {
     throttledSave(content)
