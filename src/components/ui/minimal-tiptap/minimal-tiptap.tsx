@@ -23,9 +23,11 @@ export interface MinimalTiptapProps extends Omit<
   onChange?: (value: Content) => void
   className?: string
   editorContentClassName?: string
+  /** Toolbar variant: "full" shows all sections, "minimal" shows only basic formatting */
+  toolbarVariant?: "full" | "minimal"
 }
 
-const Toolbar = ({ editor }: { editor: Editor }) => (
+const FullToolbar = ({ editor }: { editor: Editor }) => (
   <div className="border-border flex h-12 shrink-0 overflow-x-auto border-b p-2">
     <div className="flex w-max items-center gap-px">
       <SectionOne editor={editor} activeLevels={[1, 2, 3, 4, 5, 6]} />
@@ -68,11 +70,24 @@ const Toolbar = ({ editor }: { editor: Editor }) => (
   </div>
 )
 
+const MinimalToolbar = ({ editor }: { editor: Editor }) => (
+  <div className="border-border flex h-12 shrink-0 overflow-x-auto border-b p-2">
+    <div className="flex w-max items-center gap-px">
+      <SectionTwo
+        editor={editor}
+        activeActions={["bold", "italic", "underline"]}
+        mainActionCount={3}
+      />
+    </div>
+  </div>
+)
+
 export const MinimalTiptapEditor = ({
   value,
   onChange,
   className,
   editorContentClassName,
+  toolbarVariant = "full",
   ...props
 }: MinimalTiptapProps) => {
   const editor = useMinimalTiptapEditor({
@@ -91,6 +106,7 @@ export const MinimalTiptapEditor = ({
         editor={editor}
         className={className}
         editorContentClassName={editorContentClassName}
+        toolbarVariant={toolbarVariant}
       />
     </EditorContext.Provider>
   )
@@ -104,12 +120,15 @@ export const MainMinimalTiptapEditor = ({
   editor: providedEditor,
   className,
   editorContentClassName,
+  toolbarVariant = "full",
 }: MinimalTiptapProps & { editor: Editor }) => {
   const { editor } = useTiptapEditor(providedEditor)
 
   if (!editor) {
     return null
   }
+
+  const Toolbar = toolbarVariant === "minimal" ? MinimalToolbar : FullToolbar
 
   return (
     <MeasuredContainer
