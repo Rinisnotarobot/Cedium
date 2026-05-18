@@ -40,7 +40,7 @@ export const Navbar = ({ className, ...props }: NavbarProps) => {
         {/* Left */}
         <div className="flex items-center gap-2">
           <SidebarTrigger />
-          <span className="text-xl font-bold text-foreground">Aedium</span>
+          <span className="text-xl font-bold text-foreground">Cedium</span>
         </div>
 
         {/* Center: Search */}
