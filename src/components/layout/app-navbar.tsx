@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { Search, LogOut, PenLine, Send } from "lucide-react";
-import { Link, useLocation } from "@tanstack/react-router";
+import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Button } from "#/components/ui/button.tsx";
 import { Input } from "#/components/ui/input.tsx";
 import { SidebarTrigger } from "#/components/ui/sidebar.tsx";
@@ -29,8 +29,14 @@ export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {}
 export const Navbar = ({ className, ...props }: NavbarProps) => {
   const { data: session, isPending } = authClient.useSession();
   const location = useLocation();
+  const navigate = useNavigate();
   const isWriteRoute = location.pathname === "/write";
   const hasContent = useHasContent();
+
+  const handleSignOut = async () => {
+    await authClient.signOut();
+    navigate({ to: "/login" });
+  };
 
   return (
     <nav
@@ -108,17 +114,17 @@ export const Navbar = ({ className, ...props }: NavbarProps) => {
                 </DropdownMenuLabel>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
-                  onClick={() => authClient.signOut()}
+                  onClick={handleSignOut}
                   className="cursor-pointer"
                 >
                   <LogOut className="mr-2 h-4 w-4" />
-                  Log out
+                  退出登录
                 </DropdownMenuItem>
               </DropdownMenuContent>
             </DropdownMenu>
           ) : (
             <Button size="sm" asChild>
-              <Link to="/login">Login</Link>
+              <Link to="/login">登录</Link>
             </Button>
           )}
         </div>
