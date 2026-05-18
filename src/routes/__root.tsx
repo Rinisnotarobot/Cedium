@@ -17,6 +17,8 @@ interface MyRouterContext {
   queryClient: QueryClient;
 }
 
+import { NotFound } from "#/components/not-found";
+
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
@@ -39,6 +41,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
     ],
   }),
   shellComponent: RootDocument,
+  notFoundComponent: NotFound,
 });
 
 function RootDocument({ children }: { children: React.ReactNode }) {
