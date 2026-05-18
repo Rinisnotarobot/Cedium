@@ -11,13 +11,12 @@ import { Toaster } from "#/components/ui/sonner";
 import appCss from "../styles.css?url";
 
 import type { QueryClient } from "@tanstack/react-query";
-import { ThemeProvider } from "#/components/theme-provider";
+import { ThemeProvider } from "#/components/theme";
+import { NotFound } from "#/components/errors";
 
 interface MyRouterContext {
   queryClient: QueryClient;
 }
-
-import { NotFound } from "#/components/not-found";
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({

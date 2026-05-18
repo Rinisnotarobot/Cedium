@@ -6,7 +6,7 @@ import { Link, useLocation } from "@tanstack/react-router";
 import { Button } from "#/components/ui/button.tsx";
 import { Input } from "#/components/ui/input.tsx";
 import { SidebarTrigger } from "#/components/ui/sidebar.tsx";
-import { ModeToggle } from "#/components/mode-toggle.tsx";
+import { ModeToggle } from "#/components/theme";
 import {
   Avatar,
   AvatarFallback,

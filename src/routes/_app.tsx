@@ -1,7 +1,6 @@
 import { createFileRoute, Outlet } from "@tanstack/react-router";
-import { Navbar } from "#/components/app-navbar";
-import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
-import { AppSidebar } from "#/components/app-sidebar";
+import { Navbar, AppSidebar } from "#/components/layout";
+import { SidebarInset, SidebarProvider } from "#/components/ui/sidebar";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
