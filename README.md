@@ -1,236 +1,194 @@
-Welcome to your new TanStack Start app! 
+# Cedium
 
-# Getting Started
+基于 TanStack Start 构建的全栈 Web 应用模板。
 
-To run this application:
+## 技术栈
 
-```bash
-npm install
-npm run dev
-```
+| 类别 | 技术 |
+|------|------|
+| 框架 | TanStack Start (React) |
+| 路由 | TanStack Router (文件路由) |
+| 数据获取 | TanStack Query |
+| 表格 | TanStack Table |
+| 表单 | TanStack Form + Zod |
+| 数据库 | Prisma + PostgreSQL |
+| 认证 | Better Auth |
+| 样式 | Tailwind CSS v4 |
+| UI 组件 | Shadcn/UI |
+| 测试 | Vitest |
+| 包管理 | pnpm |
 
-# Building For Production
+## 快速开始
 
-To build this application for production:
-
-```bash
-npm run build
-```
-
-## Testing
-
-This project uses [Vitest](https://vitest.dev/) for testing. You can run the tests with:
-
-```bash
-npm run test
-```
-
-## Styling
-
-This project uses [Tailwind CSS](https://tailwindcss.com/) for styling.
-
-### Removing Tailwind CSS
-
-If you prefer not to use Tailwind CSS:
-
-1. Remove the demo pages in `src/routes/demo/`
-2. Replace the Tailwind import in `src/styles.css` with your own styles
-3. Remove `tailwindcss()` from the plugins array in `vite.config.ts`
-4. Uninstall the packages: `npm install @tailwindcss/vite tailwindcss -D`
-
-
-## Shadcn
-
-Add components using the latest version of [Shadcn](https://ui.shadcn.com/).
+### 安装依赖
 
 ```bash
-pnpm dlx shadcn@latest add button
+pnpm install
 ```
 
+### 配置环境变量
 
-## Setting up Better Auth
-
-1. Generate and set the `BETTER_AUTH_SECRET` environment variable in your `.env.local`:
-
-   ```bash
-   npx -y @better-auth/cli secret
-   ```
-
-2. Visit the [Better Auth documentation](https://www.better-auth.com) to unlock the full potential of authentication in your app.
-
-### Adding a Database (Optional)
-
-Better Auth can work in stateless mode, but to persist user data, add a database:
-
-```typescript
-// src/lib/auth.ts
-import { betterAuth } from "better-auth";
-import { Pool } from "pg";
-
-export const auth = betterAuth({
-  database: new Pool({
-    connectionString: process.env.DATABASE_URL,
-  }),
-  // ... rest of config
-});
-```
-
-Then run migrations:
+创建 `.env.local` 文件：
 
 ```bash
-npx -y @better-auth/cli migrate
+# 数据库连接
+DATABASE_URL="postgresql://user:password@localhost:5432/cedium"
+
+# Better Auth 密钥（运行以下命令生成）
+npx -y @better-auth/cli secret
 ```
 
+### 初始化数据库
 
+```bash
+pnpm db:generate   # 生成 Prisma Client
+pnpm db:push       # 推送数据库结构
+pnpm db:seed       # 填充种子数据（可选）
+```
 
-## Routing
+### 启动开发服务器
 
-This project uses [TanStack Router](https://tanstack.com/router) with file-based routing. Routes are managed as files in `src/routes`.
+```bash
+pnpm dev
+```
 
-### Adding A Route
+访问 http://localhost:3000
 
-To add a new route to your application just add a new file in the `./src/routes` directory.
+## 项目结构
 
-TanStack will automatically generate the content of the route file for you.
+```
+src/
+├── components/     # UI 组件
+├── hooks/          # 自定义 Hooks
+├── lib/            # 工具函数
+├── routes/         # 路由文件（文件路由）
+├── generated/      # Prisma 生成的类型
+├── router.tsx      # 路由配置
+├── styles.css      # 全局样式
+└── db.ts           # 数据库连接
+prisma/
+├── schema.prisma   # 数据库模型
+└── seed.ts         # 种子数据
+```
 
-Now that you have two routes you can use a `Link` component to navigate between them.
+## 常用命令
 
-### Adding Links
+| 命令 | 说明 |
+|------|------|
+| `pnpm dev` | 启动开发服务器 |
+| `pnpm build` | 构建生产版本 |
+| `pnpm preview` | 预览生产构建 |
+| `pnpm test` | 运行测试 |
+| `pnpm db:studio` | 打开 Prisma Studio |
+| `pnpm db:migrate` | 创建迁移 |
 
-To use SPA (Single Page Application) navigation you will need to import the `Link` component from `@tanstack/react-router`.
+## 路由系统
+
+采用文件路由，在 `src/routes/` 目录下创建文件自动生成路由：
+
+```
+src/routes/
+├── __root.tsx      # 根布局
+├── index.tsx       # / 首页
+├── about.tsx       # /about
+├── posts/
+│   ├── index.tsx   # /posts
+│   └── $id.tsx     # /posts/:id
+```
+
+使用 `Link` 组件导航：
 
 ```tsx
 import { Link } from "@tanstack/react-router";
+
+<Link to="/posts/$id" params={{ id: "1" }}>文章详情</Link>
 ```
 
-Then anywhere in your JSX you can use it like so:
+## 数据获取
 
-```tsx
-<Link to="/about">About</Link>
-```
+### 使用 Loader（推荐）
 
-This will create a link that will navigate to the `/about` route.
-
-More information on the `Link` component can be found in the [Link documentation](https://tanstack.com/router/v1/docs/framework/react/api/router/linkComponent).
-
-### Using A Layout
-
-In the File Based Routing setup the layout is located in `src/routes/__root.tsx`. Anything you add to the root route will appear in all the routes. The route content will appear in the JSX where you render `{children}` in the `shellComponent`.
-
-Here is an example layout that includes a header:
-
-```tsx
-import { HeadContent, Scripts, createRootRoute } from '@tanstack/react-router'
-
-export const Route = createRootRoute({
-  head: () => ({
-    meta: [
-      { charSet: 'utf-8' },
-      { name: 'viewport', content: 'width=device-width, initial-scale=1' },
-      { title: 'My App' },
-    ],
-  }),
-  shellComponent: ({ children }) => (
-    <html lang="en">
-      <head>
-        <HeadContent />
-      </head>
-      <body>
-        <header>
-          <nav>
-            <Link to="/">Home</Link>
-            <Link to="/about">About</Link>
-          </nav>
-        </header>
-        {children}
-        <Scripts />
-      </body>
-    </html>
-  ),
-})
-```
-
-More information on layouts can be found in the [Layouts documentation](https://tanstack.com/router/latest/docs/framework/react/guide/routing-concepts#layouts).
-
-## Server Functions
-
-TanStack Start provides server functions that allow you to write server-side code that seamlessly integrates with your client components.
-
-```tsx
-import { createServerFn } from '@tanstack/react-start'
-
-const getServerTime = createServerFn({
-  method: 'GET',
-}).handler(async () => {
-  return new Date().toISOString()
-})
-
-// Use in a component
-function MyComponent() {
-  const [time, setTime] = useState('')
-  
-  useEffect(() => {
-    getServerTime().then(setTime)
-  }, [])
-  
-  return <div>Server time: {time}</div>
-}
-```
-
-## API Routes
-
-You can create API routes by using the `server` property in your route definitions:
-
-```tsx
-import { createFileRoute } from '@tanstack/react-router'
-import { json } from '@tanstack/react-start'
-
-export const Route = createFileRoute('/api/hello')({
-  server: {
-    handlers: {
-      GET: () => json({ message: 'Hello, World!' }),
-    },
-  },
-})
-```
-
-## Data Fetching
-
-There are multiple ways to fetch data in your application. You can use TanStack Query to fetch data from a server. But you can also use the `loader` functionality built into TanStack Router to load the data for a route before it's rendered.
-
-For example:
+在路由文件中定义 loader：
 
 ```tsx
 import { createFileRoute } from '@tanstack/react-router'
 
-export const Route = createFileRoute('/people')({
+export const Route = createFileRoute('/posts')({
   loader: async () => {
-    const response = await fetch('https://swapi.dev/api/people')
-    return response.json()
+    const posts = await fetchPosts()
+    return posts
   },
-  component: PeopleComponent,
+  component: PostsPage,
 })
 
-function PeopleComponent() {
-  const data = Route.useLoaderData()
-  return (
-    <ul>
-      {data.results.map((person) => (
-        <li key={person.name}>{person.name}</li>
-      ))}
-    </ul>
-  )
+function PostsPage() {
+  const posts = Route.useLoaderData()
+  return <PostList posts={posts} />
 }
 ```
 
-Loaders simplify your data fetching logic dramatically. Check out more information in the [Loader documentation](https://tanstack.com/router/latest/docs/framework/react/guide/data-loading#loader-parameters).
+### 使用 TanStack Query
 
-# Demo files
+```tsx
+import { useQuery } from '@tanstack/react-query'
 
-Files prefixed with `demo` can be safely deleted. They are there to provide a starting point for you to play around with the features you've installed.
+const { data, isLoading } = useQuery({
+  queryKey: ['posts'],
+  queryFn: fetchPosts,
+})
+```
 
-# Learn More
+## 认证系统
 
-You can learn more about all of the offerings from TanStack in the [TanStack documentation](https://tanstack.com).
+Better Auth 提供完整的认证解决方案：
 
-For TanStack Start specific documentation, visit [TanStack Start](https://tanstack.com/start).
+1. 配置认证服务 `src/lib/auth.ts`
+2. 创建认证客户端
+3. 使用 React Hooks 管理登录状态
+
+详细配置请参考 [Better Auth 文档](https://www.better-auth.com)。
+
+## UI 组件
+
+使用 Shadcn/UI 添加组件：
+
+```bash
+pnpm dlx shadcn@latest add button
+pnpm dlx shadcn@latest add card
+pnpm dlx shadcn@latest add dialog
+```
+
+组件自动安装到 `src/components/ui/`。
+
+## 测试
+
+运行测试：
+
+```bash
+pnpm test
+```
+
+测试文件位于 `__tests__/` 目录或在源文件旁创建 `.test.ts` 文件。
+
+## 部署
+
+构建生产版本：
+
+```bash
+pnpm build
+```
+
+输出目录为 `dist/`。
+
+## 学习资源
+
+- [TanStack Start 文档](https://tanstack.com/start)
+- [TanStack Router 文档](https://tanstack.com/router)
+- [TanStack Query 文档](https://tanstack.com/query)
+- [Prisma 文档](https://www.prisma.io/docs)
+- [Better Auth 文档](https://www.better-auth.com)
+- [Shadcn/UI 文档](https://ui.shadcn.com)
+
+---
+
+由 TanStack Start 模板创建。

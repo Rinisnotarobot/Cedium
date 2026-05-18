@@ -2,62 +2,65 @@ import {
   HeadContent,
   Scripts,
   createRootRouteWithContext,
-} from '@tanstack/react-router'
-import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
-import { TanStackDevtools } from '@tanstack/react-devtools'
-import { TooltipProvider } from '#/components/ui/tooltip'
-import { Toaster } from '#/components/ui/sonner'
+} from "@tanstack/react-router";
+import { TanStackRouterDevtoolsPanel } from "@tanstack/react-router-devtools";
+import { TanStackDevtools } from "@tanstack/react-devtools";
+import { TooltipProvider } from "#/components/ui/tooltip";
+import { Toaster } from "#/components/ui/sonner";
 
-import appCss from '../styles.css?url'
+import appCss from "../styles.css?url";
 
-import type { QueryClient } from '@tanstack/react-query'
+import type { QueryClient } from "@tanstack/react-query";
+import { ThemeProvider } from "#/components/theme-provider";
 
 interface MyRouterContext {
-  queryClient: QueryClient
+  queryClient: QueryClient;
 }
 
 export const Route = createRootRouteWithContext<MyRouterContext>()({
   head: () => ({
     meta: [
       {
-        charSet: 'utf-8',
+        charSet: "utf-8",
       },
       {
-        name: 'viewport',
-        content: 'width=device-width, initial-scale=1',
+        name: "viewport",
+        content: "width=device-width, initial-scale=1",
       },
       {
-        title: 'Cedium',
+        title: "Cedium",
       },
     ],
     links: [
       {
-        rel: 'stylesheet',
+        rel: "stylesheet",
         href: appCss,
       },
     ],
   }),
   shellComponent: RootDocument,
-})
+});
 
 function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <HeadContent />
       </head>
       <body>
         <TooltipProvider>
-          {children}
+          <ThemeProvider defaultTheme="system" storageKey="theme">
+            {children}
+          </ThemeProvider>
         </TooltipProvider>
         <Toaster />
         <TanStackDevtools
           config={{
-            position: 'bottom-right',
+            position: "bottom-right",
           }}
           plugins={[
             {
-              name: 'Tanstack Router',
+              name: "Tanstack Router",
               render: <TanStackRouterDevtoolsPanel />,
             },
           ]}
@@ -65,5 +68,5 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
-  )
+  );
 }

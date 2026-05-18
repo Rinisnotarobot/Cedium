@@ -6,6 +6,7 @@ import { Link } from "@tanstack/react-router";
 import { Button } from "#/components/ui/button.tsx";
 import { Input } from "#/components/ui/input.tsx";
 import { SidebarTrigger } from "#/components/ui/sidebar.tsx";
+import { ModeToggle } from "#/components/mode-toggle.tsx";
 import {
   Avatar,
   AvatarFallback,
@@ -56,6 +57,7 @@ export const Navbar = ({ className, ...props }: NavbarProps) => {
 
         {/* Right */}
         <div className="flex items-center gap-3">
+          <ModeToggle />
           {isPending ? (
             <div className="h-8 w-8 rounded-full bg-muted animate-pulse" />
           ) : session?.user ? (
