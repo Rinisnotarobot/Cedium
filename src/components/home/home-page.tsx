@@ -38,11 +38,6 @@ export function HomePage() {
                     <ArrowRight className="size-4 transition-transform group-hover:translate-x-1" />
                   </Link>
                 </Button>
-                <Button variant="outline" size="lg" asChild>
-                  <Link to="/login">
-                    登录
-                  </Link>
-                </Button>
               </div>
             </div>
 
