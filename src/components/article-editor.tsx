@@ -1,11 +1,43 @@
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import type { Content } from "@tiptap/react"
 import { MinimalTiptapEditor } from "#/components/ui/minimal-tiptap"
 import { useIsBreakpoint } from "#/hooks/use-is-breakpoint"
+import { useThrottledCallback } from "#/hooks/use-throttled-callback"
+
+const DRAFT_KEY = "cedium_draft"
+
+function loadDraft(): Content {
+  try {
+    const draft = localStorage.getItem(DRAFT_KEY)
+    return draft || ""
+  } catch {
+    return ""
+  }
+}
+
+function saveDraft(content: Content): void {
+  try {
+    if (typeof content === "string") {
+      localStorage.setItem(DRAFT_KEY, content)
+    }
+  } catch {
+    // localStorage may be unavailable or full
+  }
+}
 
 export function ArticleEditor() {
-  const [content, setContent] = useState<Content>("")
+  const [content, setContent] = useState<Content>(loadDraft)
   const isLargeScreen = useIsBreakpoint("min", 1024)
+
+  const throttledSave = useThrottledCallback(
+    (value: Content) => saveDraft(value),
+    500,
+    []
+  )
+
+  useEffect(() => {
+    throttledSave(content)
+  }, [content, throttledSave])
 
   return (
     <div className="flex flex-col h-full">
