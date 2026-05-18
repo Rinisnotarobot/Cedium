@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Search, LogOut, PenLine } from "lucide-react";
+import { Search, LogOut, PenLine, Send } from "lucide-react";
 import { Link, useLocation } from "@tanstack/react-router";
 import { Button } from "#/components/ui/button.tsx";
 import { Input } from "#/components/ui/input.tsx";
@@ -62,11 +62,12 @@ export const Navbar = ({ className, ...props }: NavbarProps) => {
         {/* Right */}
         <div className="flex items-center gap-3">
           {isWriteRoute ? (
-            <Button size="sm" disabled={!hasContent}>
+            <Button size="default" disabled={!hasContent}>
+              <Send className="size-4 mr-1" />
               发布
             </Button>
           ) : (
-            <Button size="sm" asChild>
+            <Button size="default" asChild>
               <Link to="/write">
                 <PenLine className="size-4 mr-1" />
                 写作
