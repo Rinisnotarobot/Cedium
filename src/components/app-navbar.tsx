@@ -22,7 +22,7 @@ import {
 } from "#/components/ui/dropdown-menu.tsx";
 import { cn } from "#/lib/utils.ts";
 import { authClient } from "#/lib/auth-client.ts";
-import { useHasContent } from "#/components/editor-context";
+import { useHasContent } from "#/components/editor";
 
 export interface NavbarProps extends React.HTMLAttributes<HTMLElement> {}
 

@@ -14,17 +14,17 @@ import {
 
 const items = [
   {
-    title: "Home",
+    title: "首页",
     icon: Home,
     to: "/",
   },
   {
-    title: "Write",
+    title: "写作",
     icon: PenSquare,
     to: "/write",
   },
   {
-    title: "Profile",
+    title: "个人",
     icon: User,
     to: "/profile",
   },
@@ -35,7 +35,7 @@ export function AppSidebar() {
     <Sidebar collapsible="icon">
       <SidebarContent>
         <SidebarGroup>
-          <SidebarGroupLabel>Navigation</SidebarGroupLabel>
+          <SidebarGroupLabel>导航</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
               {items.map((item) => (

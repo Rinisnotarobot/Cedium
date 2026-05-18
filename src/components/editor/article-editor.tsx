@@ -3,28 +3,8 @@ import type { Content } from "@tiptap/react"
 import { MinimalTiptapEditor } from "#/components/ui/minimal-tiptap"
 import { useIsBreakpoint } from "#/hooks/use-is-breakpoint"
 import { useThrottledCallback } from "#/hooks/use-throttled-callback"
-import { useEditorContent } from "#/components/editor-context"
-
-const DRAFT_KEY = "cedium_draft"
-
-function loadDraft(): Content {
-  try {
-    const draft = localStorage.getItem(DRAFT_KEY)
-    return draft || ""
-  } catch {
-    return ""
-  }
-}
-
-function saveDraft(content: Content): void {
-  try {
-    if (typeof content === "string") {
-      localStorage.setItem(DRAFT_KEY, content)
-    }
-  } catch {
-    // localStorage may be unavailable or full
-  }
-}
+import { useEditorContent } from "./context"
+import { loadDraft, saveDraft } from "./draft-storage"
 
 export function ArticleEditor() {
   const [content, setContent] = useEditorContent()
@@ -37,7 +17,6 @@ export function ArticleEditor() {
   )
 
   useEffect(() => {
-    // Load draft on mount
     const draft = loadDraft()
     if (draft) {
       setContent(draft)
