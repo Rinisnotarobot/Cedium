@@ -36,11 +36,8 @@ function getSidebarStateFromCookie(): boolean {
   if (typeof document === "undefined") return true;
   const cookies = document.cookie.split("; ");
   const sidebarCookie = cookies.find((c) => c.startsWith(`${SIDEBAR_COOKIE_NAME}=`));
-  if (sidebarCookie) {
-    const value = sidebarCookie.split("=")[1];
-    return value === "true";
-  }
-  return true;
+  if (!sidebarCookie) return true;
+  return sidebarCookie.split("=")[1] === "true";
 }
 
 type SidebarContextProps = {
@@ -65,7 +62,7 @@ function useSidebar() {
 }
 
 function SidebarProvider({
-  defaultOpen,
+  defaultOpen = true,
   open: openProp,
   onOpenChange: setOpenProp,
   className,
@@ -80,9 +77,8 @@ function SidebarProvider({
   const isMobile = useIsMobile();
   const [openMobile, setOpenMobile] = React.useState(false);
 
-  // Read from cookie if defaultOpen is not provided
-  const initialOpen = defaultOpen ?? getSidebarStateFromCookie();
-  const [_open, _setOpen] = React.useState(initialOpen);
+  // Read initial state from cookie, fallback to defaultOpen
+  const [_open, _setOpen] = React.useState(() => getSidebarStateFromCookie());
   const open = openProp ?? _open;
   const setOpen = React.useCallback(
     (value: boolean | ((value: boolean) => boolean)) => {
