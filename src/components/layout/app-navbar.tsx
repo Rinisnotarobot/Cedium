@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Search, LogOut, PenLine, Send } from "lucide-react";
+import { Search, LogOut, PenLine, Send, Menu } from "lucide-react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Button } from "#/components/ui/button.tsx";
 import { Input } from "#/components/ui/input.tsx";
@@ -41,7 +41,7 @@ export const Navbar = ({ className, ...props }: NavbarProps) => {
   return (
     <nav
       className={cn(
-        "sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 px-4 md:px-6",
+        "sticky top-0 z-50 w-full bg-background/95 backdrop-blur supports-backdrop-filter:bg-background/60 px-4 ",
         className,
       )}
       {...props}
@@ -50,6 +50,7 @@ export const Navbar = ({ className, ...props }: NavbarProps) => {
         {/* Left */}
         <div className="flex items-center gap-2">
           <SidebarTrigger />
+
           <span className="text-xl font-bold text-foreground">Cedium</span>
         </div>
 
