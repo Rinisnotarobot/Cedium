@@ -3,6 +3,7 @@ import "./styles/index.css"
 import type { Content, Editor } from "@tiptap/react"
 import type { UseMinimalTiptapEditorProps } from "./hooks/use-minimal-tiptap"
 import { EditorContent, EditorContext } from "@tiptap/react"
+import { Trash2 } from "lucide-react"
 import { Separator } from "#/components/ui/separator.tsx"
 import { cn } from "#/lib/utils.ts"
 import { SectionOne } from "./components/section/one"
@@ -14,6 +15,7 @@ import { LinkBubbleMenu } from "./components/bubble-menu/link-bubble-menu"
 import { useMinimalTiptapEditor } from "./hooks/use-minimal-tiptap"
 import { MeasuredContainer } from "./components/measured-container"
 import { useTiptapEditor } from "./hooks/use-tiptap-editor"
+import { ToolbarButton } from "./components/toolbar-button"
 
 export interface MinimalTiptapProps extends Omit<
   UseMinimalTiptapEditorProps,
@@ -21,13 +23,14 @@ export interface MinimalTiptapProps extends Omit<
 > {
   value?: Content
   onChange?: (value: Content) => void
+  onClear?: () => void
   className?: string
   editorContentClassName?: string
   /** Toolbar variant: "full" shows all sections, "minimal" shows only basic formatting */
   toolbarVariant?: "full" | "minimal"
 }
 
-const FullToolbar = ({ editor }: { editor: Editor }) => (
+const FullToolbar = ({ editor, onClear }: { editor: Editor; onClear?: () => void }) => (
   <div className="border-border flex h-12 shrink-0 overflow-x-auto border-b p-2">
     <div className="flex w-max items-center gap-px">
       <SectionOne editor={editor} activeLevels={[1, 2, 3, 4, 5, 6]} />
@@ -66,11 +69,24 @@ const FullToolbar = ({ editor }: { editor: Editor }) => (
         activeActions={["codeBlock", "blockquote", "horizontalRule"]}
         mainActionCount={0}
       />
+
+      {onClear && (
+        <>
+          <Separator orientation="vertical" className="mx-2" />
+          <ToolbarButton
+            onClick={onClear}
+            tooltip="清空内容"
+            aria-label="清空内容"
+          >
+            <Trash2 className="size-4" />
+          </ToolbarButton>
+        </>
+      )}
     </div>
   </div>
 )
 
-const MinimalToolbar = ({ editor }: { editor: Editor }) => (
+const MinimalToolbar = ({ editor, onClear }: { editor: Editor; onClear?: () => void }) => (
   <div className="border-border flex h-12 shrink-0 overflow-x-auto border-b p-2">
     <div className="flex w-max items-center gap-px">
       <SectionTwo
@@ -78,6 +94,19 @@ const MinimalToolbar = ({ editor }: { editor: Editor }) => (
         activeActions={["bold", "italic", "underline"]}
         mainActionCount={3}
       />
+
+      {onClear && (
+        <>
+          <Separator orientation="vertical" className="mx-2" />
+          <ToolbarButton
+            onClick={onClear}
+            tooltip="清空内容"
+            aria-label="清空内容"
+          >
+            <Trash2 className="size-4" />
+          </ToolbarButton>
+        </>
+      )}
     </div>
   </div>
 )
@@ -85,6 +114,7 @@ const MinimalToolbar = ({ editor }: { editor: Editor }) => (
 export const MinimalTiptapEditor = ({
   value,
   onChange,
+  onClear,
   className,
   editorContentClassName,
   toolbarVariant = "full",
@@ -107,6 +137,7 @@ export const MinimalTiptapEditor = ({
         className={className}
         editorContentClassName={editorContentClassName}
         toolbarVariant={toolbarVariant}
+        onClear={onClear}
       />
     </EditorContext.Provider>
   )
@@ -121,6 +152,7 @@ export const MainMinimalTiptapEditor = ({
   className,
   editorContentClassName,
   toolbarVariant = "full",
+  onClear,
 }: MinimalTiptapProps & { editor: Editor }) => {
   const { editor } = useTiptapEditor(providedEditor)
 
@@ -140,7 +172,7 @@ export const MainMinimalTiptapEditor = ({
         className
       )}
     >
-      <Toolbar editor={editor} />
+      <Toolbar editor={editor} onClear={onClear} />
       <EditorContent
         editor={editor}
         className={cn("minimal-tiptap-editor", editorContentClassName)}

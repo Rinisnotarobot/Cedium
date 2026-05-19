@@ -268,6 +268,13 @@ export const useMinimalTiptapEditor = ({
     ...props,
   })
 
+  // Sync external clear operation to editor
+  React.useEffect(() => {
+    if (editor && value === "" && !editor.isEmpty) {
+      editor.commands.clearContent()
+    }
+  }, [editor, value])
+
   return editor
 }
 
