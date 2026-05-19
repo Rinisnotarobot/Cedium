@@ -1,7 +1,8 @@
 import { useForm } from '@tanstack/react-form'
 import { authClient } from '#/lib/auth-client'
-import { loginSchema } from '#/lib/validators/auth'
-import { useNavigate, Link, useSearch } from '@tanstack/react-router'
+import { forgotPasswordSchema } from '#/lib/validators/auth'
+import { Link } from '@tanstack/react-router'
+import { toast } from 'sonner'
 import { cn } from '#/lib/utils'
 import { Button } from '#/components/ui/button'
 import {
@@ -20,34 +21,32 @@ import {
 } from '#/components/ui/field'
 import { Input } from '#/components/ui/input'
 
-export function LoginForm({
+export interface ForgotPasswordFormProps
+  extends React.ComponentProps<'div'> {}
+
+export function ForgotPasswordForm({
   className,
   ...props
-}: React.ComponentProps<'div'>) {
-  const navigate = useNavigate()
-  const search = useSearch({ from: '/_auth/login' })
-
+}: ForgotPasswordFormProps) {
   const form = useForm({
     defaultValues: {
       email: '',
-      password: '',
     },
     validators: {
-      onChange: loginSchema,
+      onChange: forgotPasswordSchema,
     },
     onSubmit: async ({ value }) => {
-      const { data, error } = await authClient.signIn.email({
+      const { error } = await authClient.requestPasswordReset({
         email: value.email,
-        password: value.password,
+        redirectTo: '/reset-password',
       })
 
       if (error) {
+        toast.error(error.message ?? '发送失败，请稍后重试')
         return
       }
 
-      if (data) {
-        navigate({ to: search.redirect ?? '/articles' })
-      }
+      toast.success('重置链接已发送到您的邮箱')
     },
   })
 
@@ -55,8 +54,8 @@ export function LoginForm({
     <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader>
-          <CardTitle>登录账户</CardTitle>
-          <CardDescription>输入您的邮箱和密码登录</CardDescription>
+          <CardTitle>忘记密码</CardTitle>
+          <CardDescription>输入您的邮箱，我们将发送重置链接</CardDescription>
         </CardHeader>
         <CardContent>
           <form
@@ -82,32 +81,9 @@ export function LoginForm({
                     {field.state.meta.errors.length > 0 && (
                       <FieldError errors={field.state.meta.errors} />
                     )}
-                  </Field>
-                )}
-              </form.Field>
-
-              <form.Field name="password">
-                {(field) => (
-                  <Field>
-                    <div className="flex items-center">
-                      <FieldLabel htmlFor="password">密码</FieldLabel>
-                      <Link
-                        to="/forgot-password"
-                        className="ml-auto inline-block text-sm underline-offset-4 hover:underline"
-                      >
-                        忘记密码？
-                      </Link>
-                    </div>
-                    <Input
-                      id="password"
-                      type="password"
-                      value={field.state.value}
-                      onBlur={field.handleBlur}
-                      onChange={(e) => field.handleChange(e.target.value)}
-                    />
-                    {field.state.meta.errors.length > 0 && (
-                      <FieldError errors={field.state.meta.errors} />
-                    )}
+                    <FieldDescription>
+                      我们将向您发送密码重置链接
+                    </FieldDescription>
                   </Field>
                 )}
               </form.Field>
@@ -118,10 +94,10 @@ export function LoginForm({
                 {([canSubmit, isSubmitting]) => (
                   <Field>
                     <Button type="submit" disabled={!canSubmit || isSubmitting}>
-                      {isSubmitting ? '登录中...' : '登录'}
+                      {isSubmitting ? '发送中...' : '发送重置链接'}
                     </Button>
                     <FieldDescription className="text-center">
-                      没有账户？ <Link to="/sign-up">注册</Link>
+                      想起密码了？ <Link to="/login">返回登录</Link>
                     </FieldDescription>
                   </Field>
                 )}
