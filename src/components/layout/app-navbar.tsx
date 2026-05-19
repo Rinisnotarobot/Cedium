@@ -51,7 +51,9 @@ export const Navbar = ({ className, ...props }: NavbarProps) => {
         <div className="flex items-center gap-2">
           <SidebarTrigger />
 
-          <span className="text-xl font-bold text-foreground">Cedium</span>
+          <Link to="/" className="text-xl font-bold text-foreground hover:text-foreground/80 transition-colors">
+            Cedium
+          </Link>
         </div>
 
         {/* Center: Search */}

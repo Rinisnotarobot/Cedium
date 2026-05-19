@@ -1,4 +1,4 @@
-import { Home, PenSquare, User } from "lucide-react";
+import { BookOpen, PenSquare, User } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
 import {
@@ -14,9 +14,9 @@ import {
 
 const items = [
   {
-    title: "首页",
-    icon: Home,
-    to: "/",
+    title: "文章",
+    icon: BookOpen,
+    to: "/articles",
   },
   {
     title: "写作",
