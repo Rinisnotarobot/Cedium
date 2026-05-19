@@ -1,28 +1,27 @@
-import { useForm } from '@tanstack/react-form'
-import { authClient } from '#/lib/auth-client'
-import { forgotPasswordSchema } from '#/lib/validators/auth'
-import { Link } from '@tanstack/react-router'
-import { toast } from 'sonner'
-import { cn } from '#/lib/utils'
-import { Button } from '#/components/ui/button'
+import { useForm } from "@tanstack/react-form";
+import { authClient } from "#/lib/auth-client";
+import { forgotPasswordSchema } from "#/lib/validators/auth";
+import { Link } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { cn } from "#/lib/utils";
+import { Button } from "#/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '#/components/ui/card'
+} from "#/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from '#/components/ui/field'
-import { Input } from '#/components/ui/input'
+} from "#/components/ui/field";
+import { Input } from "#/components/ui/input";
 
-export interface ForgotPasswordFormProps
-  extends React.ComponentProps<'div'> {}
+export interface ForgotPasswordFormProps extends React.ComponentProps<"div"> {}
 
 export function ForgotPasswordForm({
   className,
@@ -30,7 +29,7 @@ export function ForgotPasswordForm({
 }: ForgotPasswordFormProps) {
   const form = useForm({
     defaultValues: {
-      email: '',
+      email: "",
     },
     validators: {
       onChange: forgotPasswordSchema,
@@ -38,20 +37,20 @@ export function ForgotPasswordForm({
     onSubmit: async ({ value }) => {
       const { error } = await authClient.requestPasswordReset({
         email: value.email,
-        redirectTo: '/reset-password',
-      })
+        redirectTo: "/reset-password",
+      });
 
       if (error) {
-        toast.error(error.message ?? '发送失败，请稍后重试')
-        return
+        toast.error(error.message ?? "发送失败，请稍后重试");
+        return;
       }
 
-      toast.success('重置链接已发送到您的邮箱')
+      toast.success("重置链接已发送到您的邮箱");
     },
-  })
+  });
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle>忘记密码</CardTitle>
@@ -60,9 +59,9 @@ export function ForgotPasswordForm({
         <CardContent>
           <form
             onSubmit={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              form.handleSubmit()
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
             }}
           >
             <FieldGroup>
@@ -94,7 +93,7 @@ export function ForgotPasswordForm({
                 {([canSubmit, isSubmitting]) => (
                   <Field>
                     <Button type="submit" disabled={!canSubmit || isSubmitting}>
-                      {isSubmitting ? '发送中...' : '发送重置链接'}
+                      {isSubmitting ? "发送中..." : "发送重置链接"}
                     </Button>
                     <FieldDescription className="text-center">
                       想起密码了？ <Link to="/login">返回登录</Link>
@@ -107,5 +106,5 @@ export function ForgotPasswordForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

@@ -1,36 +1,37 @@
-import { useForm } from '@tanstack/react-form'
-import { authClient } from '#/lib/auth-client'
-import { loginSchema } from '#/lib/validators/auth'
-import { useNavigate, Link, useSearch } from '@tanstack/react-router'
-import { cn } from '#/lib/utils'
-import { Button } from '#/components/ui/button'
+import { useForm } from "@tanstack/react-form";
+import { authClient } from "#/lib/auth-client";
+import { loginSchema } from "#/lib/validators/auth";
+import { useNavigate, Link, useSearch } from "@tanstack/react-router";
+import { cn } from "#/lib/utils";
+import { Button } from "#/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '#/components/ui/card'
+} from "#/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from '#/components/ui/field'
-import { Input } from '#/components/ui/input'
+} from "#/components/ui/field";
+import { Input } from "#/components/ui/input";
+import { toast } from "sonner";
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<'div'>) {
-  const navigate = useNavigate()
-  const search = useSearch({ from: '/_auth/login' })
+}: React.ComponentProps<"div">) {
+  const navigate = useNavigate();
+  const search = useSearch({ from: "/_auth/login" });
 
   const form = useForm({
     defaultValues: {
-      email: '',
-      password: '',
+      email: "",
+      password: "",
     },
     validators: {
       onChange: loginSchema,
@@ -39,20 +40,21 @@ export function LoginForm({
       const { data, error } = await authClient.signIn.email({
         email: value.email,
         password: value.password,
-      })
+      });
 
       if (error) {
-        return
+        toast.error(error.message ?? "登录失败，请检查邮箱和密码");
+        return;
       }
 
       if (data) {
-        navigate({ to: search.redirect ?? '/articles' })
+        navigate({ to: search.redirect ?? "/articles" });
       }
     },
-  })
+  });
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle>登录账户</CardTitle>
@@ -61,9 +63,9 @@ export function LoginForm({
         <CardContent>
           <form
             onSubmit={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              form.handleSubmit()
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
             }}
           >
             <FieldGroup>
@@ -118,7 +120,7 @@ export function LoginForm({
                 {([canSubmit, isSubmitting]) => (
                   <Field>
                     <Button type="submit" disabled={!canSubmit || isSubmitting}>
-                      {isSubmitting ? '登录中...' : '登录'}
+                      {isSubmitting ? "登录中..." : "登录"}
                     </Button>
                     <FieldDescription className="text-center">
                       没有账户？ <Link to="/sign-up">注册</Link>
@@ -131,5 +133,5 @@ export function LoginForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

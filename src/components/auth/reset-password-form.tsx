@@ -1,48 +1,47 @@
-import { useForm } from '@tanstack/react-form'
-import { authClient } from '#/lib/auth-client'
-import { resetPasswordSchema } from '#/lib/validators/auth'
-import { useNavigate, useSearch, Link } from '@tanstack/react-router'
-import { toast } from 'sonner'
-import { useEffect, useState } from 'react'
-import { cn } from '#/lib/utils'
-import { Button } from '#/components/ui/button'
+import { useForm } from "@tanstack/react-form";
+import { authClient } from "#/lib/auth-client";
+import { resetPasswordSchema } from "#/lib/validators/auth";
+import { useNavigate, useSearch, Link } from "@tanstack/react-router";
+import { toast } from "sonner";
+import { useEffect, useState } from "react";
+import { cn } from "#/lib/utils";
+import { Button } from "#/components/ui/button";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '#/components/ui/card'
+} from "#/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldError,
   FieldGroup,
   FieldLabel,
-} from '#/components/ui/field'
-import { Input } from '#/components/ui/input'
+} from "#/components/ui/field";
+import { Input } from "#/components/ui/input";
 
-export interface ResetPasswordFormProps
-  extends React.ComponentProps<'div'> {}
+export interface ResetPasswordFormProps extends React.ComponentProps<"div"> {}
 
 export function ResetPasswordForm({
   className,
   ...props
 }: ResetPasswordFormProps) {
-  const navigate = useNavigate()
-  const search = useSearch({ from: '/_auth/reset-password' })
-  const [invalidToken, setInvalidToken] = useState(false)
+  const navigate = useNavigate();
+  const search = useSearch({ from: "/_auth/reset-password" });
+  const [invalidToken, setInvalidToken] = useState(false);
 
   useEffect(() => {
     if (!search.token) {
-      setInvalidToken(true)
+      setInvalidToken(true);
     }
-  }, [search.token])
+  }, [search.token]);
 
   const form = useForm({
     defaultValues: {
-      password: '',
-      confirmPassword: '',
+      password: "",
+      confirmPassword: "",
     },
     validators: {
       onChange: resetPasswordSchema,
@@ -51,32 +50,33 @@ export function ResetPasswordForm({
       const { data, error } = await authClient.resetPassword({
         newPassword: value.password,
         token: search.token,
-      })
+      });
 
       if (error) {
-        if (error.message?.includes('invalid') || error.message?.includes('expired')) {
-          setInvalidToken(true)
+        if (
+          error.message?.includes("invalid") ||
+          error.message?.includes("expired")
+        ) {
+          setInvalidToken(true);
         }
-        toast.error(error.message ?? '重置失败，请稍后重试')
-        return
+        toast.error(error.message ?? "重置失败，请稍后重试");
+        return;
       }
 
       if (data) {
-        toast.success('密码已重置，请登录')
-        navigate({ to: '/login' })
+        toast.success("密码已重置，请登录");
+        navigate({ to: "/login" });
       }
     },
-  })
+  });
 
   if (invalidToken) {
     return (
-      <div className={cn('flex flex-col gap-6', className)} {...props}>
+      <div className={cn("flex flex-col gap-6", className)} {...props}>
         <Card>
           <CardHeader>
             <CardTitle>链接无效或已过期</CardTitle>
-            <CardDescription>
-              该重置链接已失效，请重新申请
-            </CardDescription>
+            <CardDescription>该重置链接已失效，请重新申请</CardDescription>
           </CardHeader>
           <CardContent>
             <FieldGroup>
@@ -89,11 +89,11 @@ export function ResetPasswordForm({
           </CardContent>
         </Card>
       </div>
-    )
+    );
   }
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader>
           <CardTitle>重置密码</CardTitle>
@@ -102,9 +102,9 @@ export function ResetPasswordForm({
         <CardContent>
           <form
             onSubmit={(e) => {
-              e.preventDefault()
-              e.stopPropagation()
-              form.handleSubmit()
+              e.preventDefault();
+              e.stopPropagation();
+              form.handleSubmit();
             }}
           >
             <FieldGroup>
@@ -151,7 +151,7 @@ export function ResetPasswordForm({
                 {([canSubmit, isSubmitting]) => (
                   <Field>
                     <Button type="submit" disabled={!canSubmit || isSubmitting}>
-                      {isSubmitting ? '重置中...' : '重置密码'}
+                      {isSubmitting ? "重置中..." : "重置密码"}
                     </Button>
                     <FieldDescription className="text-center">
                       想起密码了？ <Link to="/login">返回登录</Link>
@@ -164,5 +164,5 @@ export function ResetPasswordForm({
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }

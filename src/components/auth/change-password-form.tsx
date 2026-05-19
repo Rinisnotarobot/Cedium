@@ -1,8 +1,8 @@
+"use client";
+
 import { useForm } from "@tanstack/react-form";
 import { authClient } from "#/lib/auth-client";
-import { signupSchema } from "#/lib/validators/auth";
-import { useNavigate, Link } from "@tanstack/react-router";
-import { Button } from "#/components/ui/button";
+import { changePasswordSchema } from "#/lib/validators/auth";
 import {
   Card,
   CardContent,
@@ -12,50 +12,61 @@ import {
 } from "#/components/ui/card";
 import {
   Field,
-  FieldDescription,
+  FieldLabel,
   FieldError,
   FieldGroup,
-  FieldLabel,
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
+import { Button } from "#/components/ui/button";
+import { cn } from "#/lib/utils";
 import { toast } from "sonner";
 
-export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
-  const navigate = useNavigate();
+export interface ChangePasswordFormProps extends React.ComponentProps<
+  typeof Card
+> {
+  onSuccess?: () => void;
+}
 
+export function ChangePasswordForm({
+  className,
+  onSuccess,
+  ...props
+}: ChangePasswordFormProps) {
   const form = useForm({
     defaultValues: {
-      name: "",
-      email: "",
-      password: "",
+      currentPassword: "",
+      newPassword: "",
       confirmPassword: "",
     },
     validators: {
-      onChange: signupSchema,
+      onChange: changePasswordSchema,
     },
     onSubmit: async ({ value }) => {
-      const { data, error } = await authClient.signUp.email({
-        name: value.name,
-        email: value.email,
-        password: value.password,
+      const { data, error } = await authClient.changePassword({
+        currentPassword: value.currentPassword,
+        newPassword: value.newPassword,
       });
 
       if (error) {
-        toast.error(error.message ?? "注册失败，请稍后重试");
+        toast.error(error.message ?? "密码修改失败，请检查当前密码是否正确");
         return;
       }
 
       if (data) {
-        navigate({ to: "/" });
+        toast.success("密码已修改");
+        form.reset();
+        onSuccess?.();
       }
     },
   });
 
   return (
-    <Card {...props}>
+    <Card className={cn("w-full border-0 shadow-none", className)} {...props}>
       <CardHeader>
-        <CardTitle>创建账户</CardTitle>
-        <CardDescription>输入您的信息创建账户</CardDescription>
+        <CardTitle>修改密码</CardTitle>
+        <CardDescription>
+          请输入当前密码验证身份，然后设置新密码
+        </CardDescription>
       </CardHeader>
       <CardContent>
         <form
@@ -66,59 +77,37 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
           }}
         >
           <FieldGroup>
-            <form.Field name="name">
+            <form.Field name="currentPassword">
               {(field) => (
                 <Field>
-                  <FieldLabel htmlFor="name">姓名</FieldLabel>
+                  <FieldLabel htmlFor="currentPassword">当前密码</FieldLabel>
                   <Input
-                    id="name"
-                    type="text"
-                    placeholder="张三"
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  {field.state.meta.errors.length > 0 && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
-                </Field>
-              )}
-            </form.Field>
-
-            <form.Field name="email">
-              {(field) => (
-                <Field>
-                  <FieldLabel htmlFor="email">邮箱</FieldLabel>
-                  <Input
-                    id="email"
-                    type="email"
-                    placeholder="m@example.com"
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
-                  <FieldDescription>
-                    我们不会与他人分享您的邮箱
-                  </FieldDescription>
-                  {field.state.meta.errors.length > 0 && (
-                    <FieldError errors={field.state.meta.errors} />
-                  )}
-                </Field>
-              )}
-            </form.Field>
-
-            <form.Field name="password">
-              {(field) => (
-                <Field>
-                  <FieldLabel htmlFor="password">密码</FieldLabel>
-                  <Input
-                    id="password"
+                    id="currentPassword"
                     type="password"
+                    placeholder="输入当前密码"
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
                   />
-                  <FieldDescription>至少8个字符</FieldDescription>
+                  {field.state.meta.errors.length > 0 && (
+                    <FieldError errors={field.state.meta.errors} />
+                  )}
+                </Field>
+              )}
+            </form.Field>
+
+            <form.Field name="newPassword">
+              {(field) => (
+                <Field>
+                  <FieldLabel htmlFor="newPassword">新密码</FieldLabel>
+                  <Input
+                    id="newPassword"
+                    type="password"
+                    placeholder="输入新密码"
+                    value={field.state.value}
+                    onBlur={field.handleBlur}
+                    onChange={(e) => field.handleChange(e.target.value)}
+                  />
                   {field.state.meta.errors.length > 0 && (
                     <FieldError errors={field.state.meta.errors} />
                   )}
@@ -129,10 +118,11 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
             <form.Field name="confirmPassword">
               {(field) => (
                 <Field>
-                  <FieldLabel htmlFor="confirm-password">确认密码</FieldLabel>
+                  <FieldLabel htmlFor="confirmPassword">确认新密码</FieldLabel>
                   <Input
-                    id="confirm-password"
+                    id="confirmPassword"
                     type="password"
+                    placeholder="再次输入新密码"
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
@@ -148,16 +138,15 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               selector={(state) => [state.canSubmit, state.isSubmitting]}
             >
               {([canSubmit, isSubmitting]) => (
-                <FieldGroup>
-                  <Field>
-                    <Button type="submit" disabled={!canSubmit || isSubmitting}>
-                      {isSubmitting ? "创建中..." : "创建账户"}
-                    </Button>
-                    <FieldDescription className="px-6 text-center">
-                      已有账户？ <Link to="/login">登录</Link>
-                    </FieldDescription>
-                  </Field>
-                </FieldGroup>
+                <Field>
+                  <Button
+                    type="submit"
+                    disabled={!canSubmit || isSubmitting}
+                    className="w-full"
+                  >
+                    {isSubmitting ? "修改中..." : "修改密码"}
+                  </Button>
+                </Field>
               )}
             </form.Subscribe>
           </FieldGroup>

@@ -17,6 +17,7 @@ import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-pass
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AppWriteRouteImport } from './routes/_app/write'
+import { Route as AppVerifyEmailRouteImport } from './routes/_app/verify-email'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as AppArticlesRouteImport } from './routes/_app/articles'
 import { Route as ApiUploadAvatarRouteImport } from './routes/api/upload/avatar'
@@ -60,6 +61,11 @@ const AppWriteRoute = AppWriteRouteImport.update({
   path: '/write',
   getParentRoute: () => AppRoute,
 } as any)
+const AppVerifyEmailRoute = AppVerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppProfileRoute = AppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
@@ -85,6 +91,7 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/articles': typeof AppArticlesRoute
   '/profile': typeof AppProfileRoute
+  '/verify-email': typeof AppVerifyEmailRoute
   '/write': typeof AppWriteRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
@@ -97,6 +104,7 @@ export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/articles': typeof AppArticlesRoute
   '/profile': typeof AppProfileRoute
+  '/verify-email': typeof AppVerifyEmailRoute
   '/write': typeof AppWriteRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
@@ -112,6 +120,7 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_app/articles': typeof AppArticlesRoute
   '/_app/profile': typeof AppProfileRoute
+  '/_app/verify-email': typeof AppVerifyEmailRoute
   '/_app/write': typeof AppWriteRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
@@ -126,6 +135,7 @@ export interface FileRouteTypes {
     | '/'
     | '/articles'
     | '/profile'
+    | '/verify-email'
     | '/write'
     | '/forgot-password'
     | '/login'
@@ -138,6 +148,7 @@ export interface FileRouteTypes {
     | '/'
     | '/articles'
     | '/profile'
+    | '/verify-email'
     | '/write'
     | '/forgot-password'
     | '/login'
@@ -152,6 +163,7 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_app/articles'
     | '/_app/profile'
+    | '/_app/verify-email'
     | '/_app/write'
     | '/_auth/forgot-password'
     | '/_auth/login'
@@ -227,6 +239,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWriteRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/verify-email': {
+      id: '/_app/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof AppVerifyEmailRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/profile': {
       id: '/_app/profile'
       path: '/profile'
@@ -279,12 +298,14 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 interface AppRouteChildren {
   AppArticlesRoute: typeof AppArticlesRoute
   AppProfileRoute: typeof AppProfileRoute
+  AppVerifyEmailRoute: typeof AppVerifyEmailRoute
   AppWriteRoute: typeof AppWriteRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppArticlesRoute: AppArticlesRoute,
   AppProfileRoute: AppProfileRoute,
+  AppVerifyEmailRoute: AppVerifyEmailRoute,
   AppWriteRoute: AppWriteRoute,
 }
 
