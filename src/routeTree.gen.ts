@@ -13,10 +13,14 @@ import { Route as AppRouteImport } from './routes/_app'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
+import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
+import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AppWriteRouteImport } from './routes/_app/write'
+import { Route as AppVerifyEmailRouteImport } from './routes/_app/verify-email'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
 import { Route as AppArticlesRouteImport } from './routes/_app/articles'
+import { Route as ApiUploadAvatarRouteImport } from './routes/api/upload/avatar'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
 const AppRoute = AppRouteImport.update({
@@ -37,14 +41,29 @@ const AuthSignUpRoute = AuthSignUpRouteImport.update({
   path: '/sign-up',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AuthResetPasswordRoute = AuthResetPasswordRouteImport.update({
+  id: '/reset-password',
+  path: '/reset-password',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 const AuthLoginRoute = AuthLoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => AuthRouteRoute,
 } as any)
+const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => AuthRouteRoute,
+} as any)
 const AppWriteRoute = AppWriteRouteImport.update({
   id: '/write',
   path: '/write',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppVerifyEmailRoute = AppVerifyEmailRouteImport.update({
+  id: '/verify-email',
+  path: '/verify-email',
   getParentRoute: () => AppRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
@@ -57,6 +76,11 @@ const AppArticlesRoute = AppArticlesRouteImport.update({
   path: '/articles',
   getParentRoute: () => AppRoute,
 } as any)
+const ApiUploadAvatarRoute = ApiUploadAvatarRouteImport.update({
+  id: '/api/upload/avatar',
+  path: '/api/upload/avatar',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
@@ -67,19 +91,27 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/articles': typeof AppArticlesRoute
   '/profile': typeof AppProfileRoute
+  '/verify-email': typeof AppVerifyEmailRoute
   '/write': typeof AppWriteRoute
+  '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
+  '/reset-password': typeof AuthResetPasswordRoute
   '/sign-up': typeof AuthSignUpRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/upload/avatar': typeof ApiUploadAvatarRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/articles': typeof AppArticlesRoute
   '/profile': typeof AppProfileRoute
+  '/verify-email': typeof AppVerifyEmailRoute
   '/write': typeof AppWriteRoute
+  '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
+  '/reset-password': typeof AuthResetPasswordRoute
   '/sign-up': typeof AuthSignUpRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/upload/avatar': typeof ApiUploadAvatarRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,10 +120,14 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteWithChildren
   '/_app/articles': typeof AppArticlesRoute
   '/_app/profile': typeof AppProfileRoute
+  '/_app/verify-email': typeof AppVerifyEmailRoute
   '/_app/write': typeof AppWriteRoute
+  '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
+  '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
+  '/api/upload/avatar': typeof ApiUploadAvatarRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -99,19 +135,27 @@ export interface FileRouteTypes {
     | '/'
     | '/articles'
     | '/profile'
+    | '/verify-email'
     | '/write'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/sign-up'
     | '/api/auth/$'
+    | '/api/upload/avatar'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/articles'
     | '/profile'
+    | '/verify-email'
     | '/write'
+    | '/forgot-password'
     | '/login'
+    | '/reset-password'
     | '/sign-up'
     | '/api/auth/$'
+    | '/api/upload/avatar'
   id:
     | '__root__'
     | '/'
@@ -119,10 +163,14 @@ export interface FileRouteTypes {
     | '/_app'
     | '/_app/articles'
     | '/_app/profile'
+    | '/_app/verify-email'
     | '/_app/write'
+    | '/_auth/forgot-password'
     | '/_auth/login'
+    | '/_auth/reset-password'
     | '/_auth/sign-up'
     | '/api/auth/$'
+    | '/api/upload/avatar'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -130,6 +178,7 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   AppRoute: typeof AppRouteWithChildren
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
+  ApiUploadAvatarRoute: typeof ApiUploadAvatarRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -162,6 +211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthSignUpRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/_auth/reset-password': {
+      id: '/_auth/reset-password'
+      path: '/reset-password'
+      fullPath: '/reset-password'
+      preLoaderRoute: typeof AuthResetPasswordRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
     '/_auth/login': {
       id: '/_auth/login'
       path: '/login'
@@ -169,11 +225,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthLoginRouteImport
       parentRoute: typeof AuthRouteRoute
     }
+    '/_auth/forgot-password': {
+      id: '/_auth/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof AuthForgotPasswordRouteImport
+      parentRoute: typeof AuthRouteRoute
+    }
     '/_app/write': {
       id: '/_app/write'
       path: '/write'
       fullPath: '/write'
       preLoaderRoute: typeof AppWriteRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/verify-email': {
+      id: '/_app/verify-email'
+      path: '/verify-email'
+      fullPath: '/verify-email'
+      preLoaderRoute: typeof AppVerifyEmailRouteImport
       parentRoute: typeof AppRoute
     }
     '/_app/profile': {
@@ -190,6 +260,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppArticlesRouteImport
       parentRoute: typeof AppRoute
     }
+    '/api/upload/avatar': {
+      id: '/api/upload/avatar'
+      path: '/api/upload/avatar'
+      fullPath: '/api/upload/avatar'
+      preLoaderRoute: typeof ApiUploadAvatarRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
@@ -201,12 +278,16 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthRouteRouteChildren {
+  AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
   AuthLoginRoute: typeof AuthLoginRoute
+  AuthResetPasswordRoute: typeof AuthResetPasswordRoute
   AuthSignUpRoute: typeof AuthSignUpRoute
 }
 
 const AuthRouteRouteChildren: AuthRouteRouteChildren = {
+  AuthForgotPasswordRoute: AuthForgotPasswordRoute,
   AuthLoginRoute: AuthLoginRoute,
+  AuthResetPasswordRoute: AuthResetPasswordRoute,
   AuthSignUpRoute: AuthSignUpRoute,
 }
 
@@ -217,12 +298,14 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
 interface AppRouteChildren {
   AppArticlesRoute: typeof AppArticlesRoute
   AppProfileRoute: typeof AppProfileRoute
+  AppVerifyEmailRoute: typeof AppVerifyEmailRoute
   AppWriteRoute: typeof AppWriteRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
   AppArticlesRoute: AppArticlesRoute,
   AppProfileRoute: AppProfileRoute,
+  AppVerifyEmailRoute: AppVerifyEmailRoute,
   AppWriteRoute: AppWriteRoute,
 }
 
@@ -233,6 +316,7 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   AppRoute: AppRouteWithChildren,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
+  ApiUploadAvatarRoute: ApiUploadAvatarRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

@@ -1,7 +1,15 @@
 "use client";
 
 import * as React from "react";
-import { Search, LogOut, PenLine, Send, Menu } from "lucide-react";
+import {
+  Search,
+  LogOut,
+  PenLine,
+  Send,
+  User,
+  FileText,
+  Home,
+} from "lucide-react";
 import { Link, useLocation, useNavigate } from "@tanstack/react-router";
 import { Button } from "#/components/ui/button.tsx";
 import { Input } from "#/components/ui/input.tsx";
@@ -31,6 +39,7 @@ export const Navbar = ({ className, ...props }: NavbarProps) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isWriteRoute = location.pathname === "/write";
+  const isArticlesRoute = location.pathname === "/articles";
   const hasContent = useHasContent();
 
   const handleSignOut = async () => {
@@ -48,24 +57,26 @@ export const Navbar = ({ className, ...props }: NavbarProps) => {
     >
       <div className="flex h-16 items-center justify-between gap-4">
         {/* Left */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-4">
           <SidebarTrigger />
 
-          <Link to="/" className="text-xl font-bold text-foreground hover:text-foreground/80 transition-colors">
+          <Link
+            to="/articles"
+            className="text-xl font-bold text-foreground hover:text-foreground/80 transition-colors"
+          >
             Cedium
           </Link>
-        </div>
 
-        {/* Center: Search */}
-        <div className="flex-1 max-w-md">
-          <div className="relative">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
-            <Input
-              type="search"
-              placeholder="Search..."
-              className="pl-9 w-full"
-            />
-          </div>
+          {isArticlesRoute && (
+            <div className="relative max-w-md">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground size-4" />
+              <Input
+                type="search"
+                placeholder="Search..."
+                className="pl-9 w-full rounded-full"
+              />
+            </div>
+          )}
         </div>
 
         {/* Right */}
@@ -115,6 +126,25 @@ export const Navbar = ({ className, ...props }: NavbarProps) => {
                     </p>
                   </div>
                 </DropdownMenuLabel>
+                <DropdownMenuSeparator />
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link to="/articles">
+                    <Home className="mr-2 h-4 w-4" />
+                    文章列表
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link to="/profile">
+                    <User className="mr-2 h-4 w-4" />
+                    个人资料
+                  </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem asChild className="cursor-pointer">
+                  <Link to="/write">
+                    <FileText className="mr-2 h-4 w-4" />
+                    我的文章
+                  </Link>
+                </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem
                   onClick={handleSignOut}

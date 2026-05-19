@@ -18,6 +18,7 @@
     "db:seed": "dotenv -e .env.local -- prisma db seed"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1048.0",
     "@faker-js/faker": "^10.3.0",
     "@floating-ui/react": "^0.27.19",
     "@mantine/core": "^8.3.18",
@@ -69,6 +70,7 @@
     "react-dom": "^19.2.0",
     "react-hotkeys-hook": "^5.3.2",
     "react-medium-image-zoom": "^5.4.5",
+    "resend": "^6.12.3",
     "sonner": "^2.0.7",
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.1.18",
