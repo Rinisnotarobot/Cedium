@@ -1,13 +1,14 @@
 "use client";
 
 import {
-  BadgeCheck,
   Bell,
   ChevronsUpDown,
   CreditCard,
   LogOut,
   Sparkles,
+  User,
 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
@@ -84,9 +85,11 @@ export function NavUser({
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
             <DropdownMenuGroup>
-              <DropdownMenuItem>
-                <BadgeCheck />
-                Account
+              <DropdownMenuItem asChild>
+                <Link to="/profile">
+                  <User />
+                  个人资料
+                </Link>
               </DropdownMenuItem>
               <DropdownMenuItem>
                 <CreditCard />

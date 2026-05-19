@@ -1,5 +1,9 @@
 import { defineConfig } from 'vite'
 import { devtools } from '@tanstack/devtools-vite'
+import events from 'events'
+
+// 增加 EventTarget 监听器限制（消除 TanStack DevTools 警告）
+events.setMaxListeners(20)
 
 import { tanstackStart } from '@tanstack/react-start/plugin/vite'
 

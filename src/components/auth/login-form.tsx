@@ -46,7 +46,7 @@ export function LoginForm({
       }
 
       if (data) {
-        navigate({ to: search.redirect ?? '/' })
+        navigate({ to: search.redirect ?? '/articles' })
       }
     },
   })

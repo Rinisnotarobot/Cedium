@@ -18,6 +18,7 @@
     "db:seed": "dotenv -e .env.local -- prisma db seed"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.1048.0",
     "@faker-js/faker": "^10.3.0",
     "@floating-ui/react": "^0.27.19",
     "@mantine/core": "^8.3.18",
