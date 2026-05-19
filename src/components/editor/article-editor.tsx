@@ -1,10 +1,10 @@
-import { useEffect, useState } from "react"
-import type { Content } from "@tiptap/react"
-import { MinimalTiptapEditor } from "#/components/ui/minimal-tiptap"
-import { useIsBreakpoint } from "#/hooks/use-is-breakpoint"
-import { useThrottledCallback } from "#/hooks/use-throttled-callback"
-import { useEditorContent } from "./context"
-import { loadDraft, saveDraft, clearDraft } from "./draft-storage"
+import { useEffect, useState } from "react";
+import type { Content } from "@tiptap/react";
+import { MinimalTiptapEditor } from "#/components/ui/minimal-tiptap";
+import { useIsBreakpoint } from "#/hooks/use-is-breakpoint";
+import { useThrottledCallback } from "#/hooks/use-throttled-callback";
+import { useEditorContent } from "./context";
+import { loadDraft, saveDraft, clearDraft } from "./draft-storage";
 import {
   Dialog,
   DialogContent,
@@ -12,48 +12,48 @@ import {
   DialogFooter,
   DialogHeader,
   DialogTitle,
-} from "#/components/ui/dialog"
-import { Button } from "#/components/ui/button"
+} from "#/components/ui/dialog";
+import { Button } from "#/components/ui/button";
 
 export function ArticleEditor() {
-  const [content, setContent] = useEditorContent()
-  const [showClearDialog, setShowClearDialog] = useState(false)
-  const isLargeScreen = useIsBreakpoint("min", 1024)
+  const [content, setContent] = useEditorContent();
+  const [showClearDialog, setShowClearDialog] = useState(false);
+  const isLargeScreen = useIsBreakpoint("min", 1024);
 
   const throttledSave = useThrottledCallback(
     (value: Content) => saveDraft(value),
     500,
-    []
-  )
+    [],
+  );
 
   useEffect(() => {
-    const draft = loadDraft()
+    const draft = loadDraft();
     if (draft) {
-      setContent(draft)
+      setContent(draft);
     }
-  }, [setContent])
+  }, [setContent]);
 
   useEffect(() => {
-    throttledSave(content)
-  }, [content, throttledSave])
+    throttledSave(content);
+  }, [content, throttledSave]);
 
   const handleClearRequest = () => {
-    setShowClearDialog(true)
-  }
+    setShowClearDialog(true);
+  };
 
   const handleClearConfirm = () => {
-    setContent("")
-    clearDraft()
-    setShowClearDialog(false)
-  }
+    setContent("");
+    clearDraft();
+    setShowClearDialog(false);
+  };
 
   return (
-    <div className="flex flex-col h-full">
+    <>
       <MinimalTiptapEditor
         value={content}
         onChange={setContent}
         onClear={handleClearRequest}
-        className="flex-1 border rounded-lg shadow-sm"
+        className="min-h-[400px] lg:min-h-[500px]"
         editorContentClassName="p-5 prose prose-sm max-w-none"
         output="html"
         placeholder="开始写作..."
@@ -81,6 +81,6 @@ export function ArticleEditor() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </div>
-  )
+    </>
+  );
 }

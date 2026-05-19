@@ -1,6 +1,6 @@
 import { Card, CardContent } from "#/components/ui/card";
 import { Badge } from "#/components/ui/badge";
-import { Clock } from "lucide-react";
+import { Clock, ArrowUpRight } from "lucide-react";
 
 interface Article {
   id: string;
@@ -42,7 +42,7 @@ const articles: Article[] = [
     id: "3",
     title: "构建高性能 Rust 微服务：从 Tokio 到 gRPC 的完整实践",
     excerpt:
-      "Rust 的零成本抽象让它在微服务场景中表现卓越。本文从 Tokio runtime 配置、异步编程模式到 gRPC 集成，构建一个生产级的 Rust 微服务模板。",
+      "Rust 的零成本抽象让它在微服务场景中表现卓越。本文从 Tokio runtime 配置、异步编程模式到 gRPC 成成，构建一个生产级的 Rust 微服务模板。",
     author: { name: "赵明轩", avatarColor: "bg-orange-500" },
     createdAt: "2024-01-10",
     readTime: 15,
@@ -80,53 +80,110 @@ const articles: Article[] = [
   },
 ];
 
+function FeaturedArticleCard({ article }: { article: Article }) {
+  return (
+    <Card className="group relative overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 to-transparent hover:shadow-lg hover:border-primary/40 transition-all duration-300 cursor-pointer">
+      <CardContent className="p-8">
+        <div className="flex flex-col lg:flex-row gap-6">
+          {/* 左侧：视觉标记 */}
+          <div className="flex items-center gap-3 lg:flex-col lg:items-start lg:gap-2">
+            <div
+              className={`size-14 rounded-full ${article.author.avatarColor} flex items-center justify-center text-white font-semibold text-lg ring-2 ring-white/20`}
+            >
+              {article.author.name.charAt(0)}
+            </div>
+            <Badge variant="default" className="bg-primary/90">
+              精选
+            </Badge>
+          </div>
+
+          {/* 右侧：内容 */}
+          <div className="flex-1 min-w-0 space-y-4">
+            {/* 作者和日期 */}
+            <div className="flex items-center gap-2 text-sm">
+              <span className="font-medium text-foreground">
+                {article.author.name}
+              </span>
+              <span className="text-muted-foreground/50">·</span>
+              <span className="text-muted-foreground">{article.createdAt}</span>
+            </div>
+
+            {/* 标题 */}
+            <h2 className="font-bold text-xl lg:text-2xl leading-tight group-hover:text-primary transition-colors">
+              {article.title}
+            </h2>
+
+            {/* 摘要 */}
+            <p className="text-muted-foreground leading-relaxed line-clamp-3 lg:line-clamp-2">
+              {article.excerpt}
+            </p>
+
+            {/* 底部：阅读时间 + 标签 + 阅读指示 */}
+            <div className="flex items-center justify-between pt-2">
+              <div className="flex items-center gap-3 text-sm text-muted-foreground">
+                <div className="flex items-center gap-1.5">
+                  <Clock className="size-4" />
+                  <span>{article.readTime} 分钟</span>
+                </div>
+                <div className="flex gap-1.5">
+                  {article.tags.map((tag) => (
+                    <Badge key={tag} variant="outline" className="text-xs">
+                      {tag}
+                    </Badge>
+                  ))}
+                </div>
+              </div>
+              <ArrowUpRight className="size-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+            </div>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 function ArticleCard({ article }: { article: Article }) {
   return (
-    <Card className="hover:shadow-md hover:border-border/80 transition-all cursor-pointer group py-5">
-      <CardContent className="px-6">
-        <div className="flex gap-5">
+    <Card className="hover:shadow-md hover:border-border/80 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group">
+      <CardContent className="p-5">
+        <div className="flex gap-4">
           {/* 左侧：作者头像 */}
-          <div className="shrink-0 pt-1">
+          <div className="shrink-0">
             <div
-              className={`size-12 rounded-full ${article.author.avatarColor} flex items-center justify-center text-white font-medium text-sm`}
+              className={`size-10 rounded-full ${article.author.avatarColor} flex items-center justify-center text-white font-medium text-sm`}
             >
               {article.author.name.charAt(0)}
             </div>
           </div>
 
           {/* 右侧：内容 */}
-          <div className="flex-1 min-w-0">
+          <div className="flex-1 min-w-0 space-y-2">
             {/* 作者和日期 */}
-            <div className="flex items-center gap-2 text-sm text-muted-foreground mb-1">
-              <span className="font-medium text-foreground/80">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
+              <span className="font-medium text-foreground/70">
                 {article.author.name}
               </span>
-              <span className="text-muted-foreground/60">·</span>
+              <span className="text-muted-foreground/40">·</span>
               <span>{article.createdAt}</span>
             </div>
 
             {/* 标题 */}
-            <h2 className="font-semibold text-lg leading-snug mb-2 group-hover:text-primary transition-colors line-clamp-2">
+            <h2 className="font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
               {article.title}
             </h2>
 
             {/* 摘要 */}
-            <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2 mb-3">
+            <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
               {article.excerpt}
             </p>
 
             {/* 底部：阅读时间 + 标签 */}
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                <Clock className="size-3.5" />
-                <span>{article.readTime} 分钟阅读</span>
-                {article.featured && (
-                  <Badge variant="secondary" className="ml-2">
-                    精选
-                  </Badge>
-                )}
+            <div className="flex items-center justify-between pt-1">
+              <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <Clock className="size-3" />
+                <span>{article.readTime} 分钟</span>
               </div>
-              <div className="flex gap-1.5">
+              <div className="flex gap-1">
                 {article.tags.slice(0, 2).map((tag) => (
                   <Badge key={tag} variant="outline" className="text-xs px-2">
                     {tag}
@@ -142,23 +199,56 @@ function ArticleCard({ article }: { article: Article }) {
 }
 
 export function ArticlesPage() {
+  const featuredArticles = articles.filter((a) => a.featured);
+  const regularArticles = articles.filter((a) => !a.featured);
+
   return (
     <div className="min-h-screen bg-background">
-      <div className="max-w-3xl mx-auto px-6 py-12">
+      <div className="max-w-3xl mx-auto px-6 py-8 lg:py-12">
         {/* Header */}
-        <div className="mb-10">
-          <h1 className="text-2xl font-bold tracking-tight">文章</h1>
-          <p className="text-muted-foreground mt-1 text-sm">
+        <div className="mb-8 lg:mb-12">
+          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight">
+            文章
+          </h1>
+          <p className="text-muted-foreground mt-2 text-sm lg:text-base">
             探索技术、架构与工程实践
           </p>
         </div>
 
-        {/* Articles List */}
-        <div className="space-y-4">
-          {articles.map((article) => (
-            <ArticleCard key={article.id} article={article} />
-          ))}
-        </div>
+        {/* Featured Section */}
+        {featuredArticles.length > 0 && (
+          <section className="mb-8 lg:mb-12">
+            <div className="flex items-center gap-2 mb-4">
+              <div className="w-1 h-5 bg-primary rounded-full" />
+              <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+                精选推荐
+              </h2>
+            </div>
+            <div className="space-y-4">
+              {featuredArticles.map((article) => (
+                <FeaturedArticleCard key={article.id} article={article} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* Regular Articles */}
+        <section>
+          <div className="flex items-center gap-2 mb-4">
+            <div className="w-1 h-5 bg-muted-foreground/30 rounded-full" />
+            <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
+              最新发布
+            </h2>
+            <span className="text-xs text-muted-foreground/60 ml-auto">
+              {regularArticles.length} 篇
+            </span>
+          </div>
+          <div className="space-y-3">
+            {regularArticles.map((article) => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

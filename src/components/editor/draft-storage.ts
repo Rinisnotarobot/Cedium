@@ -1,20 +1,20 @@
-import type { Content } from "@tiptap/react"
+import type { Content } from "@tiptap/react";
 
-const DRAFT_KEY = "cedium_draft"
+const DRAFT_KEY = "cedium_draft";
 
 export function loadDraft(): Content {
   try {
-    const draft = localStorage.getItem(DRAFT_KEY)
-    return draft || ""
+    const draft = localStorage.getItem(DRAFT_KEY);
+    return draft || "";
   } catch {
-    return ""
+    return "";
   }
 }
 
 export function saveDraft(content: Content): void {
   try {
     if (typeof content === "string") {
-      localStorage.setItem(DRAFT_KEY, content)
+      localStorage.setItem(DRAFT_KEY, content);
     }
   } catch {
     // localStorage may be unavailable or full
@@ -23,7 +23,7 @@ export function saveDraft(content: Content): void {
 
 export function clearDraft(): void {
   try {
-    localStorage.removeItem(DRAFT_KEY)
+    localStorage.removeItem(DRAFT_KEY);
   } catch {
     // localStorage may be unavailable
   }
