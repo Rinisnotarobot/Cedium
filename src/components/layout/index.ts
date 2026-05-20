@@ -1,4 +1,11 @@
 export { Navbar } from "./app-navbar";
+export { NavbarBrand } from "./navbar-brand";
+export { NavbarSearch } from "./navbar-search";
+export { NavbarActions } from "./navbar-actions";
+export { NavbarUserMenu } from "./navbar-user-menu";
 export { AppSidebar } from "./app-sidebar";
 export { AppLayout } from "./app-layout";
 export { AuthLayout } from "./auth-layout";
+export { AuthNavbar } from "./auth-navbar";
+export { PageContainer } from "./page-container";
+export { PageHeader } from "./page-header";

@@ -1,3 +1,4 @@
+import { PageContainer, PageHeader } from "#/components/layout";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "#/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
 import { Badge } from "#/components/ui/badge";
@@ -12,7 +13,7 @@ export function ProfilePage() {
 
   if (isPending) {
     return (
-      <div className="min-h-screen bg-background">
+      <PageContainer width="2xl">
         <div className="mx-auto max-w-2xl px-6 py-8">
           <Skeleton className="h-8 w-48" />
           <Skeleton className="h-4 w-64 mt-2" />
@@ -35,21 +36,13 @@ export function ProfilePage() {
             </Card>
           </div>
         </div>
-      </div>
+      </PageContainer>
     );
   }
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="mx-auto max-w-2xl px-6 py-8">
-        <div className="mb-8">
-          <h1 className="text-2xl font-semibold tracking-tight">
-            个人设置
-          </h1>
-          <p className="text-sm text-muted-foreground mt-1">
-            管理您的账户信息和安全设置
-          </p>
-        </div>
+    <PageContainer width="2xl">
+      <PageHeader title="个人设置" description="管理您的账户信息和安全设置" />
 
         <Card>
           <CardContent className="p-6">
@@ -142,8 +135,7 @@ export function ProfilePage() {
             如需帮助，请联系 <a href="#" className="underline underline-offset-2 hover:text-foreground">客服支持</a>
           </p>
         </div>
-      </div>
-    </div>
+    </PageContainer>
   );
 }
 

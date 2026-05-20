@@ -4,6 +4,7 @@ import { loginSchema } from "#/lib/validators/auth";
 import { useNavigate, Link, useSearch } from "@tanstack/react-router";
 import { cn } from "#/lib/utils";
 import { Button } from "#/components/ui/button";
+import { AUTH_CONFIG } from "#/lib/auth-config";
 import {
   Card,
   CardContent,
@@ -48,7 +49,7 @@ export function LoginForm({
       }
 
       if (data) {
-        navigate({ to: search.redirect ?? "/articles" });
+        navigate({ to: search.redirect ?? AUTH_CONFIG.defaultRedirectAfterLogin });
       }
     },
   });

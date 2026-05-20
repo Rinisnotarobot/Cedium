@@ -9,8 +9,9 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as AppRouteImport } from './routes/_app'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
+import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
@@ -18,17 +19,25 @@ import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AppWriteRouteImport } from './routes/_app/write'
 import { Route as AppVerifyEmailRouteImport } from './routes/_app/verify-email'
+import { Route as AppSearchRouteImport } from './routes/_app/search'
 import { Route as AppProfileRouteImport } from './routes/_app/profile'
+import { Route as AppFavoritesRouteImport } from './routes/_app/favorites'
+import { Route as AppDraftsRouteImport } from './routes/_app/drafts'
 import { Route as AppArticlesRouteImport } from './routes/_app/articles'
 import { Route as ApiUploadAvatarRouteImport } from './routes/api/upload/avatar'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 
-const AppRoute = AppRouteImport.update({
-  id: '/_app',
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AuthRouteRoute = AuthRouteRouteImport.update({
   id: '/_auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRouteRoute = AppRouteRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -59,22 +68,37 @@ const AuthForgotPasswordRoute = AuthForgotPasswordRouteImport.update({
 const AppWriteRoute = AppWriteRouteImport.update({
   id: '/write',
   path: '/write',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppVerifyEmailRoute = AppVerifyEmailRouteImport.update({
   id: '/verify-email',
   path: '/verify-email',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppSearchRoute = AppSearchRouteImport.update({
+  id: '/search',
+  path: '/search',
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppProfileRoute = AppProfileRouteImport.update({
   id: '/profile',
   path: '/profile',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppFavoritesRoute = AppFavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppDraftsRoute = AppDraftsRouteImport.update({
+  id: '/drafts',
+  path: '/drafts',
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const AppArticlesRoute = AppArticlesRouteImport.update({
   id: '/articles',
   path: '/articles',
-  getParentRoute: () => AppRoute,
+  getParentRoute: () => AppRouteRoute,
 } as any)
 const ApiUploadAvatarRoute = ApiUploadAvatarRouteImport.update({
   id: '/api/upload/avatar',
@@ -89,8 +113,12 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/articles': typeof AppArticlesRoute
+  '/drafts': typeof AppDraftsRoute
+  '/favorites': typeof AppFavoritesRoute
   '/profile': typeof AppProfileRoute
+  '/search': typeof AppSearchRoute
   '/verify-email': typeof AppVerifyEmailRoute
   '/write': typeof AppWriteRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
@@ -102,8 +130,12 @@ export interface FileRoutesByFullPath {
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
   '/articles': typeof AppArticlesRoute
+  '/drafts': typeof AppDraftsRoute
+  '/favorites': typeof AppFavoritesRoute
   '/profile': typeof AppProfileRoute
+  '/search': typeof AppSearchRoute
   '/verify-email': typeof AppVerifyEmailRoute
   '/write': typeof AppWriteRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
@@ -116,10 +148,14 @@ export interface FileRoutesByTo {
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteRouteWithChildren
   '/_auth': typeof AuthRouteRouteWithChildren
-  '/_app': typeof AppRouteWithChildren
+  '/about': typeof AboutRoute
   '/_app/articles': typeof AppArticlesRoute
+  '/_app/drafts': typeof AppDraftsRoute
+  '/_app/favorites': typeof AppFavoritesRoute
   '/_app/profile': typeof AppProfileRoute
+  '/_app/search': typeof AppSearchRoute
   '/_app/verify-email': typeof AppVerifyEmailRoute
   '/_app/write': typeof AppWriteRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
@@ -133,8 +169,12 @@ export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/about'
     | '/articles'
+    | '/drafts'
+    | '/favorites'
     | '/profile'
+    | '/search'
     | '/verify-email'
     | '/write'
     | '/forgot-password'
@@ -146,8 +186,12 @@ export interface FileRouteTypes {
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
+    | '/about'
     | '/articles'
+    | '/drafts'
+    | '/favorites'
     | '/profile'
+    | '/search'
     | '/verify-email'
     | '/write'
     | '/forgot-password'
@@ -159,10 +203,14 @@ export interface FileRouteTypes {
   id:
     | '__root__'
     | '/'
-    | '/_auth'
     | '/_app'
+    | '/_auth'
+    | '/about'
     | '/_app/articles'
+    | '/_app/drafts'
+    | '/_app/favorites'
     | '/_app/profile'
+    | '/_app/search'
     | '/_app/verify-email'
     | '/_app/write'
     | '/_auth/forgot-password'
@@ -175,19 +223,20 @@ export interface FileRouteTypes {
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRouteRoute: typeof AppRouteRouteWithChildren
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
-  AppRoute: typeof AppRouteWithChildren
+  AboutRoute: typeof AboutRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
   ApiUploadAvatarRoute: typeof ApiUploadAvatarRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/_app': {
-      id: '/_app'
-      path: ''
-      fullPath: '/'
-      preLoaderRoute: typeof AppRouteImport
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_auth': {
@@ -195,6 +244,13 @@ declare module '@tanstack/react-router' {
       path: ''
       fullPath: '/'
       preLoaderRoute: typeof AuthRouteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -237,28 +293,49 @@ declare module '@tanstack/react-router' {
       path: '/write'
       fullPath: '/write'
       preLoaderRoute: typeof AppWriteRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/verify-email': {
       id: '/_app/verify-email'
       path: '/verify-email'
       fullPath: '/verify-email'
       preLoaderRoute: typeof AppVerifyEmailRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/search': {
+      id: '/_app/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof AppSearchRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/profile': {
       id: '/_app/profile'
       path: '/profile'
       fullPath: '/profile'
       preLoaderRoute: typeof AppProfileRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/favorites': {
+      id: '/_app/favorites'
+      path: '/favorites'
+      fullPath: '/favorites'
+      preLoaderRoute: typeof AppFavoritesRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/drafts': {
+      id: '/_app/drafts'
+      path: '/drafts'
+      fullPath: '/drafts'
+      preLoaderRoute: typeof AppDraftsRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/articles': {
       id: '/_app/articles'
       path: '/articles'
       fullPath: '/articles'
       preLoaderRoute: typeof AppArticlesRouteImport
-      parentRoute: typeof AppRoute
+      parentRoute: typeof AppRouteRoute
     }
     '/api/upload/avatar': {
       id: '/api/upload/avatar'
@@ -276,6 +353,30 @@ declare module '@tanstack/react-router' {
     }
   }
 }
+
+interface AppRouteRouteChildren {
+  AppArticlesRoute: typeof AppArticlesRoute
+  AppDraftsRoute: typeof AppDraftsRoute
+  AppFavoritesRoute: typeof AppFavoritesRoute
+  AppProfileRoute: typeof AppProfileRoute
+  AppSearchRoute: typeof AppSearchRoute
+  AppVerifyEmailRoute: typeof AppVerifyEmailRoute
+  AppWriteRoute: typeof AppWriteRoute
+}
+
+const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppArticlesRoute: AppArticlesRoute,
+  AppDraftsRoute: AppDraftsRoute,
+  AppFavoritesRoute: AppFavoritesRoute,
+  AppProfileRoute: AppProfileRoute,
+  AppSearchRoute: AppSearchRoute,
+  AppVerifyEmailRoute: AppVerifyEmailRoute,
+  AppWriteRoute: AppWriteRoute,
+}
+
+const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
+  AppRouteRouteChildren,
+)
 
 interface AuthRouteRouteChildren {
   AuthForgotPasswordRoute: typeof AuthForgotPasswordRoute
@@ -295,26 +396,11 @@ const AuthRouteRouteWithChildren = AuthRouteRoute._addFileChildren(
   AuthRouteRouteChildren,
 )
 
-interface AppRouteChildren {
-  AppArticlesRoute: typeof AppArticlesRoute
-  AppProfileRoute: typeof AppProfileRoute
-  AppVerifyEmailRoute: typeof AppVerifyEmailRoute
-  AppWriteRoute: typeof AppWriteRoute
-}
-
-const AppRouteChildren: AppRouteChildren = {
-  AppArticlesRoute: AppArticlesRoute,
-  AppProfileRoute: AppProfileRoute,
-  AppVerifyEmailRoute: AppVerifyEmailRoute,
-  AppWriteRoute: AppWriteRoute,
-}
-
-const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRouteRoute: AppRouteRouteWithChildren,
   AuthRouteRoute: AuthRouteRouteWithChildren,
-  AppRoute: AppRouteWithChildren,
+  AboutRoute: AboutRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
   ApiUploadAvatarRoute: ApiUploadAvatarRoute,
 }
