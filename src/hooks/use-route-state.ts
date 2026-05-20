@@ -10,7 +10,7 @@ export function useRouteState() {
     pathname: location.pathname,
     isWriteRoute: location.pathname === '/write',
     isArticlesRoute: location.pathname === '/articles',
-    isProfileRoute: location.pathname === '/profile',
+    isProfileRoute: location.pathname === '/me/profile',
     session,
     isPending,
     navigate,

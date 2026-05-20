@@ -3,7 +3,6 @@
 import { useForm } from "@tanstack/react-form";
 import { authClient } from "#/lib/auth-client";
 import { profileSchema } from "#/lib/validators/profile";
-import { useNavigate } from "@tanstack/react-router";
 import {
   Card,
   CardContent,
@@ -39,7 +38,6 @@ import { ChangePasswordForm } from "./change-password-form";
 export interface ProfileFormProps extends React.ComponentProps<typeof Card> {}
 
 export function ProfileForm({ className, ...props }: ProfileFormProps) {
-  const navigate = useNavigate();
   const { data: session, isPending } = authClient.useSession();
   const [uploading, setUploading] = useState(false);
   const [resending, setResending] = useState(false);
@@ -99,6 +97,12 @@ export function ProfileForm({ className, ...props }: ProfileFormProps) {
     }
   };
 
+  // TODO: 实现邮箱验证流程
+  // 当前仅发送验证码，需要后续实现验证码输入和验证页面
+  // 可选方案：
+  // 1. 在当前页面通过 Dialog/Modal 展示验证码输入
+  // 2. 创建独立的邮箱验证组件（放置在 /me/settings 下）
+  // 3. 通过 toast 提示用户检查邮箱并输入验证码
   const handleResendVerification = async () => {
     if (!session?.user?.email) return;
 
@@ -114,11 +118,8 @@ export function ProfileForm({ className, ...props }: ProfileFormProps) {
         return;
       }
 
-      toast.success("验证码已发送");
-      navigate({
-        to: "/verify-email",
-        search: { email: session.user.email },
-      });
+      toast.success("验证码已发送到您的邮箱，请查收");
+      // TODO: 验证码发送后，需要实现验证码输入界面
     } finally {
       setResending(false);
     }

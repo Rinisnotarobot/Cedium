@@ -30,7 +30,7 @@ const navItems = [
   {
     title: "草稿箱",
     icon: FileText,
-    to: "/drafts",
+    to: "/me/drafts",
   },
 ];
 
@@ -38,7 +38,7 @@ const readItems = [
   {
     title: "收藏",
     icon: Heart,
-    to: "/favorites",
+    to: "/me/favorites",
   },
 ];
 
@@ -46,7 +46,7 @@ const settingsItems = [
   {
     title: "个人资料",
     icon: User,
-    to: "/profile",
+    to: "/me/profile",
   },
 ];
 

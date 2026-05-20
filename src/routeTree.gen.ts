@@ -18,14 +18,15 @@ import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-pass
 import { Route as AuthLoginRouteImport } from './routes/_auth/login'
 import { Route as AuthForgotPasswordRouteImport } from './routes/_auth/forgot-password'
 import { Route as AppWriteRouteImport } from './routes/_app/write'
-import { Route as AppVerifyEmailRouteImport } from './routes/_app/verify-email'
 import { Route as AppSearchRouteImport } from './routes/_app/search'
-import { Route as AppProfileRouteImport } from './routes/_app/profile'
-import { Route as AppFavoritesRouteImport } from './routes/_app/favorites'
-import { Route as AppDraftsRouteImport } from './routes/_app/drafts'
 import { Route as AppArticlesRouteImport } from './routes/_app/articles'
+import { Route as AppMeRouteRouteImport } from './routes/_app/me/route'
+import { Route as AppMeIndexRouteImport } from './routes/_app/me/index'
 import { Route as ApiUploadAvatarRouteImport } from './routes/api/upload/avatar'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AppMeProfileRouteImport } from './routes/_app/me/profile'
+import { Route as AppMeFavoritesRouteImport } from './routes/_app/me/favorites'
+import { Route as AppMeDraftsRouteImport } from './routes/_app/me/drafts'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -70,35 +71,25 @@ const AppWriteRoute = AppWriteRouteImport.update({
   path: '/write',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const AppVerifyEmailRoute = AppVerifyEmailRouteImport.update({
-  id: '/verify-email',
-  path: '/verify-email',
-  getParentRoute: () => AppRouteRoute,
-} as any)
 const AppSearchRoute = AppSearchRouteImport.update({
   id: '/search',
   path: '/search',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppProfileRoute = AppProfileRouteImport.update({
-  id: '/profile',
-  path: '/profile',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppFavoritesRoute = AppFavoritesRouteImport.update({
-  id: '/favorites',
-  path: '/favorites',
-  getParentRoute: () => AppRouteRoute,
-} as any)
-const AppDraftsRoute = AppDraftsRouteImport.update({
-  id: '/drafts',
-  path: '/drafts',
   getParentRoute: () => AppRouteRoute,
 } as any)
 const AppArticlesRoute = AppArticlesRouteImport.update({
   id: '/articles',
   path: '/articles',
   getParentRoute: () => AppRouteRoute,
+} as any)
+const AppMeRouteRoute = AppMeRouteRouteImport.update({
+  id: '/me',
+  path: '/me',
+  getParentRoute: () => AppRouteRoute,
+} as any)
+const AppMeIndexRoute = AppMeIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppMeRouteRoute,
 } as any)
 const ApiUploadAvatarRoute = ApiUploadAvatarRouteImport.update({
   id: '/api/upload/avatar',
@@ -110,40 +101,56 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppMeProfileRoute = AppMeProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppMeRouteRoute,
+} as any)
+const AppMeFavoritesRoute = AppMeFavoritesRouteImport.update({
+  id: '/favorites',
+  path: '/favorites',
+  getParentRoute: () => AppMeRouteRoute,
+} as any)
+const AppMeDraftsRoute = AppMeDraftsRouteImport.update({
+  id: '/drafts',
+  path: '/drafts',
+  getParentRoute: () => AppMeRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/me': typeof AppMeRouteRouteWithChildren
   '/articles': typeof AppArticlesRoute
-  '/drafts': typeof AppDraftsRoute
-  '/favorites': typeof AppFavoritesRoute
-  '/profile': typeof AppProfileRoute
   '/search': typeof AppSearchRoute
-  '/verify-email': typeof AppVerifyEmailRoute
   '/write': typeof AppWriteRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-up': typeof AuthSignUpRoute
+  '/me/drafts': typeof AppMeDraftsRoute
+  '/me/favorites': typeof AppMeFavoritesRoute
+  '/me/profile': typeof AppMeProfileRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/upload/avatar': typeof ApiUploadAvatarRoute
+  '/me/': typeof AppMeIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/articles': typeof AppArticlesRoute
-  '/drafts': typeof AppDraftsRoute
-  '/favorites': typeof AppFavoritesRoute
-  '/profile': typeof AppProfileRoute
   '/search': typeof AppSearchRoute
-  '/verify-email': typeof AppVerifyEmailRoute
   '/write': typeof AppWriteRoute
   '/forgot-password': typeof AuthForgotPasswordRoute
   '/login': typeof AuthLoginRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-up': typeof AuthSignUpRoute
+  '/me/drafts': typeof AppMeDraftsRoute
+  '/me/favorites': typeof AppMeFavoritesRoute
+  '/me/profile': typeof AppMeProfileRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/upload/avatar': typeof ApiUploadAvatarRoute
+  '/me': typeof AppMeIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -151,74 +158,77 @@ export interface FileRoutesById {
   '/_app': typeof AppRouteRouteWithChildren
   '/_auth': typeof AuthRouteRouteWithChildren
   '/about': typeof AboutRoute
+  '/_app/me': typeof AppMeRouteRouteWithChildren
   '/_app/articles': typeof AppArticlesRoute
-  '/_app/drafts': typeof AppDraftsRoute
-  '/_app/favorites': typeof AppFavoritesRoute
-  '/_app/profile': typeof AppProfileRoute
   '/_app/search': typeof AppSearchRoute
-  '/_app/verify-email': typeof AppVerifyEmailRoute
   '/_app/write': typeof AppWriteRoute
   '/_auth/forgot-password': typeof AuthForgotPasswordRoute
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
+  '/_app/me/drafts': typeof AppMeDraftsRoute
+  '/_app/me/favorites': typeof AppMeFavoritesRoute
+  '/_app/me/profile': typeof AppMeProfileRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/upload/avatar': typeof ApiUploadAvatarRoute
+  '/_app/me/': typeof AppMeIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/me'
     | '/articles'
-    | '/drafts'
-    | '/favorites'
-    | '/profile'
     | '/search'
-    | '/verify-email'
     | '/write'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
     | '/sign-up'
+    | '/me/drafts'
+    | '/me/favorites'
+    | '/me/profile'
     | '/api/auth/$'
     | '/api/upload/avatar'
+    | '/me/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
     | '/articles'
-    | '/drafts'
-    | '/favorites'
-    | '/profile'
     | '/search'
-    | '/verify-email'
     | '/write'
     | '/forgot-password'
     | '/login'
     | '/reset-password'
     | '/sign-up'
+    | '/me/drafts'
+    | '/me/favorites'
+    | '/me/profile'
     | '/api/auth/$'
     | '/api/upload/avatar'
+    | '/me'
   id:
     | '__root__'
     | '/'
     | '/_app'
     | '/_auth'
     | '/about'
+    | '/_app/me'
     | '/_app/articles'
-    | '/_app/drafts'
-    | '/_app/favorites'
-    | '/_app/profile'
     | '/_app/search'
-    | '/_app/verify-email'
     | '/_app/write'
     | '/_auth/forgot-password'
     | '/_auth/login'
     | '/_auth/reset-password'
     | '/_auth/sign-up'
+    | '/_app/me/drafts'
+    | '/_app/me/favorites'
+    | '/_app/me/profile'
     | '/api/auth/$'
     | '/api/upload/avatar'
+    | '/_app/me/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -295,39 +305,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppWriteRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/_app/verify-email': {
-      id: '/_app/verify-email'
-      path: '/verify-email'
-      fullPath: '/verify-email'
-      preLoaderRoute: typeof AppVerifyEmailRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
     '/_app/search': {
       id: '/_app/search'
       path: '/search'
       fullPath: '/search'
       preLoaderRoute: typeof AppSearchRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/profile': {
-      id: '/_app/profile'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof AppProfileRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/favorites': {
-      id: '/_app/favorites'
-      path: '/favorites'
-      fullPath: '/favorites'
-      preLoaderRoute: typeof AppFavoritesRouteImport
-      parentRoute: typeof AppRouteRoute
-    }
-    '/_app/drafts': {
-      id: '/_app/drafts'
-      path: '/drafts'
-      fullPath: '/drafts'
-      preLoaderRoute: typeof AppDraftsRouteImport
       parentRoute: typeof AppRouteRoute
     }
     '/_app/articles': {
@@ -336,6 +318,20 @@ declare module '@tanstack/react-router' {
       fullPath: '/articles'
       preLoaderRoute: typeof AppArticlesRouteImport
       parentRoute: typeof AppRouteRoute
+    }
+    '/_app/me': {
+      id: '/_app/me'
+      path: '/me'
+      fullPath: '/me'
+      preLoaderRoute: typeof AppMeRouteRouteImport
+      parentRoute: typeof AppRouteRoute
+    }
+    '/_app/me/': {
+      id: '/_app/me/'
+      path: '/'
+      fullPath: '/me/'
+      preLoaderRoute: typeof AppMeIndexRouteImport
+      parentRoute: typeof AppMeRouteRoute
     }
     '/api/upload/avatar': {
       id: '/api/upload/avatar'
@@ -351,26 +347,59 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/me/profile': {
+      id: '/_app/me/profile'
+      path: '/profile'
+      fullPath: '/me/profile'
+      preLoaderRoute: typeof AppMeProfileRouteImport
+      parentRoute: typeof AppMeRouteRoute
+    }
+    '/_app/me/favorites': {
+      id: '/_app/me/favorites'
+      path: '/favorites'
+      fullPath: '/me/favorites'
+      preLoaderRoute: typeof AppMeFavoritesRouteImport
+      parentRoute: typeof AppMeRouteRoute
+    }
+    '/_app/me/drafts': {
+      id: '/_app/me/drafts'
+      path: '/drafts'
+      fullPath: '/me/drafts'
+      preLoaderRoute: typeof AppMeDraftsRouteImport
+      parentRoute: typeof AppMeRouteRoute
+    }
   }
 }
 
+interface AppMeRouteRouteChildren {
+  AppMeDraftsRoute: typeof AppMeDraftsRoute
+  AppMeFavoritesRoute: typeof AppMeFavoritesRoute
+  AppMeProfileRoute: typeof AppMeProfileRoute
+  AppMeIndexRoute: typeof AppMeIndexRoute
+}
+
+const AppMeRouteRouteChildren: AppMeRouteRouteChildren = {
+  AppMeDraftsRoute: AppMeDraftsRoute,
+  AppMeFavoritesRoute: AppMeFavoritesRoute,
+  AppMeProfileRoute: AppMeProfileRoute,
+  AppMeIndexRoute: AppMeIndexRoute,
+}
+
+const AppMeRouteRouteWithChildren = AppMeRouteRoute._addFileChildren(
+  AppMeRouteRouteChildren,
+)
+
 interface AppRouteRouteChildren {
+  AppMeRouteRoute: typeof AppMeRouteRouteWithChildren
   AppArticlesRoute: typeof AppArticlesRoute
-  AppDraftsRoute: typeof AppDraftsRoute
-  AppFavoritesRoute: typeof AppFavoritesRoute
-  AppProfileRoute: typeof AppProfileRoute
   AppSearchRoute: typeof AppSearchRoute
-  AppVerifyEmailRoute: typeof AppVerifyEmailRoute
   AppWriteRoute: typeof AppWriteRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
+  AppMeRouteRoute: AppMeRouteRouteWithChildren,
   AppArticlesRoute: AppArticlesRoute,
-  AppDraftsRoute: AppDraftsRoute,
-  AppFavoritesRoute: AppFavoritesRoute,
-  AppProfileRoute: AppProfileRoute,
   AppSearchRoute: AppSearchRoute,
-  AppVerifyEmailRoute: AppVerifyEmailRoute,
   AppWriteRoute: AppWriteRoute,
 }
 
