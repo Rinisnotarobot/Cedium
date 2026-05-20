@@ -126,16 +126,13 @@ export function ProfileForm({ className, ...props }: ProfileFormProps) {
 
   if (isPending) {
     return (
-      <Card className={cn("w-full max-w-md", className)} {...props}>
+      <Card className={cn("w-full", className)} {...props}>
         <CardHeader>
           <Skeleton className="h-6 w-24" />
           <Skeleton className="h-4 w-40 mt-2" />
         </CardHeader>
         <CardContent>
           <FieldGroup>
-            <div className="flex justify-center mb-6">
-              <Skeleton className="h-32 w-32 rounded-full" />
-            </div>
             <Field>
               <Skeleton className="h-4 w-12 mb-2" />
               <Skeleton className="h-9 w-full" />
@@ -152,9 +149,9 @@ export function ProfileForm({ className, ...props }: ProfileFormProps) {
   }
 
   return (
-    <Card className={cn("w-full max-w-md", className)} {...props}>
-      <CardHeader>
-        <CardTitle>个人资料</CardTitle>
+    <Card className={cn("w-full", className)} {...props}>
+      <CardHeader className="pb-4">
+        <CardTitle className="text-base">个人资料</CardTitle>
         <CardDescription>查看和编辑您的个人信息</CardDescription>
       </CardHeader>
       <CardContent>
@@ -166,36 +163,6 @@ export function ProfileForm({ className, ...props }: ProfileFormProps) {
           }}
         >
           <FieldGroup>
-            <form.Field name="image">
-              {(field) => (
-                <div className="flex flex-col items-center mb-6">
-                  <FileInput
-                    onFileSelect={handleFileUpload}
-                    onError={(error) => toast.error(error)}
-                    disabled={uploading}
-                  >
-                    <Avatar
-                      className={cn(
-                        "h-32 w-32 cursor-pointer transition-opacity hover:opacity-80",
-                        uploading && "opacity-50 cursor-not-allowed",
-                      )}
-                    >
-                      <AvatarImage
-                        src={field.state.value || undefined}
-                        alt={session?.user?.name ?? "User"}
-                      />
-                      <AvatarFallback className="text-3xl">
-                        {uploading
-                          ? "..."
-                          : (session?.user?.name?.charAt(0).toUpperCase() ??
-                            "U")}
-                      </AvatarFallback>
-                    </Avatar>
-                  </FileInput>
-                </div>
-              )}
-            </form.Field>
-
             <form.Field name="name">
               {(field) => (
                 <Field>
@@ -249,6 +216,34 @@ export function ProfileForm({ className, ...props }: ProfileFormProps) {
               )}
               <FieldDescription>邮箱地址不可修改</FieldDescription>
             </Field>
+
+            <form.Field name="image">
+              {(field) => (
+                <Field>
+                  <FieldLabel>头像</FieldLabel>
+                  <div className="flex items-center gap-3">
+                    <Avatar className="h-10 w-10">
+                      <AvatarImage
+                        src={field.state.value || undefined}
+                        alt={session?.user?.name ?? "User"}
+                      />
+                      <AvatarFallback className="text-xs">
+                        {session?.user?.name?.charAt(0).toUpperCase() ?? "U"}
+                      </AvatarFallback>
+                    </Avatar>
+                    <FileInput
+                      onFileSelect={handleFileUpload}
+                      onError={(error) => toast.error(error)}
+                      disabled={uploading}
+                    >
+                      <Button type="button" variant="outline" size="sm" disabled={uploading}>
+                        {uploading ? "上传中..." : "更换头像"}
+                      </Button>
+                    </FileInput>
+                  </div>
+                </Field>
+              )}
+            </form.Field>
 
             <Dialog
               open={passwordDialogOpen}
