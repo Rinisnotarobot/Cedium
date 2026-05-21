@@ -1,5 +1,4 @@
 import { Link } from "@tanstack/react-router";
-import { Button } from "#/components/ui/button";
 import { ModeToggle } from "#/components/theme";
 
 export function AuthNavbar() {
@@ -12,10 +11,7 @@ export function AuthNavbar() {
         >
           Cedium
         </Link>
-        <div className="flex items-center gap-3">
-          <Button variant="ghost" size="default" asChild>
-            <Link to="/login">登录</Link>
-          </Button>
+        <div className="flex items-center">
           <ModeToggle />
         </div>
       </div>

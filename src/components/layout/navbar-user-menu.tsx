@@ -77,7 +77,7 @@ export function NavbarUserMenu({ session, isPending }: NavbarUserMenuProps) {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild className="cursor-pointer">
-          <Link to="/me/profile">
+          <Link to="/me/settings">
             <Settings className="mr-2 h-4 w-4" />
             设置
           </Link>
