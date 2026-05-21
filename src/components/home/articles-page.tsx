@@ -1,3 +1,4 @@
+import { PageContainer, PageHeader } from "#/components/layout";
 import { Card, CardContent } from "#/components/ui/card";
 import { Badge } from "#/components/ui/badge";
 import { Clock, ArrowUpRight } from "lucide-react";
@@ -82,7 +83,7 @@ const articles: Article[] = [
 
 function FeaturedArticleCard({ article }: { article: Article }) {
   return (
-    <Card className="group relative overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 to-transparent hover:shadow-lg hover:border-primary/40 transition-all duration-300 cursor-pointer">
+    <Card className="group relative overflow-hidden border-primary/20 bg-gradient-to-br from-primary/5 to-transparent hover:shadow-lg hover:border-primary/40 transition-[shadow,border-color,transform] duration-300 cursor-pointer">
       <CardContent className="p-8">
         <div className="flex flex-col lg:flex-row gap-6">
           {/* 左侧：视觉标记 */}
@@ -109,7 +110,7 @@ function FeaturedArticleCard({ article }: { article: Article }) {
             </div>
 
             {/* 标题 */}
-            <h2 className="font-bold text-xl lg:text-2xl leading-tight group-hover:text-primary transition-colors">
+            <h2 className="font-bold text-xl lg:text-2xl leading-tight group-hover:text-primary transition-colors text-wrap: balance">
               {article.title}
             </h2>
 
@@ -133,7 +134,7 @@ function FeaturedArticleCard({ article }: { article: Article }) {
                   ))}
                 </div>
               </div>
-              <ArrowUpRight className="size-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-all" />
+              <ArrowUpRight className="size-5 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-[color,transform] duration-200" />
             </div>
           </div>
         </div>
@@ -144,7 +145,7 @@ function FeaturedArticleCard({ article }: { article: Article }) {
 
 function ArticleCard({ article }: { article: Article }) {
   return (
-    <Card className="hover:shadow-md hover:border-border/80 hover:-translate-y-0.5 transition-all duration-200 cursor-pointer group">
+    <Card className="hover:shadow-md hover:border-border/80 hover:-translate-y-0.5 transition-[shadow,border-color,transform] duration-200 cursor-pointer group">
       <CardContent className="p-5">
         <div className="flex gap-4">
           {/* 左侧：作者头像 */}
@@ -168,7 +169,7 @@ function ArticleCard({ article }: { article: Article }) {
             </div>
 
             {/* 标题 */}
-            <h2 className="font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2">
+            <h2 className="font-semibold leading-snug group-hover:text-primary transition-colors line-clamp-2 text-wrap: balance">
               {article.title}
             </h2>
 
@@ -203,17 +204,8 @@ export function ArticlesPage() {
   const regularArticles = articles.filter((a) => !a.featured);
 
   return (
-    <div className="min-h-screen bg-background">
-      <div className="max-w-3xl mx-auto px-6 py-8 lg:py-12">
-        {/* Header */}
-        <div className="mb-8 lg:mb-12">
-          <h1 className="text-2xl lg:text-3xl font-bold tracking-tight">
-            文章
-          </h1>
-          <p className="text-muted-foreground mt-2 text-sm lg:text-base">
-            探索技术、架构与工程实践
-          </p>
-        </div>
+    <PageContainer width="3xl" variant="spaced">
+      <PageHeader title="文章" description="探索技术、架构与工程实践" />
 
         {/* Featured Section */}
         {featuredArticles.length > 0 && (
@@ -239,7 +231,7 @@ export function ArticlesPage() {
             <h2 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider">
               最新发布
             </h2>
-            <span className="text-xs text-muted-foreground/60 ml-auto">
+            <span className="text-xs text-muted-foreground/60 ml-auto tabular-nums">
               {regularArticles.length} 篇
             </span>
           </div>
@@ -249,7 +241,6 @@ export function ArticlesPage() {
             ))}
           </div>
         </section>
-      </div>
-    </div>
+    </PageContainer>
   );
 }

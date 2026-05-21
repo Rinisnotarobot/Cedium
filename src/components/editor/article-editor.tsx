@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import type { Content } from "@tiptap/react";
 import { MinimalTiptapEditor } from "#/components/ui/minimal-tiptap";
 import { useIsBreakpoint } from "#/hooks/use-is-breakpoint";
@@ -14,10 +14,16 @@ import {
   DialogTitle,
 } from "#/components/ui/dialog";
 import { Button } from "#/components/ui/button";
+import { cn } from "#/lib/utils";
 
-export function ArticleEditor() {
+interface ArticleEditorProps {
+  toolbarCollapsed?: boolean;
+}
+
+export function ArticleEditor({ toolbarCollapsed = false }: ArticleEditorProps) {
   const [content, setContent] = useEditorContent();
   const [showClearDialog, setShowClearDialog] = useState(false);
+  const editorRef = useRef<HTMLDivElement>(null);
   const isLargeScreen = useIsBreakpoint("min", 1024);
 
   const throttledSave = useThrottledCallback(
@@ -49,19 +55,26 @@ export function ArticleEditor() {
 
   return (
     <>
-      <MinimalTiptapEditor
-        value={content}
-        onChange={setContent}
-        onClear={handleClearRequest}
-        className="min-h-[400px] lg:min-h-[500px]"
-        editorContentClassName="p-5 prose prose-sm max-w-none"
-        output="html"
-        placeholder="开始写作..."
-        autofocus={true}
-        editable={true}
-        editorClassName="focus:outline-hidden"
-        toolbarVariant={isLargeScreen ? "full" : "minimal"}
-      />
+      <div ref={editorRef} className="relative rounded-lg">
+        <MinimalTiptapEditor
+          value={content}
+          onChange={setContent}
+          onClear={handleClearRequest}
+          editorContentClassName={cn(
+            "prose prose-sm max-w-none min-h-[50vh] p-6",
+            "prose-headings:font-semibold prose-headings:tracking-tight",
+            "prose-p:text-muted-foreground prose-p:leading-relaxed",
+            "focus:outline-none"
+          )}
+          output="html"
+          placeholder="开始写作..."
+          autofocus={false}
+          editable={true}
+          editorClassName="focus:outline-hidden"
+          toolbarVariant={toolbarCollapsed ? "minimal" : (isLargeScreen ? "full" : "minimal")}
+          className="border-0 shadow-none bg-transparent"
+        />
+      </div>
 
       <Dialog open={showClearDialog} onOpenChange={setShowClearDialog}>
         <DialogContent>

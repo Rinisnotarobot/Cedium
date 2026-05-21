@@ -3,6 +3,7 @@ import { authClient } from "#/lib/auth-client";
 import { signupSchema } from "#/lib/validators/auth";
 import { useNavigate, Link } from "@tanstack/react-router";
 import { Button } from "#/components/ui/button";
+import { AUTH_CONFIG } from "#/lib/auth-config";
 import {
   Card,
   CardContent,
@@ -46,7 +47,7 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
       }
 
       if (data) {
-        navigate({ to: "/" });
+        navigate({ to: AUTH_CONFIG.defaultRedirectAfterSignup });
       }
     },
   });
