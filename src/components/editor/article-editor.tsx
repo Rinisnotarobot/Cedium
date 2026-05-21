@@ -1,10 +1,7 @@
-import { useEffect, useState, useRef } from "react";
-import type { Content } from "@tiptap/react";
+import { useState, useRef } from "react";
 import { MinimalTiptapEditor } from "#/components/ui/minimal-tiptap";
 import { useIsBreakpoint } from "#/hooks/use-is-breakpoint";
-import { useThrottledCallback } from "#/hooks/use-throttled-callback";
 import { useEditorContent } from "./context";
-import { loadDraft, saveDraft, clearDraft } from "./draft-storage";
 import {
   Dialog,
   DialogContent,
@@ -26,30 +23,12 @@ export function ArticleEditor({ toolbarCollapsed = false }: ArticleEditorProps) 
   const editorRef = useRef<HTMLDivElement>(null);
   const isLargeScreen = useIsBreakpoint("min", 1024);
 
-  const throttledSave = useThrottledCallback(
-    (value: Content) => saveDraft(value),
-    500,
-    [],
-  );
-
-  useEffect(() => {
-    const draft = loadDraft();
-    if (draft) {
-      setContent(draft);
-    }
-  }, [setContent]);
-
-  useEffect(() => {
-    throttledSave(content);
-  }, [content, throttledSave]);
-
   const handleClearRequest = () => {
     setShowClearDialog(true);
   };
 
   const handleClearConfirm = () => {
     setContent("");
-    clearDraft();
     setShowClearDialog(false);
   };
 
@@ -66,7 +45,7 @@ export function ArticleEditor({ toolbarCollapsed = false }: ArticleEditorProps) 
             "prose-p:text-muted-foreground prose-p:leading-relaxed",
             "focus:outline-none"
           )}
-          output="html"
+          output="json"
           placeholder="开始写作..."
           autofocus={false}
           editable={true}
@@ -81,7 +60,7 @@ export function ArticleEditor({ toolbarCollapsed = false }: ArticleEditorProps) 
           <DialogHeader>
             <DialogTitle>清空内容</DialogTitle>
             <DialogDescription>
-              确定要清空所有内容吗？此操作不可撤销，草稿将被删除。
+              确定要清空所有内容吗？此操作不可撤销。
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
