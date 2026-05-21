@@ -27,6 +27,11 @@ import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
 import { Route as AppMeProfileRouteImport } from './routes/_app/me/profile'
 import { Route as AppMeFavoritesRouteImport } from './routes/_app/me/favorites'
 import { Route as AppMeDraftsRouteImport } from './routes/_app/me/drafts'
+import { Route as AppMeSettingsRouteRouteImport } from './routes/_app/me/settings/route'
+import { Route as AppMeSettingsIndexRouteImport } from './routes/_app/me/settings/index'
+import { Route as AppMeSettingsPublishingRouteImport } from './routes/_app/me/settings/publishing'
+import { Route as AppMeSettingsNotificationsRouteImport } from './routes/_app/me/settings/notifications'
+import { Route as AppMeSettingsMembershipRouteImport } from './routes/_app/me/settings/membership'
 
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
@@ -116,6 +121,32 @@ const AppMeDraftsRoute = AppMeDraftsRouteImport.update({
   path: '/drafts',
   getParentRoute: () => AppMeRouteRoute,
 } as any)
+const AppMeSettingsRouteRoute = AppMeSettingsRouteRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => AppMeRouteRoute,
+} as any)
+const AppMeSettingsIndexRoute = AppMeSettingsIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AppMeSettingsRouteRoute,
+} as any)
+const AppMeSettingsPublishingRoute = AppMeSettingsPublishingRouteImport.update({
+  id: '/publishing',
+  path: '/publishing',
+  getParentRoute: () => AppMeSettingsRouteRoute,
+} as any)
+const AppMeSettingsNotificationsRoute =
+  AppMeSettingsNotificationsRouteImport.update({
+    id: '/notifications',
+    path: '/notifications',
+    getParentRoute: () => AppMeSettingsRouteRoute,
+  } as any)
+const AppMeSettingsMembershipRoute = AppMeSettingsMembershipRouteImport.update({
+  id: '/membership',
+  path: '/membership',
+  getParentRoute: () => AppMeSettingsRouteRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -128,12 +159,17 @@ export interface FileRoutesByFullPath {
   '/login': typeof AuthLoginRoute
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-up': typeof AuthSignUpRoute
+  '/me/settings': typeof AppMeSettingsRouteRouteWithChildren
   '/me/drafts': typeof AppMeDraftsRoute
   '/me/favorites': typeof AppMeFavoritesRoute
   '/me/profile': typeof AppMeProfileRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/me/': typeof AppMeIndexRoute
+  '/me/settings/membership': typeof AppMeSettingsMembershipRoute
+  '/me/settings/notifications': typeof AppMeSettingsNotificationsRoute
+  '/me/settings/publishing': typeof AppMeSettingsPublishingRoute
+  '/me/settings/': typeof AppMeSettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -151,6 +187,10 @@ export interface FileRoutesByTo {
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/me': typeof AppMeIndexRoute
+  '/me/settings/membership': typeof AppMeSettingsMembershipRoute
+  '/me/settings/notifications': typeof AppMeSettingsNotificationsRoute
+  '/me/settings/publishing': typeof AppMeSettingsPublishingRoute
+  '/me/settings': typeof AppMeSettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -166,12 +206,17 @@ export interface FileRoutesById {
   '/_auth/login': typeof AuthLoginRoute
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
+  '/_app/me/settings': typeof AppMeSettingsRouteRouteWithChildren
   '/_app/me/drafts': typeof AppMeDraftsRoute
   '/_app/me/favorites': typeof AppMeFavoritesRoute
   '/_app/me/profile': typeof AppMeProfileRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/_app/me/': typeof AppMeIndexRoute
+  '/_app/me/settings/membership': typeof AppMeSettingsMembershipRoute
+  '/_app/me/settings/notifications': typeof AppMeSettingsNotificationsRoute
+  '/_app/me/settings/publishing': typeof AppMeSettingsPublishingRoute
+  '/_app/me/settings/': typeof AppMeSettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -186,12 +231,17 @@ export interface FileRouteTypes {
     | '/login'
     | '/reset-password'
     | '/sign-up'
+    | '/me/settings'
     | '/me/drafts'
     | '/me/favorites'
     | '/me/profile'
     | '/api/auth/$'
     | '/api/upload/avatar'
     | '/me/'
+    | '/me/settings/membership'
+    | '/me/settings/notifications'
+    | '/me/settings/publishing'
+    | '/me/settings/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -209,6 +259,10 @@ export interface FileRouteTypes {
     | '/api/auth/$'
     | '/api/upload/avatar'
     | '/me'
+    | '/me/settings/membership'
+    | '/me/settings/notifications'
+    | '/me/settings/publishing'
+    | '/me/settings'
   id:
     | '__root__'
     | '/'
@@ -223,12 +277,17 @@ export interface FileRouteTypes {
     | '/_auth/login'
     | '/_auth/reset-password'
     | '/_auth/sign-up'
+    | '/_app/me/settings'
     | '/_app/me/drafts'
     | '/_app/me/favorites'
     | '/_app/me/profile'
     | '/api/auth/$'
     | '/api/upload/avatar'
     | '/_app/me/'
+    | '/_app/me/settings/membership'
+    | '/_app/me/settings/notifications'
+    | '/_app/me/settings/publishing'
+    | '/_app/me/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -368,10 +427,63 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMeDraftsRouteImport
       parentRoute: typeof AppMeRouteRoute
     }
+    '/_app/me/settings': {
+      id: '/_app/me/settings'
+      path: '/settings'
+      fullPath: '/me/settings'
+      preLoaderRoute: typeof AppMeSettingsRouteRouteImport
+      parentRoute: typeof AppMeRouteRoute
+    }
+    '/_app/me/settings/': {
+      id: '/_app/me/settings/'
+      path: '/'
+      fullPath: '/me/settings/'
+      preLoaderRoute: typeof AppMeSettingsIndexRouteImport
+      parentRoute: typeof AppMeSettingsRouteRoute
+    }
+    '/_app/me/settings/publishing': {
+      id: '/_app/me/settings/publishing'
+      path: '/publishing'
+      fullPath: '/me/settings/publishing'
+      preLoaderRoute: typeof AppMeSettingsPublishingRouteImport
+      parentRoute: typeof AppMeSettingsRouteRoute
+    }
+    '/_app/me/settings/notifications': {
+      id: '/_app/me/settings/notifications'
+      path: '/notifications'
+      fullPath: '/me/settings/notifications'
+      preLoaderRoute: typeof AppMeSettingsNotificationsRouteImport
+      parentRoute: typeof AppMeSettingsRouteRoute
+    }
+    '/_app/me/settings/membership': {
+      id: '/_app/me/settings/membership'
+      path: '/membership'
+      fullPath: '/me/settings/membership'
+      preLoaderRoute: typeof AppMeSettingsMembershipRouteImport
+      parentRoute: typeof AppMeSettingsRouteRoute
+    }
   }
 }
 
+interface AppMeSettingsRouteRouteChildren {
+  AppMeSettingsMembershipRoute: typeof AppMeSettingsMembershipRoute
+  AppMeSettingsNotificationsRoute: typeof AppMeSettingsNotificationsRoute
+  AppMeSettingsPublishingRoute: typeof AppMeSettingsPublishingRoute
+  AppMeSettingsIndexRoute: typeof AppMeSettingsIndexRoute
+}
+
+const AppMeSettingsRouteRouteChildren: AppMeSettingsRouteRouteChildren = {
+  AppMeSettingsMembershipRoute: AppMeSettingsMembershipRoute,
+  AppMeSettingsNotificationsRoute: AppMeSettingsNotificationsRoute,
+  AppMeSettingsPublishingRoute: AppMeSettingsPublishingRoute,
+  AppMeSettingsIndexRoute: AppMeSettingsIndexRoute,
+}
+
+const AppMeSettingsRouteRouteWithChildren =
+  AppMeSettingsRouteRoute._addFileChildren(AppMeSettingsRouteRouteChildren)
+
 interface AppMeRouteRouteChildren {
+  AppMeSettingsRouteRoute: typeof AppMeSettingsRouteRouteWithChildren
   AppMeDraftsRoute: typeof AppMeDraftsRoute
   AppMeFavoritesRoute: typeof AppMeFavoritesRoute
   AppMeProfileRoute: typeof AppMeProfileRoute
@@ -379,6 +491,7 @@ interface AppMeRouteRouteChildren {
 }
 
 const AppMeRouteRouteChildren: AppMeRouteRouteChildren = {
+  AppMeSettingsRouteRoute: AppMeSettingsRouteRouteWithChildren,
   AppMeDraftsRoute: AppMeDraftsRoute,
   AppMeFavoritesRoute: AppMeFavoritesRoute,
   AppMeProfileRoute: AppMeProfileRoute,
