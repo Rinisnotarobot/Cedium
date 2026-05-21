@@ -63,7 +63,8 @@ export async function sendEmail({ to, subject, html }: SendEmailOptions) {
 
 export function generateVerificationCodeEmailHtml(
   userName: string,
-  code: string
+  code: string,
+  purpose: string = '验证您的邮箱'
 ) {
   return `
 <!DOCTYPE html>
@@ -85,12 +86,12 @@ export function generateVerificationCodeEmailHtml(
       <h1>Cedium</h1>
     </div>
     <div class="content">
-      <h2>验证您的邮箱</h2>
+      <h2>${purpose}</h2>
       <p>您好，${userName}！</p>
       <p>您的验证码是：</p>
       <div class="code">${code}</div>
       <p style="margin-top: 20px; font-size: 14px; color: #666;">
-        此验证码将在 10 分钟后失效。如果您没有请求验证，请忽略此邮件。
+        此验证码将在 10 分钟后失效。如果您没有请求此操作，请忽略此邮件。
       </p>
     </div>
     <div class="footer">

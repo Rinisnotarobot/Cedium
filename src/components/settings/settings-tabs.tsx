@@ -5,7 +5,7 @@ const tabs = [
   { label: "账户", path: "/me/settings" },
   { label: "发布", path: "/me/settings/publishing" },
   { label: "通知", path: "/me/settings/notifications" },
-  { label: "会员与支付", path: "/me/settings/membership" },
+  { label: "安全", path: "/me/settings/security" },
 ];
 
 export function SettingsTabs() {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { toast } from "sonner";
 import { authClient } from "#/lib/auth-client";
 import {
@@ -18,6 +18,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
 import { FileInput } from "#/components/ui/file-input";
 import { cn } from "#/lib/utils";
 import { Loader2 } from "lucide-react";
+import { useAvatarUpload, useUpdateProfile } from "#/hooks/mutations";
 
 interface ExtendedUser {
   name: string;
@@ -35,70 +36,35 @@ interface ProfileEditDialogProps {
 }
 
 export function ProfileEditDialog({ open, onOpenChange }: ProfileEditDialogProps) {
-  const { data: session, refetch } = authClient.useSession();
+  const { data: session } = authClient.useSession();
   const user = session?.user as ExtendedUser | undefined;
 
   const [name, setName] = useState(user?.name ?? "");
   const [image, setImage] = useState(user?.image ?? "");
-  const [uploading, setUploading] = useState(false);
-  const [saving, setSaving] = useState(false);
 
   const nameLength = name.length;
   const nameLimit = 50;
   const nameError = name.length > 0 && name.length < 2;
 
-  const handleFileUpload = useCallback(async (file: File) => {
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
+  const avatarUpload = useAvatarUpload({
+    onSuccess: (url) => setImage(url),
+  });
 
-      const response = await fetch("/api/upload/avatar", {
-        method: "POST",
-        body: formData,
-      });
+  const updateProfile = useUpdateProfile({
+    onSuccess: () => onOpenChange(false),
+  });
 
-      const result = await response.json();
+  const handleFileUpload = (file: File) => {
+    avatarUpload.mutate({ file });
+  };
 
-      if (!result.success) {
-        toast.error(result.error || "上传失败");
-        return;
-      }
-
-      setImage(result.url);
-    } catch {
-      toast.error("上传失败，请稍后重试");
-    } finally {
-      setUploading(false);
-    }
-  }, []);
-
-  const handleSave = useCallback(async () => {
+  const handleSave = () => {
     if (nameError) return;
-
-    setSaving(true);
-    try {
-      const { data, error } = await authClient.updateUser({
-        name: name.trim(),
-        image: image || undefined,
-      });
-
-      if (error) {
-        toast.error(error.message ?? "更新失败，请稍后重试");
-        return;
-      }
-
-      if (data) {
-        toast.success("个人资料已更新");
-        refetch();
-        onOpenChange(false);
-      }
-    } catch {
-      toast.error("更新失败，请稍后重试");
-    } finally {
-      setSaving(false);
-    }
-  }, [name, nameError, image, refetch, onOpenChange]);
+    updateProfile.mutate({
+      name: name.trim(),
+      image: image || undefined,
+    });
+  };
 
   const handleOpenChange = (newOpen: boolean) => {
     if (!newOpen) {
@@ -127,7 +93,7 @@ export function ProfileEditDialog({ open, onOpenChange }: ProfileEditDialogProps
                   {name?.charAt(0).toUpperCase() ?? user?.name?.charAt(0).toUpperCase() ?? "U"}
                 </AvatarFallback>
               </Avatar>
-              {uploading && (
+              {avatarUpload.isPending && (
                 <div className="absolute inset-0 flex items-center justify-center rounded-full bg-black/40">
                   <Loader2 className="size-4 animate-spin text-white" />
                 </div>
@@ -135,8 +101,8 @@ export function ProfileEditDialog({ open, onOpenChange }: ProfileEditDialogProps
             </div>
             <div className="space-y-1">
               <div className="flex items-center gap-3">
-                <FileInput onFileSelect={handleFileUpload} onError={(e) => toast.error(e)} disabled={uploading}>
-                  <Button type="button" variant="link" size="sm" className="h-auto p-0" disabled={uploading}>
+                <FileInput onFileSelect={handleFileUpload} onError={(e) => toast.error(e)} disabled={avatarUpload.isPending}>
+                  <Button type="button" variant="link" size="sm" className="h-auto p-0" disabled={avatarUpload.isPending}>
                     更换头像
                   </Button>
                 </FileInput>
@@ -216,13 +182,13 @@ export function ProfileEditDialog({ open, onOpenChange }: ProfileEditDialogProps
         <DialogFooter>
           <Button
             onClick={handleSave}
-            disabled={saving || nameError || name.trim().length === 0}
+            disabled={updateProfile.isPending || nameError || name.trim().length === 0}
             className={cn(
               "transition-[transform,opacity] duration-150 ease-out",
               "active:scale-[0.97]",
             )}
           >
-            {saving && <Loader2 className="size-4 animate-spin" />}
+            {updateProfile.isPending && <Loader2 className="size-4 animate-spin" />}
             保存
           </Button>
         </DialogFooter>

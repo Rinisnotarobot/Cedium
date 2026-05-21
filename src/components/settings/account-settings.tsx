@@ -1,5 +1,4 @@
-import { useState, useEffect, useCallback } from "react";
-import { toast } from "sonner";
+import { useState, useEffect } from "react";
 import { authClient } from "#/lib/auth-client";
 import { cn } from "#/lib/utils";
 import { Avatar, AvatarFallback, AvatarImage } from "#/components/ui/avatar";
@@ -21,6 +20,7 @@ import {
 import { Skeleton } from "#/components/ui/skeleton";
 import { ArrowUpRight, Loader2 } from "lucide-react";
 import { ProfileEditDialog } from "#/components/settings/profile-edit-dialog";
+import { useSendVerificationOtp, useVerifyEmail } from "#/hooks/mutations";
 
 export function AccountSettings() {
   const { data: session, isPending, refetch } = authClient.useSession();
@@ -118,9 +118,18 @@ function EmailVerificationStatus({
 }) {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [otp, setOtp] = useState("");
-  const [isSending, setIsSending] = useState(false);
-  const [isVerifying, setIsVerifying] = useState(false);
   const [countdown, setCountdown] = useState(0);
+
+  const sendOtp = useSendVerificationOtp({
+    onSuccess: () => setCountdown(60),
+  });
+
+  const verifyEmail = useVerifyEmail({
+    onSuccess: () => {
+      setDialogOpen(false);
+      onVerified();
+    },
+  });
 
   // 倒计时逻辑
   useEffect(() => {
@@ -141,47 +150,14 @@ function EmailVerificationStatus({
     }
   }, [dialogOpen]);
 
-  const handleSendOtp = useCallback(async () => {
+  const handleSendOtp = () => {
     if (countdown > 0) return;
+    sendOtp.mutate({ email, type: "email-verification" });
+  };
 
-    setIsSending(true);
-    try {
-      const { error } = await authClient.emailOtp.sendVerificationOtp({
-        email,
-        type: "email-verification",
-      });
-
-      if (error) {
-        toast.error(error.message ?? "发送验证码失败，请稍后重试");
-        return;
-      }
-
-      setCountdown(60);
-      toast.success("验证码已发送");
-    } finally {
-      setIsSending(false);
-    }
-  }, [countdown, email]);
-
-  const handleVerify = async () => {
-    if (otp.length !== 6) {
-      toast.error("请输入 6 位验证码");
-      return;
-    }
-    setIsVerifying(true);
-    try {
-      await authClient.$fetch("/email-otp/verify-email", {
-        method: "POST",
-        body: { email, otp },
-      });
-      toast.success("邮箱验证成功");
-      setDialogOpen(false);
-      onVerified();
-    } catch {
-      toast.error("验证码错误或已过期");
-    } finally {
-      setIsVerifying(false);
-    }
+  const handleVerify = () => {
+    if (otp.length !== 6) return;
+    verifyEmail.mutate({ email, otp });
   };
 
   if (emailVerified) {
@@ -224,7 +200,7 @@ function EmailVerificationStatus({
               maxLength={6}
               value={otp}
               onChange={(value) => setOtp(value)}
-              disabled={isVerifying}
+              disabled={verifyEmail.isPending}
             >
               <InputOTPGroup>
                 <InputOTPSlot index={0} />
@@ -239,7 +215,7 @@ function EmailVerificationStatus({
             <Button
               variant="outline"
               onClick={handleSendOtp}
-              disabled={isSending || countdown > 0}
+              disabled={sendOtp.isPending || countdown > 0}
               className={cn(
                 "w-full",
                 "transition-[transform,opacity] duration-150 ease-out",
@@ -247,7 +223,7 @@ function EmailVerificationStatus({
                 countdown > 0 && "opacity-70"
               )}
             >
-              {isSending ? (
+              {sendOtp.isPending ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : countdown > 0 ? (
                 <span className="tabular-nums">{countdown}秒后可重发</span>
@@ -260,7 +236,7 @@ function EmailVerificationStatus({
           <DialogFooter className="justify-center">
             <Button
               onClick={handleVerify}
-              disabled={isVerifying || otp.length !== 6}
+              disabled={verifyEmail.isPending || otp.length !== 6}
               className={cn(
                 "w-full",
                 "transition-[transform,opacity] duration-150 ease-out",
@@ -268,7 +244,7 @@ function EmailVerificationStatus({
                 "disabled:opacity-50"
               )}
             >
-              {isVerifying && <Loader2 className="size-4 animate-spin" />}
+              {verifyEmail.isPending && <Loader2 className="size-4 animate-spin" />}
               验证
             </Button>
           </DialogFooter>

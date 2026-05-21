@@ -45,6 +45,15 @@ export const auth = betterAuth({
           if (!result.success) {
             throw new Error(result.error || '邮件发送失败')
           }
+        } else if (type === 'forget-password') {
+          const result = await sendEmail({
+            to: email,
+            subject: '重置密码验证码',
+            html: generateVerificationCodeEmailHtml(email, otp, '重置密码'),
+          })
+          if (!result.success) {
+            throw new Error(result.error || '邮件发送失败')
+          }
         }
       },
       otpLength: 6,

@@ -1,4 +1,4 @@
-import { BookOpen, PenSquare, User, Heart, FileText, Sun, Moon } from "lucide-react";
+import { BookOpen, PenSquare, Heart, FileText, Sun, Moon } from "lucide-react";
 import { Link, useLocation } from "@tanstack/react-router";
 
 import {
@@ -39,14 +39,6 @@ const readItems = [
     title: "收藏",
     icon: Heart,
     to: "/me/favorites",
-  },
-];
-
-const settingsItems = [
-  {
-    title: "个人资料",
-    icon: User,
-    to: "/me/profile",
   },
 ];
 
@@ -113,28 +105,6 @@ export function AppSidebar() {
           <SidebarGroupContent>
             <SidebarMenu>
               {readItems.map((item) => (
-                <SidebarMenuItem key={item.title}>
-                  <SidebarMenuButton
-                    asChild
-                    tooltip={item.title}
-                    isActive={isActive(item.to)}
-                  >
-                    <Link to={item.to}>
-                      <item.icon />
-                      <span>{item.title}</span>
-                    </Link>
-                  </SidebarMenuButton>
-                </SidebarMenuItem>
-              ))}
-            </SidebarMenu>
-          </SidebarGroupContent>
-        </SidebarGroup>
-
-        <SidebarGroup>
-          <SidebarGroupLabel>设置</SidebarGroupLabel>
-          <SidebarGroupContent>
-            <SidebarMenu>
-              {settingsItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild
