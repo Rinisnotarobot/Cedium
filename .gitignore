@@ -12,3 +12,6 @@ dist-ssr
 __unconfig*
 todos.json
 *.tsbuildinfo
+
+# CodeGraph index (local tool cache)
+.codegraph/
