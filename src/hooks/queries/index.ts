@@ -1,1 +1,2 @@
-export { useArticles, useArticle, useMyArticles, useArticlesByAuthor } from './use-article-queries'
+// Article queries removed - routes now use loaders directly
+export {}

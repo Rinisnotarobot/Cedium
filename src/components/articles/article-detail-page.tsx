@@ -76,6 +76,24 @@ export function ArticleDetailPage() {
             </div>
           </div>
 
+          {/* 标签显示 */}
+          {article.tags && article.tags.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {article.tags.map(tag => (
+                <Link
+                  key={tag.slug}
+                  to="/articles"
+                  search={{ tag: tag.slug }}
+                  className="transition-colors"
+                >
+                  <Badge variant="outline" className="hover:bg-primary/10 hover:text-primary">
+                    #{tag.slug}
+                  </Badge>
+                </Link>
+              ))}
+            </div>
+          )}
+
           {/* 分隔线 */}
           <div className="h-px bg-border" />
         </header>

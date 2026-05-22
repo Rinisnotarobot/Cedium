@@ -66,3 +66,13 @@ export type Verification = Prisma.VerificationModel
  * 
  */
 export type Article = Prisma.ArticleModel
+/**
+ * Model Tag
+ * 
+ */
+export type Tag = Prisma.TagModel
+/**
+ * Model ArticleTag
+ * 
+ */
+export type ArticleTag = Prisma.ArticleTagModel
