@@ -1,6 +1,7 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { authClient } from '#/lib/auth-client'
+import { uploadAvatarFn } from '#/data/user'
 import { getErrorMessage } from '../utils/get-error-message'
 
 export interface AvatarUploadVariables {
@@ -9,12 +10,6 @@ export interface AvatarUploadVariables {
 
 interface AvatarUploadResult {
   url: string
-}
-
-interface UploadApiResponse {
-  success: boolean
-  url?: string
-  error?: string
 }
 
 export interface UseAvatarUploadOptions {
@@ -26,22 +21,7 @@ async function uploadAvatar(variables: AvatarUploadVariables): Promise<AvatarUpl
   const formData = new FormData()
   formData.append('file', variables.file)
 
-  const response = await fetch('/api/upload/avatar', {
-    method: 'POST',
-    body: formData,
-  })
-
-  if (!response.ok) {
-    throw new Error(`上传失败: HTTP ${response.status}`)
-  }
-
-  const result: UploadApiResponse = await response.json()
-
-  if (!result.success || !result.url) {
-    throw new Error(result.error ?? '上传失败')
-  }
-
-  return { url: result.url }
+  return await uploadAvatarFn({ data: formData })
 }
 
 export function useAvatarUpload(options?: UseAvatarUploadOptions) {

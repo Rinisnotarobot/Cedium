@@ -16,10 +16,12 @@ model User {
   image         String?
   bio           String?
   pronouns      String?
+  draftCount    Int       @default(0)
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
   sessions      Session[]
   accounts      Account[]
+  articles      Article[]
 
   @@unique([email])
   @@map("user")
@@ -71,4 +73,30 @@ model Verification {
 
   @@index([identifier])
   @@map("verification")
+}
+
+enum ArticleStatus {
+  DRAFT      // 草稿 - 仅作者可见
+  PUBLISHED  // 已发布 - 公开可见
+  ARCHIVED   // 已归档 - 仅作者可见，从列表隐藏
+}
+
+model Article {
+  id          String        @id @default(cuid())
+  title       String        @db.VarChar(100)
+  slug        String        @unique @default(cuid())
+  excerpt     String?       @db.VarChar(200)
+  content     String        @db.Text
+  coverImage  String?       @db.VarChar(500)
+  status      ArticleStatus @default(DRAFT)
+  authorId    String
+  author      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt   DateTime      @default(now())
+  updatedAt   DateTime      @updatedAt
+  publishedAt DateTime?
+
+  @@index([authorId])
+  @@index([status])
+  @@index([publishedAt])
+  @@map("article")
 }

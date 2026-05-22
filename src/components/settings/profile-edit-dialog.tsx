@@ -62,7 +62,7 @@ export function ProfileEditDialog({ open, onOpenChange }: ProfileEditDialogProps
     if (nameError) return;
     updateProfile.mutate({
       name: name.trim(),
-      image: image || undefined,
+      image: image || '',
     });
   };
 

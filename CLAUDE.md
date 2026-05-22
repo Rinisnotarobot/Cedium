@@ -123,6 +123,35 @@ pnpm dlx shadcn@latest add dialog
 
 Tiptap 富文本编辑器封装在 `src/components/ui/minimal-tiptap/`，用于写作功能 (`src/routes/_app/write.tsx`)。
 
+## Hooks 结构
+
+`src/hooks/` 按功能分类：
+
+| 目录/文件 | 用途 |
+|----------|------|
+| `mutations/` | TanStack Query mutations（头像上传、密码重置、邮箱验证等） |
+| `use-*.ts` | 工具 hooks（响应式、滚动、窗口尺寸等） |
+
+所有 hooks 从 `#/hooks` 统一导出。
+
+## 验证器
+
+Zod schemas 在 `src/lib/validators/`：
+- `auth.ts` - 登录、注册、密码相关验证
+- `profile.ts` - 用户资料验证
+
+## 组件结构
+
+组件按功能划分在 `src/components/`：
+
+| 目录 | 用途 |
+|------|------|
+| `auth/` | 认证相关（登录表单、密码修改） |
+| `settings/` | 设置页面组件（账号、安全、通知） |
+| `layout/` | 布局组件（AppSidebar） |
+| `editor/` | 编辑器相关 |
+| `ui/` | Shadcn/UI 基础组件 + minimal-tiptap |
+
 ## React Compiler
 
 项目启用了 React Compiler (Babel preset)，无需手动 memo/useMemo。

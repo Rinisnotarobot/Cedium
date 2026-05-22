@@ -1,4 +1,5 @@
 export * from './mutations'
+export * from './queries'
 export { useComposedRef } from './use-composed-ref'
 export { useElementRect } from './use-element-rect'
 export { useIsBreakpoint } from './use-is-breakpoint'

@@ -41,7 +41,7 @@
     "@tanstack/react-router-ssr-query": "latest",
     "@tanstack/react-start": "latest",
     "@tanstack/react-table": "latest",
-    "@tanstack/router-plugin": "^1.168.6",
+    "@tanstack/router-plugin": "^1.168.9",
     "@tiptap/extension-bubble-menu": "^3.23.4",
     "@tiptap/extension-code-block-lowlight": "^3.23.4",
     "@tiptap/extension-color": "^3.23.4",
