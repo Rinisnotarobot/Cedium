@@ -1,10 +1,9 @@
 import { useState } from "react"
-import { Link } from "@tanstack/react-router"
+import { Link, useRouter } from "@tanstack/react-router"
 import { PageContainer, PageHeader } from "#/components/layout"
 import { Card, CardContent } from "#/components/ui/card"
 import { Clock, Edit3, Trash2, Send, MoreVertical } from "lucide-react"
 import { Button } from "#/components/ui/button"
-import { Skeleton } from "#/components/ui/skeleton"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -21,8 +20,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "#/components/ui/alert-dialog"
-import { useMyArticles, useDeleteArticle, usePublishArticle } from "#/hooks"
-import { ArticleStatus } from "#/generated/prisma/enums"
+import { useDeleteArticle, usePublishArticle } from "#/hooks"
+import { Route } from "#/routes/_app/me/drafts"
 import type { Article } from "#/types/article"
 
 function DraftCard({
@@ -93,71 +92,38 @@ function DraftCard({
   )
 }
 
-function DraftCardSkeleton() {
-  return (
-    <Card>
-      <CardContent className="p-5">
-        <div className="flex flex-col gap-3">
-          <Skeleton className="h-5 w-3/4" />
-          <Skeleton className="h-4 w-full" />
-          <Skeleton className="h-4 w-2/3" />
-          <div className="flex items-center justify-between">
-            <Skeleton className="h-3 w-12" />
-            <Skeleton className="h-3 w-20" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
 export function DraftsPage() {
-  const { data, isLoading, error } = useMyArticles(1, 20, ArticleStatus.DRAFT)
+  const router = useRouter()
+  const data = Route.useLoaderData()
   const deleteArticle = useDeleteArticle()
   const publishArticle = usePublishArticle()
 
   const [deleteTarget, setDeleteTarget] = useState<string | null>(null)
   const [publishTarget, setPublishTarget] = useState<string | null>(null)
 
-  const drafts = data?.data ?? []
+  const drafts = data?.articles ?? []
   const total = data?.meta?.total ?? 0
 
   function handleDeleteConfirm() {
     if (deleteTarget) {
-      deleteArticle.mutate(deleteTarget)
-      setDeleteTarget(null)
+      deleteArticle.mutate(deleteTarget, {
+        onSuccess: () => {
+          router.invalidate()
+          setDeleteTarget(null)
+        },
+      })
     }
   }
 
   function handlePublishConfirm() {
     if (publishTarget) {
-      publishArticle.mutate({ id: publishTarget })
-      setPublishTarget(null)
+      publishArticle.mutate({ id: publishTarget }, {
+        onSuccess: () => {
+          router.invalidate()
+          setPublishTarget(null)
+        },
+      })
     }
-  }
-
-  if (isLoading) {
-    return (
-      <PageContainer width="3xl" variant="spaced">
-        <PageHeader title="草稿箱" description="继续编辑您未完成的文章" />
-        <div className="space-y-4">
-          {[1, 2, 3].map((i) => (
-            <DraftCardSkeleton key={i} />
-          ))}
-        </div>
-      </PageContainer>
-    )
-  }
-
-  if (error) {
-    return (
-      <PageContainer width="3xl" variant="spaced">
-        <PageHeader title="草稿箱" description="继续编辑您未完成的文章" />
-        <div className="text-center py-12 text-muted-foreground">
-          加载失败，请稍后重试
-        </div>
-      </PageContainer>
-    )
   }
 
   return (

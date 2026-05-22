@@ -48,3 +48,35 @@ export const paginationSchema = z.object({
   limit: z.number().int().min(1).max(50).default(10),
 })
 export type PaginationInput = z.infer<typeof paginationSchema>
+
+// 获取文章详情
+export const getArticleByIdSchema = z.object({
+  id: z.string().min(1, '文章ID不能为空'),
+})
+export type GetArticleByIdInput = z.infer<typeof getArticleByIdSchema>
+
+// 获取我的文章列表（带状态过滤）
+export const getMyArticlesSchema = paginationSchema.extend({
+  status: z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED']).optional(),
+})
+export type GetMyArticlesInput = z.infer<typeof getMyArticlesSchema>
+
+// 获取公开文章列表
+export const getPublishedArticlesSchema = paginationSchema
+export type GetPublishedArticlesInput = z.infer<typeof getPublishedArticlesSchema>
+
+// 获取作者文章列表
+export const getArticlesByAuthorSchema = paginationSchema.extend({
+  username: z.string().optional(),
+  authorId: z.string().optional(),
+}).refine(
+  (data) => data.username || data.authorId,
+  { message: '请提供用户名或用户ID' },
+)
+export type GetArticlesByAuthorInput = z.infer<typeof getArticlesByAuthorSchema>
+
+// 删除文章
+export const deleteArticleSchema = z.object({
+  id: z.string().min(1, '文章ID不能为空'),
+})
+export type DeleteArticleInput = z.infer<typeof deleteArticleSchema>

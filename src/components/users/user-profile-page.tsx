@@ -1,48 +1,12 @@
 import { PageContainer } from "#/components/layout"
 import { Card, CardContent } from "#/components/ui/card"
-import { Skeleton } from "#/components/ui/skeleton"
 import { Clock } from "lucide-react"
 import { Link } from "@tanstack/react-router"
-import { useArticlesByAuthor } from "#/hooks"
 import { getAvatarColor } from "#/lib/utils/avatar-color"
 import { estimateReadTime } from "#/lib/utils/article-content"
 import { Button } from "#/components/ui/button"
 import { Route } from "#/routes/users.$username"
 import type { Article } from "#/types/article"
-
-function UserProfileSkeleton() {
-  return (
-    <PageContainer width="3xl" variant="spaced">
-      <header className="mb-8">
-        <div className="flex items-center gap-4">
-          <Skeleton className="size-16 rounded-full" />
-          <div className="space-y-2">
-            <Skeleton className="h-6 w-24" />
-            <Skeleton className="h-4 w-40" />
-          </div>
-        </div>
-      </header>
-      <section>
-        <Skeleton className="h-4 w-20 mb-4" />
-        <div className="space-y-3">
-          {[1, 2, 3].map((i) => (
-            <Card key={i}>
-              <CardContent className="p-5">
-                <div className="flex gap-4">
-                  <Skeleton className="size-10 rounded-full shrink-0" />
-                  <div className="flex-1 min-w-0 space-y-2">
-                    <Skeleton className="h-5 w-3/4" />
-                    <Skeleton className="h-4 w-full" />
-                  </div>
-                </div>
-              </CardContent>
-            </Card>
-          ))}
-        </div>
-      </section>
-    </PageContainer>
-  )
-}
 
 function UserArticleCard({ article }: { article: Article }) {
   const avatarColor = getAvatarColor(article.author?.name || "")
@@ -90,32 +54,11 @@ function UserArticleCard({ article }: { article: Article }) {
 }
 
 export function UserProfilePage() {
-  const { username } = Route.useParams()
-  const { data, isLoading, error } = useArticlesByAuthor(username, 1, 20)
+  const data = Route.useLoaderData()
 
-  if (isLoading) {
-    return <UserProfileSkeleton />
-  }
-
-  if (error || !data?.success) {
-    return (
-      <PageContainer width="3xl" variant="spaced">
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold mb-4">用户不存在</h1>
-          <p className="text-muted-foreground mb-6">
-            该用户可能尚未注册或用户名不正确
-          </p>
-          <Button variant="outline" asChild>
-            <Link to="/articles">返回文章列表</Link>
-          </Button>
-        </div>
-      </PageContainer>
-    )
-  }
-
-  const articles = data.data ?? []
-  const total = data.meta?.total ?? 0
-  const author = data.author
+  const articles = data?.articles ?? []
+  const total = data?.meta?.total ?? 0
+  const author = data?.author
   const avatarColor = getAvatarColor(author?.name || "")
 
   return (

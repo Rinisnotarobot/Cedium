@@ -9,9 +9,9 @@ export interface Article {
   coverImage: string | null
   status: ArticleStatus
   authorId: string
-  createdAt: string
-  updatedAt: string
-  publishedAt: string | null
+  createdAt: Date | string
+  updatedAt: Date | string
+  publishedAt: Date | string | null
   author?: {
     id: string
     name: string

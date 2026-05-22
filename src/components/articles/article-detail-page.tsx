@@ -1,61 +1,16 @@
 import { PageContainer } from "#/components/layout"
-import { Skeleton } from "#/components/ui/skeleton"
 import { Badge } from "#/components/ui/badge"
 import { Clock, ArrowLeft } from "lucide-react"
 import { Link } from "@tanstack/react-router"
-import { useArticle } from "#/hooks"
 import { ArticleContent } from "./article-content"
 import { getAvatarColor } from "#/lib/utils/avatar-color"
 import { estimateReadTime } from "#/lib/utils/article-content"
 import { Button } from "#/components/ui/button"
 import { Route } from "#/routes/articles.$slug"
 
-function ArticleDetailSkeleton() {
-  return (
-    <PageContainer width="3xl" variant="spaced">
-      <header className="mb-8">
-        <Skeleton className="h-4 w-16 mb-4" />
-        <Skeleton className="h-10 w-3/4 mb-4" />
-        <div className="flex items-center gap-3">
-          <Skeleton className="size-10 rounded-full" />
-          <Skeleton className="h-4 w-24" />
-        </div>
-      </header>
-      <main className="space-y-6">
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-full" />
-        <Skeleton className="h-4 w-2/3" />
-        <Skeleton className="h-64 w-full" />
-      </main>
-    </PageContainer>
-  )
-}
-
 export function ArticleDetailPage() {
-  const { slug } = Route.useParams()
-  const { data, isLoading, error } = useArticle(slug)
+  const { article } = Route.useLoaderData()
 
-  if (isLoading) {
-    return <ArticleDetailSkeleton />
-  }
-
-  if (error || !data?.success || !data?.data) {
-    return (
-      <PageContainer width="3xl" variant="spaced">
-        <div className="text-center py-12">
-          <h1 className="text-2xl font-bold mb-4">文章不存在</h1>
-          <p className="text-muted-foreground mb-6">
-            该文章可能已被删除或尚未发布
-          </p>
-          <Button variant="outline" asChild>
-            <Link to="/articles">返回文章列表</Link>
-          </Button>
-        </div>
-      </PageContainer>
-    )
-  }
-
-  const article = data.data
   const avatarColor = getAvatarColor(article.author?.name || "")
   const readTime = estimateReadTime(article.content)
 

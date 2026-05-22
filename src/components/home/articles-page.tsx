@@ -1,55 +1,12 @@
 import { PageContainer, PageHeader } from "#/components/layout"
 import { Card, CardContent } from "#/components/ui/card"
 import { Badge } from "#/components/ui/badge"
-import { Skeleton } from "#/components/ui/skeleton"
 import { Clock, ArrowUpRight } from "lucide-react"
 import { Link, useNavigate } from "@tanstack/react-router"
-import { useArticles } from "#/hooks"
 import { getAvatarColor } from "#/lib/utils/avatar-color"
 import { estimateReadTime } from "#/lib/utils/article-content"
+import { Route } from "#/routes/_app/articles"
 import type { Article } from "#/types/article"
-
-function ArticleCardSkeleton() {
-  return (
-    <Card>
-      <CardContent className="p-5">
-        <div className="flex gap-4">
-          <Skeleton className="size-10 rounded-full shrink-0" />
-          <div className="flex-1 min-w-0 space-y-2">
-            <Skeleton className="h-3 w-24" />
-            <Skeleton className="h-5 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <div className="flex justify-between pt-1">
-              <Skeleton className="h-3 w-16" />
-              <Skeleton className="h-3 w-20" />
-            </div>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
-
-function FeaturedArticleCardSkeleton() {
-  return (
-    <Card>
-      <CardContent className="p-8">
-        <div className="flex flex-col lg:flex-row gap-6">
-          <div className="flex items-center gap-3 lg:flex-col lg:items-start lg:gap-2">
-            <Skeleton className="size-14 rounded-full" />
-            <Skeleton className="h-5 w-12" />
-          </div>
-          <div className="flex-1 min-w-0 space-y-4">
-            <Skeleton className="h-3 w-32" />
-            <Skeleton className="h-8 w-3/4" />
-            <Skeleton className="h-4 w-full" />
-            <Skeleton className="h-4 w-2/3" />
-          </div>
-        </div>
-      </CardContent>
-    </Card>
-  )
-}
 
 function FeaturedArticleCard({ article }: { article: Article }) {
   const avatarColor = getAvatarColor(article.author?.name || "")
@@ -192,39 +149,10 @@ function ArticleCard({ article }: { article: Article }) {
 }
 
 export function ArticlesPage() {
-  const { data, isLoading, error } = useArticles(1, 20)
+  const data = Route.useLoaderData()
 
-  const articles = data?.data ?? []
+  const articles = data?.articles ?? []
   const total = data?.meta?.total ?? 0
-
-  if (isLoading) {
-    return (
-      <PageContainer width="3xl" variant="spaced">
-        <PageHeader title="文章" description="探索技术、架构与工程实践" />
-        <section className="mb-8 lg:mb-12">
-          <FeaturedArticleCardSkeleton />
-        </section>
-        <section>
-          <div className="space-y-3">
-            {[1, 2, 3].map((i) => (
-              <ArticleCardSkeleton key={i} />
-            ))}
-          </div>
-        </section>
-      </PageContainer>
-    )
-  }
-
-  if (error) {
-    return (
-      <PageContainer width="3xl" variant="spaced">
-        <PageHeader title="文章" description="探索技术、架构与工程实践" />
-        <div className="text-center py-12 text-muted-foreground">
-          加载失败，请稍后重试
-        </div>
-      </PageContainer>
-    )
-  }
 
   if (articles.length === 0) {
     return (

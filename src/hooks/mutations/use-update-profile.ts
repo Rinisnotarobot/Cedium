@@ -1,12 +1,12 @@
 import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 import { authClient } from '#/lib/auth-client'
+import { updateProfileFn } from '#/data/user'
+import { profileSchema } from '#/lib/validators/profile'
+import type { ProfileInput } from '#/lib/validators/profile'
 import { getErrorMessage } from '../utils/get-error-message'
 
-export interface UpdateProfileVariables {
-  name?: string
-  image?: string | null
-}
+export type UpdateProfileVariables = ProfileInput
 
 export interface UseUpdateProfileOptions {
   onSuccess?: () => void
@@ -18,16 +18,7 @@ export function useUpdateProfile(options?: UseUpdateProfileOptions) {
 
   return useMutation({
     mutationFn: async (variables: UpdateProfileVariables) => {
-      const { data, error } = await authClient.updateUser({
-        name: variables.name,
-        image: variables.image || undefined,
-      })
-
-      if (error) {
-        throw new Error(error.message ?? '更新失败，请稍后重试')
-      }
-
-      return data
+      return await updateProfileFn({ data: profileSchema.parse(variables) })
     },
     onSuccess: () => {
       refetch()

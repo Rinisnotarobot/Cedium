@@ -106,7 +106,7 @@ export function WritePage() {
           excerpt: currentExcerpt || undefined,
           content: contentStr,
         });
-        return result.article.id;
+        return result.id;
       } catch {
         return null;
       }
