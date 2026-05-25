@@ -67,6 +67,22 @@ function FeaturedArticleCard({ article }: { article: Article }) {
                 {article.excerpt || "暂无摘要"}
               </p>
 
+              {/* 标签显示 */}
+              {article.tags && article.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1.5">
+                  {article.tags.slice(0, 3).map(tag => (
+                    <Badge key={tag.slug} variant="outline" className="text-xs">
+                      #{tag.slug}
+                    </Badge>
+                  ))}
+                  {article.tags.length > 3 && (
+                    <span className="text-xs text-muted-foreground">
+                      +{article.tags.length - 3}
+                    </span>
+                  )}
+                </div>
+              )}
+
               <div className="flex items-center justify-between pt-2">
                 <div className="flex items-center gap-1.5 text-sm text-muted-foreground">
                   <Clock className="size-4" />
@@ -133,6 +149,22 @@ function ArticleCard({ article }: { article: Article }) {
               <p className="text-muted-foreground text-sm leading-relaxed line-clamp-2">
                 {article.excerpt || "暂无摘要"}
               </p>
+
+              {/* 标签显示 */}
+              {article.tags && article.tags.length > 0 && (
+                <div className="flex flex-wrap gap-1 pt-1">
+                  {article.tags.slice(0, 3).map(tag => (
+                    <Badge key={tag.slug} variant="outline" className="text-xs px-1.5 py-0 h-auto">
+                      #{tag.slug}
+                    </Badge>
+                  ))}
+                  {article.tags.length > 3 && (
+                    <span className="text-xs text-muted-foreground">
+                      +{article.tags.length - 3}
+                    </span>
+                  )}
+                </div>
+              )}
 
               <div className="flex items-center justify-between pt-1">
                 <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

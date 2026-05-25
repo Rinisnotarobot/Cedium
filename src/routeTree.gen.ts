@@ -23,18 +23,10 @@ import { Route as AppWriteRouteImport } from './routes/_app/write'
 import { Route as AppSearchRouteImport } from './routes/_app/search'
 import { Route as AppArticlesRouteImport } from './routes/_app/articles'
 import { Route as AppMeRouteRouteImport } from './routes/_app/me/route'
-import { Route as ApiArticlesIndexRouteImport } from './routes/api/articles/index'
 import { Route as AppMeIndexRouteImport } from './routes/_app/me/index'
-import { Route as ApiUploadAvatarRouteImport } from './routes/api/upload/avatar'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
-import { Route as ApiArticlesPublishRouteImport } from './routes/api/articles/publish'
-import { Route as ApiArticlesCreateRouteImport } from './routes/api/articles/create'
-import { Route as ApiArticlesByMeRouteImport } from './routes/api/articles/by-me'
-import { Route as ApiArticlesByAuthorRouteImport } from './routes/api/articles/by-author'
-import { Route as ApiArticlesArchiveRouteImport } from './routes/api/articles/archive'
-import { Route as ApiArticlesIdRouteImport } from './routes/api/articles/$id'
 import { Route as AppMeFavoritesRouteImport } from './routes/_app/me/favorites'
-import { Route as AppMeDraftsRouteImport } from './routes/_app/me/drafts'
+import { Route as AppMeArticlesRouteImport } from './routes/_app/me/articles'
 import { Route as AppMeSettingsRouteRouteImport } from './routes/_app/me/settings/route'
 import { Route as AppMeSettingsIndexRouteImport } from './routes/_app/me/settings/index'
 import { Route as AppMeSettingsSecurityRouteImport } from './routes/_app/me/settings/security'
@@ -109,54 +101,14 @@ const AppMeRouteRoute = AppMeRouteRouteImport.update({
   path: '/me',
   getParentRoute: () => AppRouteRoute,
 } as any)
-const ApiArticlesIndexRoute = ApiArticlesIndexRouteImport.update({
-  id: '/api/articles/',
-  path: '/api/articles/',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AppMeIndexRoute = AppMeIndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => AppMeRouteRoute,
 } as any)
-const ApiUploadAvatarRoute = ApiUploadAvatarRouteImport.update({
-  id: '/api/upload/avatar',
-  path: '/api/upload/avatar',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   id: '/api/auth/$',
   path: '/api/auth/$',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiArticlesPublishRoute = ApiArticlesPublishRouteImport.update({
-  id: '/api/articles/publish',
-  path: '/api/articles/publish',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiArticlesCreateRoute = ApiArticlesCreateRouteImport.update({
-  id: '/api/articles/create',
-  path: '/api/articles/create',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiArticlesByMeRoute = ApiArticlesByMeRouteImport.update({
-  id: '/api/articles/by-me',
-  path: '/api/articles/by-me',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiArticlesByAuthorRoute = ApiArticlesByAuthorRouteImport.update({
-  id: '/api/articles/by-author',
-  path: '/api/articles/by-author',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiArticlesArchiveRoute = ApiArticlesArchiveRouteImport.update({
-  id: '/api/articles/archive',
-  path: '/api/articles/archive',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ApiArticlesIdRoute = ApiArticlesIdRouteImport.update({
-  id: '/api/articles/$id',
-  path: '/api/articles/$id',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AppMeFavoritesRoute = AppMeFavoritesRouteImport.update({
@@ -164,9 +116,9 @@ const AppMeFavoritesRoute = AppMeFavoritesRouteImport.update({
   path: '/favorites',
   getParentRoute: () => AppMeRouteRoute,
 } as any)
-const AppMeDraftsRoute = AppMeDraftsRouteImport.update({
-  id: '/drafts',
-  path: '/drafts',
+const AppMeArticlesRoute = AppMeArticlesRouteImport.update({
+  id: '/articles',
+  path: '/articles',
   getParentRoute: () => AppMeRouteRoute,
 } as any)
 const AppMeSettingsRouteRoute = AppMeSettingsRouteRouteImport.update({
@@ -210,18 +162,10 @@ export interface FileRoutesByFullPath {
   '/articles/$slug': typeof ArticlesSlugRoute
   '/users/$username': typeof UsersUsernameRoute
   '/me/settings': typeof AppMeSettingsRouteRouteWithChildren
-  '/me/drafts': typeof AppMeDraftsRoute
+  '/me/articles': typeof AppMeArticlesRoute
   '/me/favorites': typeof AppMeFavoritesRoute
-  '/api/articles/$id': typeof ApiArticlesIdRoute
-  '/api/articles/archive': typeof ApiArticlesArchiveRoute
-  '/api/articles/by-author': typeof ApiArticlesByAuthorRoute
-  '/api/articles/by-me': typeof ApiArticlesByMeRoute
-  '/api/articles/create': typeof ApiArticlesCreateRoute
-  '/api/articles/publish': typeof ApiArticlesPublishRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/me/': typeof AppMeIndexRoute
-  '/api/articles/': typeof ApiArticlesIndexRoute
   '/me/settings/notifications': typeof AppMeSettingsNotificationsRoute
   '/me/settings/publishing': typeof AppMeSettingsPublishingRoute
   '/me/settings/security': typeof AppMeSettingsSecurityRoute
@@ -239,18 +183,10 @@ export interface FileRoutesByTo {
   '/sign-up': typeof AuthSignUpRoute
   '/articles/$slug': typeof ArticlesSlugRoute
   '/users/$username': typeof UsersUsernameRoute
-  '/me/drafts': typeof AppMeDraftsRoute
+  '/me/articles': typeof AppMeArticlesRoute
   '/me/favorites': typeof AppMeFavoritesRoute
-  '/api/articles/$id': typeof ApiArticlesIdRoute
-  '/api/articles/archive': typeof ApiArticlesArchiveRoute
-  '/api/articles/by-author': typeof ApiArticlesByAuthorRoute
-  '/api/articles/by-me': typeof ApiArticlesByMeRoute
-  '/api/articles/create': typeof ApiArticlesCreateRoute
-  '/api/articles/publish': typeof ApiArticlesPublishRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/me': typeof AppMeIndexRoute
-  '/api/articles': typeof ApiArticlesIndexRoute
   '/me/settings/notifications': typeof AppMeSettingsNotificationsRoute
   '/me/settings/publishing': typeof AppMeSettingsPublishingRoute
   '/me/settings/security': typeof AppMeSettingsSecurityRoute
@@ -273,18 +209,10 @@ export interface FileRoutesById {
   '/articles/$slug': typeof ArticlesSlugRoute
   '/users/$username': typeof UsersUsernameRoute
   '/_app/me/settings': typeof AppMeSettingsRouteRouteWithChildren
-  '/_app/me/drafts': typeof AppMeDraftsRoute
+  '/_app/me/articles': typeof AppMeArticlesRoute
   '/_app/me/favorites': typeof AppMeFavoritesRoute
-  '/api/articles/$id': typeof ApiArticlesIdRoute
-  '/api/articles/archive': typeof ApiArticlesArchiveRoute
-  '/api/articles/by-author': typeof ApiArticlesByAuthorRoute
-  '/api/articles/by-me': typeof ApiArticlesByMeRoute
-  '/api/articles/create': typeof ApiArticlesCreateRoute
-  '/api/articles/publish': typeof ApiArticlesPublishRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
-  '/api/upload/avatar': typeof ApiUploadAvatarRoute
   '/_app/me/': typeof AppMeIndexRoute
-  '/api/articles/': typeof ApiArticlesIndexRoute
   '/_app/me/settings/notifications': typeof AppMeSettingsNotificationsRoute
   '/_app/me/settings/publishing': typeof AppMeSettingsPublishingRoute
   '/_app/me/settings/security': typeof AppMeSettingsSecurityRoute
@@ -306,18 +234,10 @@ export interface FileRouteTypes {
     | '/articles/$slug'
     | '/users/$username'
     | '/me/settings'
-    | '/me/drafts'
+    | '/me/articles'
     | '/me/favorites'
-    | '/api/articles/$id'
-    | '/api/articles/archive'
-    | '/api/articles/by-author'
-    | '/api/articles/by-me'
-    | '/api/articles/create'
-    | '/api/articles/publish'
     | '/api/auth/$'
-    | '/api/upload/avatar'
     | '/me/'
-    | '/api/articles/'
     | '/me/settings/notifications'
     | '/me/settings/publishing'
     | '/me/settings/security'
@@ -335,18 +255,10 @@ export interface FileRouteTypes {
     | '/sign-up'
     | '/articles/$slug'
     | '/users/$username'
-    | '/me/drafts'
+    | '/me/articles'
     | '/me/favorites'
-    | '/api/articles/$id'
-    | '/api/articles/archive'
-    | '/api/articles/by-author'
-    | '/api/articles/by-me'
-    | '/api/articles/create'
-    | '/api/articles/publish'
     | '/api/auth/$'
-    | '/api/upload/avatar'
     | '/me'
-    | '/api/articles'
     | '/me/settings/notifications'
     | '/me/settings/publishing'
     | '/me/settings/security'
@@ -368,18 +280,10 @@ export interface FileRouteTypes {
     | '/articles/$slug'
     | '/users/$username'
     | '/_app/me/settings'
-    | '/_app/me/drafts'
+    | '/_app/me/articles'
     | '/_app/me/favorites'
-    | '/api/articles/$id'
-    | '/api/articles/archive'
-    | '/api/articles/by-author'
-    | '/api/articles/by-me'
-    | '/api/articles/create'
-    | '/api/articles/publish'
     | '/api/auth/$'
-    | '/api/upload/avatar'
     | '/_app/me/'
-    | '/api/articles/'
     | '/_app/me/settings/notifications'
     | '/_app/me/settings/publishing'
     | '/_app/me/settings/security'
@@ -393,15 +297,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
   UsersUsernameRoute: typeof UsersUsernameRoute
-  ApiArticlesIdRoute: typeof ApiArticlesIdRoute
-  ApiArticlesArchiveRoute: typeof ApiArticlesArchiveRoute
-  ApiArticlesByAuthorRoute: typeof ApiArticlesByAuthorRoute
-  ApiArticlesByMeRoute: typeof ApiArticlesByMeRoute
-  ApiArticlesCreateRoute: typeof ApiArticlesCreateRoute
-  ApiArticlesPublishRoute: typeof ApiArticlesPublishRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
-  ApiUploadAvatarRoute: typeof ApiUploadAvatarRoute
-  ApiArticlesIndexRoute: typeof ApiArticlesIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -504,13 +400,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMeRouteRouteImport
       parentRoute: typeof AppRouteRoute
     }
-    '/api/articles/': {
-      id: '/api/articles/'
-      path: '/api/articles'
-      fullPath: '/api/articles/'
-      preLoaderRoute: typeof ApiArticlesIndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/_app/me/': {
       id: '/_app/me/'
       path: '/'
@@ -518,60 +407,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMeIndexRouteImport
       parentRoute: typeof AppMeRouteRoute
     }
-    '/api/upload/avatar': {
-      id: '/api/upload/avatar'
-      path: '/api/upload/avatar'
-      fullPath: '/api/upload/avatar'
-      preLoaderRoute: typeof ApiUploadAvatarRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/api/auth/$': {
       id: '/api/auth/$'
       path: '/api/auth/$'
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/articles/publish': {
-      id: '/api/articles/publish'
-      path: '/api/articles/publish'
-      fullPath: '/api/articles/publish'
-      preLoaderRoute: typeof ApiArticlesPublishRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/articles/create': {
-      id: '/api/articles/create'
-      path: '/api/articles/create'
-      fullPath: '/api/articles/create'
-      preLoaderRoute: typeof ApiArticlesCreateRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/articles/by-me': {
-      id: '/api/articles/by-me'
-      path: '/api/articles/by-me'
-      fullPath: '/api/articles/by-me'
-      preLoaderRoute: typeof ApiArticlesByMeRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/articles/by-author': {
-      id: '/api/articles/by-author'
-      path: '/api/articles/by-author'
-      fullPath: '/api/articles/by-author'
-      preLoaderRoute: typeof ApiArticlesByAuthorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/articles/archive': {
-      id: '/api/articles/archive'
-      path: '/api/articles/archive'
-      fullPath: '/api/articles/archive'
-      preLoaderRoute: typeof ApiArticlesArchiveRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/api/articles/$id': {
-      id: '/api/articles/$id'
-      path: '/api/articles/$id'
-      fullPath: '/api/articles/$id'
-      preLoaderRoute: typeof ApiArticlesIdRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/_app/me/favorites': {
@@ -581,11 +421,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppMeFavoritesRouteImport
       parentRoute: typeof AppMeRouteRoute
     }
-    '/_app/me/drafts': {
-      id: '/_app/me/drafts'
-      path: '/drafts'
-      fullPath: '/me/drafts'
-      preLoaderRoute: typeof AppMeDraftsRouteImport
+    '/_app/me/articles': {
+      id: '/_app/me/articles'
+      path: '/articles'
+      fullPath: '/me/articles'
+      preLoaderRoute: typeof AppMeArticlesRouteImport
       parentRoute: typeof AppMeRouteRoute
     }
     '/_app/me/settings': {
@@ -645,14 +485,14 @@ const AppMeSettingsRouteRouteWithChildren =
 
 interface AppMeRouteRouteChildren {
   AppMeSettingsRouteRoute: typeof AppMeSettingsRouteRouteWithChildren
-  AppMeDraftsRoute: typeof AppMeDraftsRoute
+  AppMeArticlesRoute: typeof AppMeArticlesRoute
   AppMeFavoritesRoute: typeof AppMeFavoritesRoute
   AppMeIndexRoute: typeof AppMeIndexRoute
 }
 
 const AppMeRouteRouteChildren: AppMeRouteRouteChildren = {
   AppMeSettingsRouteRoute: AppMeSettingsRouteRouteWithChildren,
-  AppMeDraftsRoute: AppMeDraftsRoute,
+  AppMeArticlesRoute: AppMeArticlesRoute,
   AppMeFavoritesRoute: AppMeFavoritesRoute,
   AppMeIndexRoute: AppMeIndexRoute,
 }
@@ -704,15 +544,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
   UsersUsernameRoute: UsersUsernameRoute,
-  ApiArticlesIdRoute: ApiArticlesIdRoute,
-  ApiArticlesArchiveRoute: ApiArticlesArchiveRoute,
-  ApiArticlesByAuthorRoute: ApiArticlesByAuthorRoute,
-  ApiArticlesByMeRoute: ApiArticlesByMeRoute,
-  ApiArticlesCreateRoute: ApiArticlesCreateRoute,
-  ApiArticlesPublishRoute: ApiArticlesPublishRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
-  ApiUploadAvatarRoute: ApiUploadAvatarRoute,
-  ApiArticlesIndexRoute: ApiArticlesIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

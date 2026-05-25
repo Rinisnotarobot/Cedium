@@ -231,6 +231,7 @@ export type ArticleWhereInput = {
   updatedAt?: Prisma.DateTimeFilter<"Article"> | Date | string
   publishedAt?: Prisma.DateTimeNullableFilter<"Article"> | Date | string | null
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  tags?: Prisma.ArticleTagListRelationFilter
 }
 
 export type ArticleOrderByWithRelationInput = {
@@ -246,6 +247,7 @@ export type ArticleOrderByWithRelationInput = {
   updatedAt?: Prisma.SortOrder
   publishedAt?: Prisma.SortOrderInput | Prisma.SortOrder
   author?: Prisma.UserOrderByWithRelationInput
+  tags?: Prisma.ArticleTagOrderByRelationAggregateInput
 }
 
 export type ArticleWhereUniqueInput = Prisma.AtLeast<{
@@ -264,6 +266,7 @@ export type ArticleWhereUniqueInput = Prisma.AtLeast<{
   updatedAt?: Prisma.DateTimeFilter<"Article"> | Date | string
   publishedAt?: Prisma.DateTimeNullableFilter<"Article"> | Date | string | null
   author?: Prisma.XOR<Prisma.UserScalarRelationFilter, Prisma.UserWhereInput>
+  tags?: Prisma.ArticleTagListRelationFilter
 }, "id" | "slug">
 
 export type ArticleOrderByWithAggregationInput = {
@@ -312,6 +315,7 @@ export type ArticleCreateInput = {
   updatedAt?: Date | string
   publishedAt?: Date | string | null
   author: Prisma.UserCreateNestedOneWithoutArticlesInput
+  tags?: Prisma.ArticleTagCreateNestedManyWithoutArticleInput
 }
 
 export type ArticleUncheckedCreateInput = {
@@ -326,6 +330,7 @@ export type ArticleUncheckedCreateInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  tags?: Prisma.ArticleTagUncheckedCreateNestedManyWithoutArticleInput
 }
 
 export type ArticleUpdateInput = {
@@ -340,6 +345,7 @@ export type ArticleUpdateInput = {
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
   author?: Prisma.UserUpdateOneRequiredWithoutArticlesNestedInput
+  tags?: Prisma.ArticleTagUpdateManyWithoutArticleNestedInput
 }
 
 export type ArticleUncheckedUpdateInput = {
@@ -354,6 +360,7 @@ export type ArticleUncheckedUpdateInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tags?: Prisma.ArticleTagUncheckedUpdateManyWithoutArticleNestedInput
 }
 
 export type ArticleCreateManyInput = {
@@ -449,6 +456,11 @@ export type ArticleMinOrderByAggregateInput = {
   publishedAt?: Prisma.SortOrder
 }
 
+export type ArticleScalarRelationFilter = {
+  is?: Prisma.ArticleWhereInput
+  isNot?: Prisma.ArticleWhereInput
+}
+
 export type ArticleCreateNestedManyWithoutAuthorInput = {
   create?: Prisma.XOR<Prisma.ArticleCreateWithoutAuthorInput, Prisma.ArticleUncheckedCreateWithoutAuthorInput> | Prisma.ArticleCreateWithoutAuthorInput[] | Prisma.ArticleUncheckedCreateWithoutAuthorInput[]
   connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutAuthorInput | Prisma.ArticleCreateOrConnectWithoutAuthorInput[]
@@ -495,6 +507,20 @@ export type EnumArticleStatusFieldUpdateOperationsInput = {
   set?: $Enums.ArticleStatus
 }
 
+export type ArticleCreateNestedOneWithoutTagsInput = {
+  create?: Prisma.XOR<Prisma.ArticleCreateWithoutTagsInput, Prisma.ArticleUncheckedCreateWithoutTagsInput>
+  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutTagsInput
+  connect?: Prisma.ArticleWhereUniqueInput
+}
+
+export type ArticleUpdateOneRequiredWithoutTagsNestedInput = {
+  create?: Prisma.XOR<Prisma.ArticleCreateWithoutTagsInput, Prisma.ArticleUncheckedCreateWithoutTagsInput>
+  connectOrCreate?: Prisma.ArticleCreateOrConnectWithoutTagsInput
+  upsert?: Prisma.ArticleUpsertWithoutTagsInput
+  connect?: Prisma.ArticleWhereUniqueInput
+  update?: Prisma.XOR<Prisma.XOR<Prisma.ArticleUpdateToOneWithWhereWithoutTagsInput, Prisma.ArticleUpdateWithoutTagsInput>, Prisma.ArticleUncheckedUpdateWithoutTagsInput>
+}
+
 export type ArticleCreateWithoutAuthorInput = {
   id?: string
   title: string
@@ -506,6 +532,7 @@ export type ArticleCreateWithoutAuthorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  tags?: Prisma.ArticleTagCreateNestedManyWithoutArticleInput
 }
 
 export type ArticleUncheckedCreateWithoutAuthorInput = {
@@ -519,6 +546,7 @@ export type ArticleUncheckedCreateWithoutAuthorInput = {
   createdAt?: Date | string
   updatedAt?: Date | string
   publishedAt?: Date | string | null
+  tags?: Prisma.ArticleTagUncheckedCreateNestedManyWithoutArticleInput
 }
 
 export type ArticleCreateOrConnectWithoutAuthorInput = {
@@ -564,6 +592,78 @@ export type ArticleScalarWhereInput = {
   publishedAt?: Prisma.DateTimeNullableFilter<"Article"> | Date | string | null
 }
 
+export type ArticleCreateWithoutTagsInput = {
+  id?: string
+  title: string
+  slug?: string
+  excerpt?: string | null
+  content: string
+  coverImage?: string | null
+  status?: $Enums.ArticleStatus
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  publishedAt?: Date | string | null
+  author: Prisma.UserCreateNestedOneWithoutArticlesInput
+}
+
+export type ArticleUncheckedCreateWithoutTagsInput = {
+  id?: string
+  title: string
+  slug?: string
+  excerpt?: string | null
+  content: string
+  coverImage?: string | null
+  status?: $Enums.ArticleStatus
+  authorId: string
+  createdAt?: Date | string
+  updatedAt?: Date | string
+  publishedAt?: Date | string | null
+}
+
+export type ArticleCreateOrConnectWithoutTagsInput = {
+  where: Prisma.ArticleWhereUniqueInput
+  create: Prisma.XOR<Prisma.ArticleCreateWithoutTagsInput, Prisma.ArticleUncheckedCreateWithoutTagsInput>
+}
+
+export type ArticleUpsertWithoutTagsInput = {
+  update: Prisma.XOR<Prisma.ArticleUpdateWithoutTagsInput, Prisma.ArticleUncheckedUpdateWithoutTagsInput>
+  create: Prisma.XOR<Prisma.ArticleCreateWithoutTagsInput, Prisma.ArticleUncheckedCreateWithoutTagsInput>
+  where?: Prisma.ArticleWhereInput
+}
+
+export type ArticleUpdateToOneWithWhereWithoutTagsInput = {
+  where?: Prisma.ArticleWhereInput
+  data: Prisma.XOR<Prisma.ArticleUpdateWithoutTagsInput, Prisma.ArticleUncheckedUpdateWithoutTagsInput>
+}
+
+export type ArticleUpdateWithoutTagsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumArticleStatusFieldUpdateOperationsInput | $Enums.ArticleStatus
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  author?: Prisma.UserUpdateOneRequiredWithoutArticlesNestedInput
+}
+
+export type ArticleUncheckedUpdateWithoutTagsInput = {
+  id?: Prisma.StringFieldUpdateOperationsInput | string
+  title?: Prisma.StringFieldUpdateOperationsInput | string
+  slug?: Prisma.StringFieldUpdateOperationsInput | string
+  excerpt?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  content?: Prisma.StringFieldUpdateOperationsInput | string
+  coverImage?: Prisma.NullableStringFieldUpdateOperationsInput | string | null
+  status?: Prisma.EnumArticleStatusFieldUpdateOperationsInput | $Enums.ArticleStatus
+  authorId?: Prisma.StringFieldUpdateOperationsInput | string
+  createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
+  publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+}
+
 export type ArticleCreateManyAuthorInput = {
   id?: string
   title: string
@@ -588,6 +688,7 @@ export type ArticleUpdateWithoutAuthorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tags?: Prisma.ArticleTagUpdateManyWithoutArticleNestedInput
 }
 
 export type ArticleUncheckedUpdateWithoutAuthorInput = {
@@ -601,6 +702,7 @@ export type ArticleUncheckedUpdateWithoutAuthorInput = {
   createdAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   updatedAt?: Prisma.DateTimeFieldUpdateOperationsInput | Date | string
   publishedAt?: Prisma.NullableDateTimeFieldUpdateOperationsInput | Date | string | null
+  tags?: Prisma.ArticleTagUncheckedUpdateManyWithoutArticleNestedInput
 }
 
 export type ArticleUncheckedUpdateManyWithoutAuthorInput = {
@@ -617,6 +719,35 @@ export type ArticleUncheckedUpdateManyWithoutAuthorInput = {
 }
 
 
+/**
+ * Count Type ArticleCountOutputType
+ */
+
+export type ArticleCountOutputType = {
+  tags: number
+}
+
+export type ArticleCountOutputTypeSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  tags?: boolean | ArticleCountOutputTypeCountTagsArgs
+}
+
+/**
+ * ArticleCountOutputType without action
+ */
+export type ArticleCountOutputTypeDefaultArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ArticleCountOutputType
+   */
+  select?: Prisma.ArticleCountOutputTypeSelect<ExtArgs> | null
+}
+
+/**
+ * ArticleCountOutputType without action
+ */
+export type ArticleCountOutputTypeCountTagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  where?: Prisma.ArticleTagWhereInput
+}
+
 
 export type ArticleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
   id?: boolean
@@ -631,6 +762,8 @@ export type ArticleSelect<ExtArgs extends runtime.Types.Extensions.InternalArgs 
   updatedAt?: boolean
   publishedAt?: boolean
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tags?: boolean | Prisma.Article$tagsArgs<ExtArgs>
+  _count?: boolean | Prisma.ArticleCountOutputTypeDefaultArgs<ExtArgs>
 }, ExtArgs["result"]["article"]>
 
 export type ArticleSelectCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetSelect<{
@@ -680,6 +813,8 @@ export type ArticleSelectScalar = {
 export type ArticleOmit<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = runtime.Types.Extensions.GetOmit<"id" | "title" | "slug" | "excerpt" | "content" | "coverImage" | "status" | "authorId" | "createdAt" | "updatedAt" | "publishedAt", ExtArgs["result"]["article"]>
 export type ArticleInclude<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
+  tags?: boolean | Prisma.Article$tagsArgs<ExtArgs>
+  _count?: boolean | Prisma.ArticleCountOutputTypeDefaultArgs<ExtArgs>
 }
 export type ArticleIncludeCreateManyAndReturn<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
   author?: boolean | Prisma.UserDefaultArgs<ExtArgs>
@@ -692,6 +827,7 @@ export type $ArticlePayload<ExtArgs extends runtime.Types.Extensions.InternalArg
   name: "Article"
   objects: {
     author: Prisma.$UserPayload<ExtArgs>
+    tags: Prisma.$ArticleTagPayload<ExtArgs>[]
   }
   scalars: runtime.Types.Extensions.GetPayloadResult<{
     id: string
@@ -1100,6 +1236,7 @@ readonly fields: ArticleFieldRefs;
 export interface Prisma__ArticleClient<T, Null = never, ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs, GlobalOmitOptions = {}> extends Prisma.PrismaPromise<T> {
   readonly [Symbol.toStringTag]: "PrismaPromise"
   author<T extends Prisma.UserDefaultArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.UserDefaultArgs<ExtArgs>>): Prisma.Prisma__UserClient<runtime.Types.Result.GetResult<Prisma.$UserPayload<ExtArgs>, T, "findUniqueOrThrow", GlobalOmitOptions> | Null, Null, ExtArgs, GlobalOmitOptions>
+  tags<T extends Prisma.Article$tagsArgs<ExtArgs> = {}>(args?: Prisma.Subset<T, Prisma.Article$tagsArgs<ExtArgs>>): Prisma.PrismaPromise<runtime.Types.Result.GetResult<Prisma.$ArticleTagPayload<ExtArgs>, T, "findMany", GlobalOmitOptions> | Null>
   /**
    * Attaches callbacks for the resolution and/or rejection of the Promise.
    * @param onfulfilled The callback to execute when the Promise is resolved.
@@ -1538,6 +1675,30 @@ export type ArticleDeleteManyArgs<ExtArgs extends runtime.Types.Extensions.Inter
    * Limit how many Articles to delete.
    */
   limit?: number
+}
+
+/**
+ * Article.tags
+ */
+export type Article$tagsArgs<ExtArgs extends runtime.Types.Extensions.InternalArgs = runtime.Types.Extensions.DefaultArgs> = {
+  /**
+   * Select specific fields to fetch from the ArticleTag
+   */
+  select?: Prisma.ArticleTagSelect<ExtArgs> | null
+  /**
+   * Omit specific fields from the ArticleTag
+   */
+  omit?: Prisma.ArticleTagOmit<ExtArgs> | null
+  /**
+   * Choose, which related nodes to fetch as well
+   */
+  include?: Prisma.ArticleTagInclude<ExtArgs> | null
+  where?: Prisma.ArticleTagWhereInput
+  orderBy?: Prisma.ArticleTagOrderByWithRelationInput | Prisma.ArticleTagOrderByWithRelationInput[]
+  cursor?: Prisma.ArticleTagWhereUniqueInput
+  take?: number
+  skip?: number
+  distinct?: Prisma.ArticleTagScalarFieldEnum | Prisma.ArticleTagScalarFieldEnum[]
 }
 
 /**

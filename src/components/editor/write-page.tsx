@@ -1,47 +1,48 @@
+import { useState, useEffect, useRef, useCallback } from "react";
+import {
+  Save,
+  Eye,
+  ChevronDown,
+  ChevronUp,
+  Check,
+  PenLine,
+  Send,
+} from "lucide-react";
 import { PageContainer } from "#/components/layout";
 import { Button } from "#/components/ui/button";
-import { useState, useEffect, useRef, useCallback } from "react";
-import { Save, Eye, ChevronDown, ChevronUp, Check, PenLine, Send } from "lucide-react";
+import { TagSelector } from "#/components/ui/tag-selector";
 import { ArticleEditor } from "#/components/editor";
 import { cn } from "#/lib/utils";
 import { Link } from "@tanstack/react-router";
-import { useCreateArticle, useUpdateArticle, usePublishArticle, useArticle } from "#/hooks";
-import { useEditorContent, useEditorContentValue } from "#/components/editor/context";
+import { useCreateArticle, useUpdateArticle, usePublishArticle } from "#/hooks";
 import { Route } from "#/routes/_app/write";
-import { Skeleton } from "#/components/ui/skeleton";
 import type { Article } from "#/types/article";
+import type { Content } from "@tiptap/react";
 
 export function WritePage() {
   const { id } = Route.useSearch();
-  const { data: existingArticle, isLoading: isLoadingArticle } = useArticle(id || "");
+  const loaderData = Route.useLoaderData();
+  const existingArticle = loaderData?.article;
 
   const [title, setTitle] = useState("");
   const [excerpt, setExcerpt] = useState("");
+  const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [lastSaved, setLastSaved] = useState<Date | null>(null);
   const [toolbarCollapsed, setToolbarCollapsed] = useState(false);
   const [articleId, setArticleId] = useState<string | null>(null);
+  const [content, setContent] = useState<Content>("");
   const titleRef = useRef<HTMLInputElement>(null);
 
-  const content = useEditorContentValue();
-  const [, setContent] = useEditorContent();
-
-  // 使用 ref 存储最新值，用于离开时保存
-  const titleRefValue = useRef(title);
-  const excerptRefValue = useRef(excerpt);
-  const contentRefValue = useRef(content);
-  const articleIdRefValue = useRef(articleId);
+  const draftRef = useRef({ title, excerpt, content, articleId, selectedTags });
 
   useEffect(() => {
-    titleRefValue.current = title;
-    excerptRefValue.current = excerpt;
-    contentRefValue.current = content;
-    articleIdRefValue.current = articleId;
-  }, [title, excerpt, content, articleId]);
+    draftRef.current = { title, excerpt, content, articleId, selectedTags };
+  }, [title, excerpt, content, articleId, selectedTags]);
 
   const createArticle = useCreateArticle({
     onSuccess: (article: Article) => {
       setArticleId(article.id);
-      articleIdRefValue.current = article.id;
+      draftRef.current.articleId = article.id;
       setLastSaved(new Date());
     },
   });
@@ -52,22 +53,35 @@ export function WritePage() {
 
   // 加载已有文章数据
   useEffect(() => {
-    if (existingArticle?.data && id) {
-      setTitle(existingArticle.data.title);
-      setExcerpt(existingArticle.data.excerpt || "");
-      setArticleId(existingArticle.data.id);
+    if (existingArticle && id) {
+      setTitle(existingArticle.title);
+      setExcerpt(existingArticle.excerpt || "");
+      setArticleId(existingArticle.id);
+
+      // 加载现有标签
+      if (existingArticle.tags && existingArticle.tags.length > 0) {
+        setSelectedTags(existingArticle.tags.map((tag) => tag.slug));
+      }
 
       // 解析并设置编辑器内容
       try {
-        const parsedContent = JSON.parse(existingArticle.data.content);
+        const parsedContent = JSON.parse(existingArticle.content);
         setContent(parsedContent);
       } catch {
-        setContent(existingArticle.data.content);
+        setContent(existingArticle.content);
       }
 
-      setLastSaved(new Date(existingArticle.data.updatedAt));
+      setLastSaved(new Date(existingArticle.updatedAt));
+    } else if (!id) {
+      // 新建文章：清空所有状态
+      setTitle("");
+      setExcerpt("");
+      setArticleId(null);
+      setSelectedTags([]);
+      setContent("");
+      setLastSaved(null);
     }
-  }, [existingArticle?.data, id, setContent]);
+  }, [id, existingArticle]);
 
   useEffect(() => {
     if (!id) {
@@ -78,14 +92,14 @@ export function WritePage() {
   const saving = createArticle.isPending || updateArticle.isPending;
 
   const handleSaveDraft = useCallback(async (): Promise<string | null> => {
-    const currentTitle = titleRefValue.current;
-    const currentExcerpt = excerptRefValue.current;
-    const currentContent = contentRefValue.current;
-    const currentArticleId = articleIdRefValue.current;
+    const { title: currentTitle, excerpt: currentExcerpt, content: currentContent, articleId: currentArticleId, selectedTags: currentTags } = draftRef.current;
 
     if (!currentTitle.trim()) return null;
 
-    const contentStr = typeof currentContent === "string" ? currentContent : JSON.stringify(currentContent);
+    const contentStr =
+      typeof currentContent === "string"
+        ? currentContent
+        : JSON.stringify(currentContent);
 
     if (currentArticleId) {
       try {
@@ -94,6 +108,7 @@ export function WritePage() {
           title: currentTitle,
           excerpt: currentExcerpt || undefined,
           content: contentStr,
+          tags: currentTags,
         });
         return currentArticleId;
       } catch {
@@ -105,6 +120,7 @@ export function WritePage() {
           title: currentTitle,
           excerpt: currentExcerpt || undefined,
           content: contentStr,
+          tags: currentTags,
         });
         return result.id;
       } catch {
@@ -114,7 +130,7 @@ export function WritePage() {
   }, [createArticle, updateArticle]);
 
   const handlePublish = async () => {
-    let publishId = articleIdRefValue.current;
+    let publishId = draftRef.current.articleId;
     if (!publishId) {
       publishId = await handleSaveDraft();
       if (!publishId) return;
@@ -137,7 +153,7 @@ export function WritePage() {
   // 离开页面时提示保存
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
-      if (titleRefValue.current.trim()) {
+      if (draftRef.current.title.trim()) {
         e.preventDefault();
         e.returnValue = "";
       }
@@ -147,52 +163,34 @@ export function WritePage() {
     return () => window.removeEventListener("beforeunload", handleBeforeUnload);
   }, []);
 
-  // 页面隐藏时尝试保存（visibilitychange 比 beforeunload 更可靠）
+  // 页面隐藏时尝试保存
   useEffect(() => {
     const handleVisibilityChange = () => {
-      if (document.visibilityState === "hidden" && titleRefValue.current.trim()) {
+      if (
+        document.visibilityState === "hidden" &&
+        draftRef.current.title.trim()
+      ) {
         handleSaveDraft();
       }
     };
 
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, [handleSaveDraft]);
-
-  // 加载已有文章时显示 Skeleton
-  if (id && isLoadingArticle) {
-    return (
-      <PageContainer width="4xl" variant="spaced" className="bg-muted/30">
-        <header className="flex items-center justify-between mb-8">
-          <div className="flex items-center gap-3">
-            <Link to="/me/drafts" className="text-muted-foreground hover:text-foreground transition-colors text-sm">
-              草稿
-            </Link>
-            <span className="text-muted-foreground/40">/</span>
-            <Skeleton className="h-4 w-12" />
-          </div>
-        </header>
-        <main className="space-y-6">
-          <Skeleton className="h-10 w-3/4" />
-          <Skeleton className="h-4 w-1/2" />
-          <Skeleton className="h-64 w-full" />
-        </main>
-      </PageContainer>
-    );
-  }
 
   return (
     <PageContainer width="4xl" variant="spaced" className="bg-muted/30">
-      {/* 顶部工具栏 - 极简设计 */}
+      {/* 顶部工具栏 */}
       <header className="flex items-center justify-between mb-8 animate-in fade-in slide-in-from-top-4 duration-500">
         <div className="flex items-center gap-3">
           {id ? (
             <>
               <Link
-                to="/me/drafts"
+                to="/me/articles"
                 className="text-muted-foreground hover:text-foreground transition-colors text-sm"
               >
-                草稿
+                文章管理
               </Link>
               <span className="text-muted-foreground/40">/</span>
               <span className="text-sm font-medium">编辑</span>
@@ -212,13 +210,13 @@ export function WritePage() {
         </div>
 
         <div className="flex items-center gap-4">
-          {/* 保存状态 - 静默反馈 */}
+          {/* 保存状态 */}
           <div className="flex items-center gap-2">
             {lastSaved && (
               <div
                 className={cn(
                   "flex items-center gap-1.5 text-xs text-muted-foreground transition-opacity",
-                  saving && "opacity-0"
+                  saving && "opacity-0",
                 )}
               >
                 <Check className="size-3 text-emerald-500" />
@@ -263,9 +261,9 @@ export function WritePage() {
         </div>
       </header>
 
-      {/* 写作区域 - 一体化设计 */}
+      {/* 写作区域 */}
       <main className="space-y-0 animate-in fade-in slide-in-from-bottom-4 duration-500 delay-100">
-        {/* 标题输入 - 大号字体，无边框 */}
+        {/* 标题输入 */}
         <div className="mb-6">
           <input
             ref={titleRef}
@@ -278,7 +276,7 @@ export function WritePage() {
               "placeholder:text-muted-foreground/30 placeholder:font-normal",
               "focus:placeholder:text-muted-foreground/50",
               "transition-colors duration-200",
-              title.trim() && "text-foreground"
+              title.trim() && "text-foreground",
             )}
             style={{ caretColor: "var(--color-primary)" }}
           />
@@ -294,13 +292,17 @@ export function WritePage() {
               "w-full bg-transparent border-0 outline-none",
               "text-sm text-muted-foreground",
               "placeholder:text-muted-foreground/30",
-              "transition-colors duration-200"
+              "transition-colors duration-200",
             )}
             maxLength={200}
           />
         </div>
 
-        {/* 分隔线 - 淡雅 */}
+        <TagSelector
+            selectedTags={selectedTags}
+            onChange={setSelectedTags}
+            maxTags={5}
+          />
         <div className="h-px bg-border/40 mb-6" />
 
         {/* 编辑器工具栏折叠控制 */}
@@ -328,7 +330,11 @@ export function WritePage() {
         </div>
 
         {/* 编辑器 */}
-        <ArticleEditor toolbarCollapsed={toolbarCollapsed} />
+        <ArticleEditor
+          value={content}
+          onChange={setContent}
+          toolbarCollapsed={toolbarCollapsed}
+        />
       </main>
 
       {/* 底部留白 */}

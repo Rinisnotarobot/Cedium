@@ -1,4 +1,4 @@
-import { BookOpen, PenSquare, Heart, FileText, Sun, Moon } from "lucide-react";
+import { BookOpen, PenSquare, Heart, FolderOpen, Sun, Moon } from "lucide-react";
 import { Link, useLocation } from "@tanstack/react-router";
 
 import {
@@ -28,9 +28,9 @@ const navItems = [
     to: "/write",
   },
   {
-    title: "草稿箱",
-    icon: FileText,
-    to: "/me/drafts",
+    title: "文章管理",
+    icon: FolderOpen,
+    to: "/me/articles",
   },
 ];
 

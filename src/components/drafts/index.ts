@@ -1,1 +1,0 @@
-export { DraftsPage } from "./drafts-page";

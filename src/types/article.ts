@@ -1,4 +1,5 @@
 import type { ArticleStatus } from '#/generated/prisma/enums'
+import type { Tag } from './tag'
 
 export interface Article {
   id: string
@@ -17,6 +18,7 @@ export interface Article {
     name: string
     image: string | null
   }
+  tags?: Tag[]
 }
 
 export interface ArticleListResponse {

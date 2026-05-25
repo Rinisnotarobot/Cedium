@@ -4,15 +4,16 @@ import { z } from 'zod'
 export const articleStatusSchema = z.enum(['DRAFT', 'PUBLISHED', 'ARCHIVED'])
 export type ArticleStatus = z.infer<typeof articleStatusSchema>
 
-// 创建文章
+// 创建文章（草稿允许内容为空）
 export const createArticleSchema = z.object({
   title: z
     .string()
     .min(1, '标题不能为空')
     .max(100, '标题不能超过100个字符'),
   excerpt: z.string().max(200, '摘要不能超过200个字符').optional(),
-  content: z.string().min(1, '内容不能为空'),
+  content: z.string(), // 草稿允许空内容
   coverImage: z.string().url('请输入有效的图片URL').optional().nullable(),
+  tags: z.array(z.string()).max(5, '最多添加5个标签').optional(), // tag slugs
 })
 export type CreateArticleInput = z.infer<typeof createArticleSchema>
 
@@ -27,6 +28,7 @@ export const updateArticleSchema = z.object({
   excerpt: z.string().max(200, '摘要不能超过200个字符').optional(),
   content: z.string().min(1, '内容不能为空').optional(),
   coverImage: z.string().url('请输入有效的图片URL').optional().nullable(),
+  tags: z.array(z.string()).max(5, '最多添加5个标签').optional(), // tag slugs
 })
 export type UpdateArticleInput = z.infer<typeof updateArticleSchema>
 
@@ -41,6 +43,18 @@ export const archiveArticleSchema = z.object({
   id: z.string().min(1, '文章ID不能为空'),
 })
 export type ArchiveArticleInput = z.infer<typeof archiveArticleSchema>
+
+// 撤销发布（将已发布文章变回草稿）
+export const unpublishArticleSchema = z.object({
+  id: z.string().min(1, '文章ID不能为空'),
+})
+export type UnpublishArticleInput = z.infer<typeof unpublishArticleSchema>
+
+// 恢复归档（将已归档文章恢复为已发布）
+export const restoreArticleSchema = z.object({
+  id: z.string().min(1, '文章ID不能为空'),
+})
+export type RestoreArticleInput = z.infer<typeof restoreArticleSchema>
 
 // 分页参数
 export const paginationSchema = z.object({

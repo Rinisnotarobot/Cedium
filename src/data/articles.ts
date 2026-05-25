@@ -9,12 +9,41 @@ import {
   updateArticleSchema,
   publishArticleSchema,
   archiveArticleSchema,
+  unpublishArticleSchema,
+  restoreArticleSchema,
   getArticleByIdSchema,
   getMyArticlesSchema,
   getPublishedArticlesSchema,
   getArticlesByAuthorSchema,
   deleteArticleSchema,
 } from '#/lib/validators/article'
+import type { Tag } from '#/types/tag'
+
+async function ensureTagIds(slugs: string[]): Promise<string[]> {
+  const existingTags = await prisma.tag.findMany({
+    where: { slug: { in: slugs } },
+    select: { id: true, slug: true },
+  })
+
+  const slugToId = new Map(existingTags.map(t => [t.slug, t.id]))
+  const missingSlugs = slugs.filter(slug => !slugToId.has(slug))
+
+  if (missingSlugs.length > 0) {
+    await prisma.tag.createMany({
+      data: missingSlugs.map(slug => ({ name: slug, slug })),
+      skipDuplicates: true,
+    })
+
+    const newTags = await prisma.tag.findMany({
+      where: { slug: { in: missingSlugs } },
+      select: { id: true, slug: true },
+    })
+
+    newTags.forEach(t => slugToId.set(t.slug, t.id))
+  }
+
+  return slugs.map(slug => slugToId.get(slug)!)
+}
 
 // ===== 写操作 (POST, 需认证) =====
 
@@ -51,7 +80,15 @@ export const createArticleFn = createServerFn({ method: 'POST' })
           coverImage: data.coverImage,
           authorId: userId,
           status: ArticleStatus.DRAFT,
+          tags: data.tags ? {
+            create: data.tags.map(slug => ({
+              tag: { connect: { slug } }
+            }))
+          } : undefined
         },
+        include: {
+          tags: { include: { tag: true } }
+        }
       }),
       prisma.user.update({
         where: { id: userId },
@@ -59,7 +96,12 @@ export const createArticleFn = createServerFn({ method: 'POST' })
       }),
     ])
 
-    return article
+    // 转换 tags 格式：从 Prisma 嵌套格式转为 Tag 数组
+    const articleWithTags = {
+      ...article,
+      tags: article.tags?.map(at => at.tag) as Tag[]
+    }
+    return articleWithTags
   })
 
 /**
@@ -86,6 +128,20 @@ export const updateArticleFn = createServerFn({ method: 'POST' })
       throw new Error('无权限编辑此文章')
     }
 
+    // 处理标签更新：先删除现有关联，再批量创建新关联
+    if (data.tags) {
+      await prisma.articleTag.deleteMany({ where: { articleId: data.id } })
+
+      // 批量获取或创建标签 ID
+      const tagIds = await ensureTagIds(data.tags)
+
+      // 批量创建关联
+      await prisma.articleTag.createMany({
+        data: tagIds.map(tagId => ({ articleId: data.id, tagId })),
+        skipDuplicates: true,
+      })
+    }
+
     const article = await prisma.article.update({
       where: { id: data.id },
       data: {
@@ -94,9 +150,17 @@ export const updateArticleFn = createServerFn({ method: 'POST' })
         content: data.content,
         coverImage: data.coverImage,
       },
+      include: {
+        tags: { include: { tag: true } }
+      }
     })
 
-    return article
+    // 转换 tags 格式
+    const articleWithTags = {
+      ...article,
+      tags: article.tags?.map(at => at.tag) as Tag[]
+    }
+    return articleWithTags
   })
 
 /**
@@ -113,7 +177,7 @@ export const publishArticleFn = createServerFn({ method: 'POST' })
 
     const existing = await prisma.article.findUnique({
       where: { id: data.id },
-      select: { authorId: true, status: true },
+      select: { authorId: true, status: true, title: true, content: true },
     })
 
     if (!existing) {
@@ -126,6 +190,32 @@ export const publishArticleFn = createServerFn({ method: 'POST' })
 
     if (existing.status !== ArticleStatus.DRAFT) {
       throw new Error('只能发布草稿状态的文章')
+    }
+
+    // 检查标题是否为空
+    if (!existing.title || existing.title.trim() === '') {
+      throw new Error('文章标题不能为空')
+    }
+
+    // 检查内容是否为空（空字符串或空 Tiptap JSON）
+    const contentStr = existing.content || ''
+    let isEmptyContent = contentStr.trim() === ''
+
+    // 尝试解析 Tiptap JSON 格式
+    if (!isEmptyContent && contentStr.startsWith('{')) {
+      try {
+        const parsed = JSON.parse(contentStr)
+        // Tiptap doc 结构: { type: 'doc', content: [...] }
+        if (parsed.type === 'doc' && Array.isArray(parsed.content)) {
+          isEmptyContent = parsed.content.length === 0
+        }
+      } catch {
+        // JSON 解析失败，说明不是 JSON 格式，内容不为空
+      }
+    }
+
+    if (isEmptyContent) {
+      throw new Error('文章内容不能为空')
     }
 
     await prisma.$transaction([
@@ -175,6 +265,85 @@ export const archiveArticleFn = createServerFn({ method: 'POST' })
     await prisma.article.update({
       where: { id: data.id },
       data: { status: ArticleStatus.ARCHIVED },
+    })
+  })
+
+/**
+ * 撤销发布文章
+ * - 验证 PUBLISHED 状态
+ * - 验证所有权
+ * - 事务: 更新状态为 DRAFT + 清除 publishedAt + 增加 draftCount
+ */
+export const unpublishArticleFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
+  .inputValidator(unpublishArticleSchema)
+  .handler(async ({ data, context }) => {
+    const userId = context.session.user.id
+
+    const existing = await prisma.article.findUnique({
+      where: { id: data.id },
+      select: { authorId: true, status: true },
+    })
+
+    if (!existing) {
+      throw new Error('文章不存在')
+    }
+
+    if (existing.authorId !== userId) {
+      throw new Error('无权限操作此文章')
+    }
+
+    if (existing.status !== ArticleStatus.PUBLISHED) {
+      throw new Error('只能撤销已发布的文章')
+    }
+
+    await prisma.$transaction([
+      prisma.article.update({
+        where: { id: data.id },
+        data: {
+          status: ArticleStatus.DRAFT,
+          publishedAt: null,
+        },
+      }),
+      prisma.user.update({
+        where: { id: userId },
+        data: { draftCount: { increment: 1 } },
+      }),
+    ])
+  })
+
+/**
+ * 恢复归档文章
+ * - 验证 ARCHIVED 状态
+ * - 验证所有权
+ * - 更新状态为 PUBLISHED（不涉及 draftCount）
+ */
+export const restoreArticleFn = createServerFn({ method: 'POST' })
+  .middleware([authMiddleware])
+  .inputValidator(restoreArticleSchema)
+  .handler(async ({ data, context }) => {
+    const userId = context.session.user.id
+
+    const existing = await prisma.article.findUnique({
+      where: { id: data.id },
+      select: { authorId: true, status: true },
+    })
+
+    if (!existing) {
+      throw new Error('文章不存在')
+    }
+
+    if (existing.authorId !== userId) {
+      throw new Error('无权限操作此文章')
+    }
+
+    if (existing.status !== ArticleStatus.ARCHIVED) {
+      throw new Error('只能恢复已归档的文章')
+    }
+
+    await prisma.article.update({
+      where: { id: data.id },
+      data: { status: ArticleStatus.PUBLISHED },
     })
   })
 
@@ -239,6 +408,11 @@ export const getArticleByIdFn = createServerFn({ method: 'GET' })
         author: {
           select: { id: true, name: true, image: true },
         },
+        tags: {
+          include: {
+            tag: true
+          }
+        }
       },
     })
 
@@ -246,9 +420,15 @@ export const getArticleByIdFn = createServerFn({ method: 'GET' })
       throw new Error('文章不存在')
     }
 
+    // 转换 tags 格式
+    const articleWithTags = {
+      ...article,
+      tags: article.tags?.map(at => at.tag) as Tag[]
+    }
+
     // 公开文章无需认证
     if (article.status === ArticleStatus.PUBLISHED) {
-      return article
+      return articleWithTags
     }
 
     // 私有文章需要认证 + 所有权验证
@@ -260,7 +440,7 @@ export const getArticleByIdFn = createServerFn({ method: 'GET' })
       throw new Error('无权限查看此文章')
     }
 
-    return article
+    return articleWithTags
   })
 
 /**
@@ -382,5 +562,29 @@ export const getArticlesByAuthorFn = createServerFn({ method: 'GET' })
       articles,
       meta: { total, page: data.page, limit: data.limit },
       author: user,
+    }
+  })
+
+/**
+ * 获取我的文章统计数据
+ * - 需认证
+ * - 返回各状态文章数量
+ */
+export const getMyArticlesStatsFn = createServerFn({ method: 'GET' })
+  .middleware([authMiddleware])
+  .handler(async ({ context }) => {
+    const userId = context.session.user.id
+
+    const [draft, published, archived] = await Promise.all([
+      prisma.article.count({ where: { authorId: userId, status: ArticleStatus.DRAFT } }),
+      prisma.article.count({ where: { authorId: userId, status: ArticleStatus.PUBLISHED } }),
+      prisma.article.count({ where: { authorId: userId, status: ArticleStatus.ARCHIVED } }),
+    ])
+
+    return {
+      draft,
+      published,
+      archived,
+      total: draft + published + archived,
     }
   })

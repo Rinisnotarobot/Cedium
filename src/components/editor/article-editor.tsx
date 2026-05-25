@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { MinimalTiptapEditor } from "#/components/ui/minimal-tiptap";
 import { useIsBreakpoint } from "#/hooks/use-is-breakpoint";
-import { useEditorContent } from "./context";
+import { useImageUpload } from "#/hooks/mutations";
 import {
   Dialog,
   DialogContent,
@@ -12,23 +12,35 @@ import {
 } from "#/components/ui/dialog";
 import { Button } from "#/components/ui/button";
 import { cn } from "#/lib/utils";
+import type { Content } from "@tiptap/react";
 
 interface ArticleEditorProps {
+  value: Content;
+  onChange: (content: Content) => void;
   toolbarCollapsed?: boolean;
 }
 
-export function ArticleEditor({ toolbarCollapsed = false }: ArticleEditorProps) {
-  const [content, setContent] = useEditorContent();
+export function ArticleEditor({
+  value,
+  onChange,
+  toolbarCollapsed = false,
+}: ArticleEditorProps) {
   const [showClearDialog, setShowClearDialog] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
   const isLargeScreen = useIsBreakpoint("min", 1024);
+  const imageUpload = useImageUpload();
+
+  const uploader = async (file: File): Promise<string> => {
+    const { url } = await imageUpload.mutateAsync(file);
+    return url;
+  };
 
   const handleClearRequest = () => {
     setShowClearDialog(true);
   };
 
   const handleClearConfirm = () => {
-    setContent("");
+    onChange("");
     setShowClearDialog(false);
   };
 
@@ -36,9 +48,10 @@ export function ArticleEditor({ toolbarCollapsed = false }: ArticleEditorProps) 
     <>
       <div ref={editorRef} className="relative rounded-lg">
         <MinimalTiptapEditor
-          value={content}
-          onChange={setContent}
+          value={value}
+          onChange={onChange}
           onClear={handleClearRequest}
+          uploader={uploader}
           editorContentClassName={cn(
             "prose prose-sm max-w-none min-h-[50vh] p-6",
             "prose-headings:font-semibold prose-headings:tracking-tight",

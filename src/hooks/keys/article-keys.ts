@@ -7,4 +7,6 @@ export const articleKeys = {
   myArticles: () => [...articleKeys.all, 'my'] as const,
   myArticlesWithFilter: (status?: string) => [...articleKeys.myArticles(), { status }] as const,
   byAuthor: (username: string) => [...articleKeys.all, 'by-author', username] as const,
+  byTag: (slug: string) => [...articleKeys.lists(), { tag: slug }] as const,
+  stats: () => [...articleKeys.all, 'my', 'stats'] as const,
 }
