@@ -91,3 +91,13 @@ export type Bookmark = Prisma.BookmarkModel
  * 
  */
 export type Like = Prisma.LikeModel
+/**
+ * Model Comment
+ * 
+ */
+export type Comment = Prisma.CommentModel
+/**
+ * Model CommentLike
+ * 
+ */
+export type CommentLike = Prisma.CommentLikeModel

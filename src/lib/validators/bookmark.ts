@@ -1,7 +1,6 @@
 import { z } from 'zod'
 import { paginationSchema } from '#/lib/validators/article'
-
-export const articleIdSchema = z.string().min(1, '文章ID不能为空')
+import { articleIdSchema } from '#/lib/validators/common'
 
 export const bookmarkArticleSchema = z.object({
   articleId: articleIdSchema,
@@ -17,6 +16,6 @@ export const checkBookmarkStatusSchema = z.object({
 export type CheckBookmarkStatusInput = z.infer<typeof checkBookmarkStatusSchema>
 
 export const checkMultipleBookmarkStatusSchema = z.object({
-  articleIds: z.array(articleIdSchema),
+  articleIds: z.array(articleIdSchema).min(1).max(100, '最多查询100篇文章状态'),
 })
 export type CheckMultipleBookmarkStatusInput = z.infer<typeof checkMultipleBookmarkStatusSchema>

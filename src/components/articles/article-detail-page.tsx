@@ -1,8 +1,9 @@
 import { PageContainer } from "#/components/layout"
 import { Badge } from "#/components/ui/badge"
-import { Clock, ArrowLeft, Heart, Bookmark } from "lucide-react"
+import { Clock, ArrowLeft, Heart, Bookmark, MessageCircle } from "lucide-react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { ArticleContent } from "./article-content"
+import { CommentList } from "#/components/comments"
 import { getAvatarColor } from "#/lib/utils/avatar-color"
 import { estimateReadTime } from "#/lib/utils/article-content"
 import { Button } from "#/components/ui/button"
@@ -180,6 +181,16 @@ export function ArticleDetailPage() {
                 <Bookmark className={cn("size-4", isBookmarked && "fill-current")} />
                 <span>{isBookmarked ? "已收藏" : "收藏"}</span>
               </Button>
+
+              {/* 评论计数 */}
+              <Button
+                variant="ghost"
+                size="sm"
+                className="gap-1.5 text-muted-foreground"
+              >
+                <MessageCircle className="size-4" />
+                <span className="tabular-nums">{article.commentCount || 0}</span>
+              </Button>
             </div>
 
             {/* 右侧：返回按钮 */}
@@ -191,6 +202,14 @@ export function ArticleDetailPage() {
             </Button>
           </div>
         </footer>
+
+        {/* 评论区域 */}
+        <section className="pt-8 border-t border-border">
+          <CommentList
+            articleId={article.id}
+            articleAuthorId={article.authorId}
+          />
+        </section>
       </article>
     </PageContainer>
   )
