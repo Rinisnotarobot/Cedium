@@ -15,6 +15,8 @@ interface UseUnfollowUserOptions {
   onError?: (error: string) => void
 }
 
+type FollowStatusResult = { isFollowing: boolean }
+
 /**
  * 关注用户 mutation hook
  */
@@ -23,17 +25,43 @@ export function useFollowUser(options?: UseFollowUserOptions) {
 
   return useMutation({
     mutationFn: (variables: FollowUserInput) => followUserFn({ data: variables }),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followKeys.stats(variables.userId) })
-      // 刷新当前用户的关注状态
-      queryClient.invalidateQueries({ queryKey: ['follow', 'status'] })
-      toast.success('已关注')
-      options?.onSuccess?.()
+    onMutate: (_variables) => {
+      // 取消相关查询
+      queryClient.cancelQueries({ queryKey: followKeys.statusBase() })
+
+      // 更新所有 follow status 缓存（乐观设为已关注）
+      queryClient.getQueryCache().findAll({ queryKey: followKeys.statusBase() }).forEach(query => {
+        const data = query.state.data as FollowStatusResult | undefined
+        if (data) {
+          queryClient.setQueryData(query.queryKey, { isFollowing: true })
+        }
+      })
+
+      // 保存旧值用于回滚
+      const previousStatuses = queryClient.getQueryCache().findAll({ queryKey: followKeys.statusBase() })
+        .map(query => ({ key: query.queryKey, data: query.state.data }))
+
+      return { previousStatuses }
     },
-    onError: (error) => {
+    onError: (error, _variables, context) => {
+      // 回滚所有 follow status
+      if (context?.previousStatuses) {
+        context.previousStatuses.forEach(({ key, data }) => {
+          queryClient.setQueryData(key, data)
+        })
+      }
       const message = getErrorMessage(error)
       toast.error(message)
       options?.onError?.(message)
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: followKeys.stats(variables.userId) })
+      toast.success('已关注')
+      options?.onSuccess?.()
+    },
+    onSettled: (_, __, variables) => {
+      queryClient.invalidateQueries({ queryKey: followKeys.statusBase() })
+      queryClient.invalidateQueries({ queryKey: followKeys.stats(variables.userId) })
     },
   })
 }
@@ -46,17 +74,40 @@ export function useUnfollowUser(options?: UseUnfollowUserOptions) {
 
   return useMutation({
     mutationFn: (variables: FollowUserInput) => unfollowUserFn({ data: variables }),
-    onSuccess: (_, variables) => {
-      queryClient.invalidateQueries({ queryKey: followKeys.stats(variables.userId) })
-      // 刷新当前用户的关注状态
-      queryClient.invalidateQueries({ queryKey: ['follow', 'status'] })
-      toast.success('已取消关注')
-      options?.onSuccess?.()
+    onMutate: (_variables) => {
+      queryClient.cancelQueries({ queryKey: followKeys.statusBase() })
+
+      // 更新所有 follow status 缓存（乐观设为未关注）
+      queryClient.getQueryCache().findAll({ queryKey: followKeys.statusBase() }).forEach(query => {
+        const data = query.state.data as FollowStatusResult | undefined
+        if (data) {
+          queryClient.setQueryData(query.queryKey, { isFollowing: false })
+        }
+      })
+
+      const previousStatuses = queryClient.getQueryCache().findAll({ queryKey: followKeys.statusBase() })
+        .map(query => ({ key: query.queryKey, data: query.state.data }))
+
+      return { previousStatuses }
     },
-    onError: (error) => {
+    onError: (error, _variables, context) => {
+      if (context?.previousStatuses) {
+        context.previousStatuses.forEach(({ key, data }) => {
+          queryClient.setQueryData(key, data)
+        })
+      }
       const message = getErrorMessage(error)
       toast.error(message)
       options?.onError?.(message)
+    },
+    onSuccess: (_, variables) => {
+      queryClient.invalidateQueries({ queryKey: followKeys.stats(variables.userId) })
+      toast.success('已取消关注')
+      options?.onSuccess?.()
+    },
+    onSettled: (_, __, variables) => {
+      queryClient.invalidateQueries({ queryKey: followKeys.statusBase() })
+      queryClient.invalidateQueries({ queryKey: followKeys.stats(variables.userId) })
     },
   })
 }

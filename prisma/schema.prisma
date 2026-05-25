@@ -24,6 +24,8 @@ model User {
   articles      Article[]
   followers     Follow[]  @relation("Followers")
   following     Follow[]  @relation("Following")
+  bookmarks     Bookmark[]
+  likes         Like[]
 
   @@unique([email])
   @@map("user")
@@ -84,23 +86,28 @@ enum ArticleStatus {
 }
 
 model Article {
-  id          String        @id @default(cuid())
-  title       String        @db.VarChar(100)
-  slug        String        @unique @default(cuid())
-  excerpt     String?       @db.VarChar(200)
-  content     String        @db.Text
-  coverImage  String?       @db.VarChar(500)
-  status      ArticleStatus @default(DRAFT)
-  authorId    String
-  author      User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
-  createdAt   DateTime      @default(now())
-  updatedAt   DateTime      @updatedAt
-  publishedAt DateTime?
-  tags        ArticleTag[]
+  id            String        @id @default(cuid())
+  title         String        @db.VarChar(100)
+  slug          String        @unique @default(cuid())
+  excerpt       String?       @db.VarChar(200)
+  content       String        @db.Text
+  coverImage    String?       @db.VarChar(500)
+  status        ArticleStatus @default(DRAFT)
+  authorId      String
+  author        User          @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  publishedAt   DateTime?
+  tags          ArticleTag[]
+  bookmarks     Bookmark[]
+  likes         Like[]
+  likeCount     Int           @default(0)
+  bookmarkCount Int           @default(0)
 
   @@index([authorId])
   @@index([status])
   @@index([publishedAt])
+  @@index([likeCount])
   @@map("article")
 }
 
@@ -137,4 +144,30 @@ model Follow {
   @@index([followerId])
   @@index([followingId])
   @@map("follow")
+}
+
+model Bookmark {
+  userId    String
+  articleId String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, articleId])
+  @@index([userId])
+  @@index([articleId])
+  @@map("bookmark")
+}
+
+model Like {
+  userId    String
+  articleId String
+  user      User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  article   Article @relation(fields: [articleId], references: [id], onDelete: Cascade)
+  createdAt DateTime @default(now())
+
+  @@unique([userId, articleId])
+  @@index([userId])
+  @@index([articleId])
+  @@map("like")
 }

@@ -81,3 +81,13 @@ export type ArticleTag = Prisma.ArticleTagModel
  * 
  */
 export type Follow = Prisma.FollowModel
+/**
+ * Model Bookmark
+ * 
+ */
+export type Bookmark = Prisma.BookmarkModel
+/**
+ * Model Like
+ * 
+ */
+export type Like = Prisma.LikeModel

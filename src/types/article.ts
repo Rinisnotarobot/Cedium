@@ -13,6 +13,8 @@ export interface Article {
   createdAt: Date | string
   updatedAt: Date | string
   publishedAt: Date | string | null
+  likeCount: number
+  bookmarkCount: number
   author?: {
     id: string
     name: string

@@ -1,9 +1,11 @@
+import { useState } from "react"
 import { cn } from "#/lib/utils"
 import { getAvatarColor } from "#/lib/utils/avatar-color"
 import { Button } from "#/components/ui/button"
 import { UserPlus, UserCheck, Edit } from "lucide-react"
 import { Link } from "@tanstack/react-router"
 import { useFollowUser, useUnfollowUser } from "#/hooks/mutations"
+import { FollowingList } from "#/components/users/following-list"
 import type { FollowStats } from "#/types/follow"
 
 interface ProfileSidebarProps {
@@ -22,18 +24,32 @@ export function ProfileSidebar({
   author,
   followStats,
   isSelf,
-  isFollowing,
+  isFollowing: initialIsFollowing,
 }: ProfileSidebarProps) {
+  // 本地追踪关注状态变化
+  const [followingDelta, setFollowingDelta] = useState(0)
+  // 使用数值逻辑：初始状态转为数字，加上变化量
+  const isFollowing = (initialIsFollowing ? 1 : 0) + followingDelta > 0
+
   const avatarColor = getAvatarColor(author?.name || "")
   const followMutation = useFollowUser()
   const unfollowMutation = useUnfollowUser()
 
+  // 本地追踪粉丝数变化
+  const displayFollowerCount = followStats.followerCount + followingDelta
+
   const handleFollowClick = () => {
     if (!author?.id) return
     if (isFollowing) {
-      unfollowMutation.mutate({ userId: author.id })
+      setFollowingDelta(prev => prev - 1)
+      unfollowMutation.mutate({ userId: author.id }, {
+        onError: () => setFollowingDelta(prev => prev + 1) // 回滚
+      })
     } else {
-      followMutation.mutate({ userId: author.id })
+      setFollowingDelta(prev => prev + 1)
+      followMutation.mutate({ userId: author.id }, {
+        onError: () => setFollowingDelta(prev => prev - 1) // 回滚
+      })
     }
   }
 
@@ -68,7 +84,7 @@ export function ProfileSidebar({
 
         {/* 粉丝数量 */}
         <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
-          <span>{followStats.followerCount} Followers</span>
+          <span>{displayFollowerCount} Followers</span>
           <span>{followStats.followingCount} Following</span>
         </div>
 
@@ -122,9 +138,13 @@ export function ProfileSidebar({
         <h3 className="text-sm font-semibold text-muted-foreground mb-4">
           Following
         </h3>
-        <p className="text-sm text-muted-foreground">
-          暂无关注用户
-        </p>
+        {author?.id && (
+          <FollowingList
+            userId={author.id}
+            limit={5}
+            followingCount={followStats.followingCount}
+          />
+        )}
       </div>
 
       {/* Lists 书单 */}

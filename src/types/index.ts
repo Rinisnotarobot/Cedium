@@ -1,1 +1,5 @@
 export * from './article'
+export * from './bookmark'
+export * from './like'
+export * from './follow'
+export * from './tag'

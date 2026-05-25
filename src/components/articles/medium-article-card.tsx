@@ -1,8 +1,7 @@
-import { useState } from "react"
 import { Link, useNavigate } from "@tanstack/react-router"
 import { cn } from "#/lib/utils"
 import { timeAgo } from "#/lib/utils/time"
-import { Bookmark, MoreHorizontal, Heart, Star } from "lucide-react"
+import { Bookmark, MoreHorizontal, Heart } from "lucide-react"
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -10,16 +9,38 @@ import {
   DropdownMenuTrigger,
 } from "#/components/ui/dropdown-menu"
 import type { Article } from "#/types/article"
+import { useBookmarkStatus, useLikeStatus } from "#/hooks/queries"
+import { useBookmarkArticle, useUnbookmarkArticle, useLikeArticle, useUnlikeArticle } from "#/hooks/mutations"
+import { authClient } from "#/lib/auth-client"
 
 interface MediumArticleCardProps {
   article: Article
   category?: string
+  /** 批量状态：父组件提供时跳过个体查询 */
+  isBookmarked?: boolean
+  isLiked?: boolean
 }
 
-export function MediumArticleCard({ article, category }: MediumArticleCardProps) {
-  const [isBookmarked, setIsBookmarked] = useState(false)
-  const [dropdownOpen, setDropdownOpen] = useState(false)
+export function MediumArticleCard({ article, category, isBookmarked: propBookmarked, isLiked: propLiked }: MediumArticleCardProps) {
   const navigate = useNavigate()
+  const { data: session } = authClient.useSession()
+
+  // 仅在父组件未提供状态时启用个体查询（避免 N+1）
+  const shouldFetchBookmark = propBookmarked === undefined
+  const shouldFetchLike = propLiked === undefined
+
+  const { data: bookmarkStatus } = useBookmarkStatus(article.id, { enabled: shouldFetchBookmark })
+  const { data: likeStatus } = useLikeStatus(article.id, { enabled: shouldFetchLike })
+
+  // 获取 mutation hooks（带错误回调以回滚乐观更新）
+  const bookmarkMutation = useBookmarkArticle()
+  const unbookmarkMutation = useUnbookmarkArticle()
+  const likeMutation = useLikeArticle()
+  const unlikeMutation = useUnlikeArticle()
+
+  // 状态来自 prop 或查询结果
+  const isBookmarked = propBookmarked ?? bookmarkStatus?.isBookmarked ?? false
+  const isLiked = propLiked ?? likeStatus?.isLiked ?? false
 
   const handleUserClick = (e: React.MouseEvent) => {
     e.preventDefault()
@@ -33,7 +54,33 @@ export function MediumArticleCard({ article, category }: MediumArticleCardProps)
   const toggleBookmark = (e: React.MouseEvent) => {
     e.preventDefault()
     e.stopPropagation()
-    setIsBookmarked(!isBookmarked)
+
+    if (!session) {
+      navigate({ to: "/login" })
+      return
+    }
+
+    if (isBookmarked) {
+      unbookmarkMutation.mutate(article.id)
+    } else {
+      bookmarkMutation.mutate(article.id)
+    }
+  }
+
+  const toggleLike = (e: React.MouseEvent) => {
+    e.preventDefault()
+    e.stopPropagation()
+
+    if (!session) {
+      navigate({ to: "/login" })
+      return
+    }
+
+    if (isLiked) {
+      unlikeMutation.mutate(article.id)
+    } else {
+      likeMutation.mutate(article.id)
+    }
   }
 
   return (
@@ -46,9 +93,8 @@ export function MediumArticleCard({ article, category }: MediumArticleCardProps)
         className={cn(
           "group flex items-start justify-between",
           "py-4 border-b border-border/20",
-          "hover:bg-muted/30 -mx-3 px-3 rounded-lg",
+          "-mx-3 px-3 rounded-lg",
           "transition-colors duration-150",
-          // 移动端：紧凑间距
           "gap-3 lg:gap-6"
         )}
       >
@@ -78,10 +124,9 @@ export function MediumArticleCard({ article, category }: MediumArticleCardProps)
           <h2
             className={cn(
               "font-bold leading-snug mb-1.5",
-              // 移动端：标题更紧凑，折行更多
               "text-base lg:text-xl",
               "line-clamp-3 lg:line-clamp-2",
-              "group-hover:text-primary transition-colors"
+              "transition-colors"
             )}
           >
             {article.title}
@@ -100,20 +145,22 @@ export function MediumArticleCard({ article, category }: MediumArticleCardProps)
 
           {/* 底部互动栏 */}
           <div className="flex items-center justify-between mt-2">
-            {/* 左侧：收藏/点赞 */}
+            {/* 左侧：点赞 */}
             <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-muted-foreground">
-                <Star className="size-3.5 lg:size-4 text-yellow-500" />
-              </div>
               <button
                 type="button"
+                onClick={toggleLike}
                 className={cn(
-                  "flex items-center gap-1 text-muted-foreground",
-                  "hover:text-foreground transition-colors"
+                  "flex items-center gap-1",
+                  "text-muted-foreground hover:text-red-500 transition-colors",
+                  isLiked && "text-red-500"
                 )}
               >
-                <Heart className="size-3.5 lg:size-4" />
+                <Heart className={cn("size-3.5 lg:size-4", isLiked && "fill-current")} />
               </button>
+              <span className="text-xs text-muted-foreground tabular-nums">
+                {article.likeCount}
+              </span>
             </div>
 
             {/* 右侧：操作 */}
@@ -132,12 +179,10 @@ export function MediumArticleCard({ article, category }: MediumArticleCardProps)
                   className={cn("size-3.5 lg:size-4", isBookmarked && "fill-current")}
                 />
               </button>
-              <DropdownMenu
-                open={dropdownOpen}
-                onOpenChange={setDropdownOpen}
-              >
+              <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button
+                    type="button"
                     className={cn(
                       "size-7 lg:size-9 flex items-center justify-center rounded-md",
                       "text-muted-foreground hover:text-foreground hover:bg-muted/60",
@@ -148,7 +193,6 @@ export function MediumArticleCard({ article, category }: MediumArticleCardProps)
                   </button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end" className="w-40">
-                  <DropdownMenuItem>收藏文章</DropdownMenuItem>
                   <DropdownMenuItem>分享</DropdownMenuItem>
                   <DropdownMenuItem className="text-destructive focus:text-destructive">
                     不感兴趣

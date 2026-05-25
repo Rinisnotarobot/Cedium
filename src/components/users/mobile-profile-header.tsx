@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { cn } from "#/lib/utils"
 import { getAvatarColor } from "#/lib/utils/avatar-color"
 import { Button } from "#/components/ui/button"
@@ -22,18 +23,32 @@ export function MobileProfileHeader({
   author,
   followStats,
   isSelf,
-  isFollowing,
+  isFollowing: initialIsFollowing,
 }: MobileProfileHeaderProps) {
+  // 本地追踪关注状态变化
+  const [followingDelta, setFollowingDelta] = useState(0)
+  // 使用数值逻辑：初始状态转为数字，加上变化量
+  const isFollowing = (initialIsFollowing ? 1 : 0) + followingDelta > 0
+
   const avatarColor = getAvatarColor(author?.name || "")
   const followMutation = useFollowUser()
   const unfollowMutation = useUnfollowUser()
 
+  // 本地追踪粉丝数变化
+  const displayFollowerCount = followStats.followerCount + followingDelta
+
   const handleFollowClick = () => {
     if (!author?.id) return
     if (isFollowing) {
-      unfollowMutation.mutate({ userId: author.id })
+      setFollowingDelta(prev => prev - 1)
+      unfollowMutation.mutate({ userId: author.id }, {
+        onError: () => setFollowingDelta(prev => prev + 1) // 回滚
+      })
     } else {
-      followMutation.mutate({ userId: author.id })
+      setFollowingDelta(prev => prev + 1)
+      followMutation.mutate({ userId: author.id }, {
+        onError: () => setFollowingDelta(prev => prev - 1) // 回滚
+      })
     }
   }
 
@@ -78,7 +93,7 @@ export function MobileProfileHeader({
 
       {/* 粉丝数 */}
       <div className="flex items-center gap-4 mt-1 text-sm text-muted-foreground">
-        <span className="font-medium">{followStats.followerCount.toLocaleString()}</span>
+        <span className="font-medium">{displayFollowerCount.toLocaleString()}</span>
         <span>followers</span>
         <span className="font-medium">{followStats.followingCount.toLocaleString()}</span>
         <span>following</span>
