@@ -21,10 +21,16 @@ const FILE_SIGNATURES: Record<string, number[]> = {
   'image/webp': [0x52, 0x49, 0x46, 0x46],
 }
 
-function generateKey(userId: string): string {
+function generateAvatarKey(userId: string): string {
   const timestamp = Date.now()
   const random = Math.random().toString(36).substring(2, 8)
   return `avatars/${userId}/${timestamp}-${random}`
+}
+
+function generateImageKey(userId: string): string {
+  const timestamp = Date.now()
+  const random = Math.random().toString(36).substring(2, 8)
+  return `images/${userId}/${timestamp}-${random}`
 }
 
 export function validateFileType(buffer: Buffer, mimeType: string): boolean {
@@ -57,7 +63,29 @@ export async function uploadAvatar(
   file: Buffer,
   contentType: string
 ): Promise<{ key: string; url: string }> {
-  const key = generateKey(userId)
+  const key = generateAvatarKey(userId)
+  const extension = contentType.split('/')[1]
+
+  const command = new PutObjectCommand({
+    Bucket: BUCKET_NAME,
+    Key: `${key}.${extension}`,
+    Body: file,
+    ContentType: contentType,
+    CacheControl: 'public, max-age=31536000',
+  })
+
+  await r2Client.send(command)
+
+  const url = `${PUBLIC_URL}/${key}.${extension}`
+  return { key, url }
+}
+
+export async function uploadImage(
+  userId: string,
+  file: Buffer,
+  contentType: string
+): Promise<{ key: string; url: string }> {
+  const key = generateImageKey(userId)
   const extension = contentType.split('/')[1]
 
   const command = new PutObjectCommand({

@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { MinimalTiptapEditor } from "#/components/ui/minimal-tiptap";
 import { useIsBreakpoint } from "#/hooks/use-is-breakpoint";
+import { useImageUpload } from "#/hooks/mutations";
 import {
   Dialog,
   DialogContent,
@@ -27,6 +28,12 @@ export function ArticleEditor({
   const [showClearDialog, setShowClearDialog] = useState(false);
   const editorRef = useRef<HTMLDivElement>(null);
   const isLargeScreen = useIsBreakpoint("min", 1024);
+  const imageUpload = useImageUpload();
+
+  const uploader = async (file: File): Promise<string> => {
+    const { url } = await imageUpload.mutateAsync(file);
+    return url;
+  };
 
   const handleClearRequest = () => {
     setShowClearDialog(true);
@@ -44,6 +51,7 @@ export function ArticleEditor({
           value={value}
           onChange={onChange}
           onClear={handleClearRequest}
+          uploader={uploader}
           editorContentClassName={cn(
             "prose prose-sm max-w-none min-h-[50vh] p-6",
             "prose-headings:font-semibold prose-headings:tracking-tight",
