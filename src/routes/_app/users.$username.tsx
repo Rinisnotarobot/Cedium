@@ -1,15 +1,17 @@
 import { createFileRoute, notFound } from "@tanstack/react-router"
-import { getArticlesByAuthorFn } from "#/data/articles"
+import { getUserProfileDataFn } from "#/data/follow"
 import { UserProfilePage } from "#/components/users"
 
-export const Route = createFileRoute("/users/$username")({
+export const Route = createFileRoute("/_app/users/$username")({
   loader: async ({ params }) => {
-    const result = await getArticlesByAuthorFn({
+    const result = await getUserProfileDataFn({
       data: { username: params.username, page: 1, limit: 20 }
     })
+
     if (!result.author) {
       throw notFound()
     }
+
     return result
   },
   component: UserProfilePage,

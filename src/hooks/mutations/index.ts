@@ -15,3 +15,4 @@ export {
   useRestoreArticle,
 } from './use-article-mutations'
 export { useCreateTag, useEnsureTag } from './use-tag-mutations'
+export { useFollowUser, useUnfollowUser } from './use-follow-mutations'

@@ -1,5 +1,6 @@
-import { BookOpen, PenSquare, Heart, FolderOpen, Sun, Moon } from "lucide-react";
+import { BookOpen, PenSquare, Heart, FolderOpen, Sun, Moon, User } from "lucide-react";
 import { Link, useLocation } from "@tanstack/react-router";
+import { authClient } from "#/lib/auth-client";
 
 import {
   Sidebar,
@@ -45,7 +46,7 @@ const readItems = [
 export function AppSidebar() {
   const location = useLocation();
   const { theme, setTheme } = useTheme();
-  // const { session, isPending } = useRouteState();
+  const { data: session } = authClient.useSession();
 
   const isActive = (to: string) => location.pathname === to;
 
@@ -124,6 +125,22 @@ export function AppSidebar() {
       </SidebarContent>
 
       <SidebarFooter>
+        {session?.user && (
+          <SidebarMenu>
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                asChild
+                tooltip="我的主页"
+                isActive={isActive(`/users/${session.user.name}`)}
+              >
+                <Link to="/users/$username" params={{ username: session.user.name }}>
+                  <User />
+                  <span>我的主页</span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          </SidebarMenu>
+        )}
         <div className="p-2 text-xs text-muted-foreground text-center">
           Cedium v1.0
         </div>

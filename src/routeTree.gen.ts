@@ -13,7 +13,6 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as AuthRouteRouteImport } from './routes/_auth/route'
 import { Route as AppRouteRouteImport } from './routes/_app/route'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as UsersUsernameRouteImport } from './routes/users.$username'
 import { Route as ArticlesSlugRouteImport } from './routes/articles.$slug'
 import { Route as AuthSignUpRouteImport } from './routes/_auth/sign-up'
 import { Route as AuthResetPasswordRouteImport } from './routes/_auth/reset-password'
@@ -25,6 +24,7 @@ import { Route as AppArticlesRouteImport } from './routes/_app/articles'
 import { Route as AppMeRouteRouteImport } from './routes/_app/me/route'
 import { Route as AppMeIndexRouteImport } from './routes/_app/me/index'
 import { Route as ApiAuthSplatRouteImport } from './routes/api/auth/$'
+import { Route as AppUsersUsernameRouteImport } from './routes/_app/users.$username'
 import { Route as AppMeFavoritesRouteImport } from './routes/_app/me/favorites'
 import { Route as AppMeArticlesRouteImport } from './routes/_app/me/articles'
 import { Route as AppMeSettingsRouteRouteImport } from './routes/_app/me/settings/route'
@@ -49,11 +49,6 @@ const AppRouteRoute = AppRouteRouteImport.update({
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const UsersUsernameRoute = UsersUsernameRouteImport.update({
-  id: '/users/$username',
-  path: '/users/$username',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ArticlesSlugRoute = ArticlesSlugRouteImport.update({
@@ -111,6 +106,11 @@ const ApiAuthSplatRoute = ApiAuthSplatRouteImport.update({
   path: '/api/auth/$',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppUsersUsernameRoute = AppUsersUsernameRouteImport.update({
+  id: '/users/$username',
+  path: '/users/$username',
+  getParentRoute: () => AppRouteRoute,
+} as any)
 const AppMeFavoritesRoute = AppMeFavoritesRouteImport.update({
   id: '/favorites',
   path: '/favorites',
@@ -160,10 +160,10 @@ export interface FileRoutesByFullPath {
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-up': typeof AuthSignUpRoute
   '/articles/$slug': typeof ArticlesSlugRoute
-  '/users/$username': typeof UsersUsernameRoute
   '/me/settings': typeof AppMeSettingsRouteRouteWithChildren
   '/me/articles': typeof AppMeArticlesRoute
   '/me/favorites': typeof AppMeFavoritesRoute
+  '/users/$username': typeof AppUsersUsernameRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/me/': typeof AppMeIndexRoute
   '/me/settings/notifications': typeof AppMeSettingsNotificationsRoute
@@ -182,9 +182,9 @@ export interface FileRoutesByTo {
   '/reset-password': typeof AuthResetPasswordRoute
   '/sign-up': typeof AuthSignUpRoute
   '/articles/$slug': typeof ArticlesSlugRoute
-  '/users/$username': typeof UsersUsernameRoute
   '/me/articles': typeof AppMeArticlesRoute
   '/me/favorites': typeof AppMeFavoritesRoute
+  '/users/$username': typeof AppUsersUsernameRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/me': typeof AppMeIndexRoute
   '/me/settings/notifications': typeof AppMeSettingsNotificationsRoute
@@ -207,10 +207,10 @@ export interface FileRoutesById {
   '/_auth/reset-password': typeof AuthResetPasswordRoute
   '/_auth/sign-up': typeof AuthSignUpRoute
   '/articles/$slug': typeof ArticlesSlugRoute
-  '/users/$username': typeof UsersUsernameRoute
   '/_app/me/settings': typeof AppMeSettingsRouteRouteWithChildren
   '/_app/me/articles': typeof AppMeArticlesRoute
   '/_app/me/favorites': typeof AppMeFavoritesRoute
+  '/_app/users/$username': typeof AppUsersUsernameRoute
   '/api/auth/$': typeof ApiAuthSplatRoute
   '/_app/me/': typeof AppMeIndexRoute
   '/_app/me/settings/notifications': typeof AppMeSettingsNotificationsRoute
@@ -232,10 +232,10 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-up'
     | '/articles/$slug'
-    | '/users/$username'
     | '/me/settings'
     | '/me/articles'
     | '/me/favorites'
+    | '/users/$username'
     | '/api/auth/$'
     | '/me/'
     | '/me/settings/notifications'
@@ -254,9 +254,9 @@ export interface FileRouteTypes {
     | '/reset-password'
     | '/sign-up'
     | '/articles/$slug'
-    | '/users/$username'
     | '/me/articles'
     | '/me/favorites'
+    | '/users/$username'
     | '/api/auth/$'
     | '/me'
     | '/me/settings/notifications'
@@ -278,10 +278,10 @@ export interface FileRouteTypes {
     | '/_auth/reset-password'
     | '/_auth/sign-up'
     | '/articles/$slug'
-    | '/users/$username'
     | '/_app/me/settings'
     | '/_app/me/articles'
     | '/_app/me/favorites'
+    | '/_app/users/$username'
     | '/api/auth/$'
     | '/_app/me/'
     | '/_app/me/settings/notifications'
@@ -296,7 +296,6 @@ export interface RootRouteChildren {
   AuthRouteRoute: typeof AuthRouteRouteWithChildren
   AboutRoute: typeof AboutRoute
   ArticlesSlugRoute: typeof ArticlesSlugRoute
-  UsersUsernameRoute: typeof UsersUsernameRoute
   ApiAuthSplatRoute: typeof ApiAuthSplatRoute
 }
 
@@ -328,13 +327,6 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/users/$username': {
-      id: '/users/$username'
-      path: '/users/$username'
-      fullPath: '/users/$username'
-      preLoaderRoute: typeof UsersUsernameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/articles/$slug': {
@@ -413,6 +405,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/api/auth/$'
       preLoaderRoute: typeof ApiAuthSplatRouteImport
       parentRoute: typeof rootRouteImport
+    }
+    '/_app/users/$username': {
+      id: '/_app/users/$username'
+      path: '/users/$username'
+      fullPath: '/users/$username'
+      preLoaderRoute: typeof AppUsersUsernameRouteImport
+      parentRoute: typeof AppRouteRoute
     }
     '/_app/me/favorites': {
       id: '/_app/me/favorites'
@@ -506,6 +505,7 @@ interface AppRouteRouteChildren {
   AppArticlesRoute: typeof AppArticlesRoute
   AppSearchRoute: typeof AppSearchRoute
   AppWriteRoute: typeof AppWriteRoute
+  AppUsersUsernameRoute: typeof AppUsersUsernameRoute
 }
 
 const AppRouteRouteChildren: AppRouteRouteChildren = {
@@ -513,6 +513,7 @@ const AppRouteRouteChildren: AppRouteRouteChildren = {
   AppArticlesRoute: AppArticlesRoute,
   AppSearchRoute: AppSearchRoute,
   AppWriteRoute: AppWriteRoute,
+  AppUsersUsernameRoute: AppUsersUsernameRoute,
 }
 
 const AppRouteRouteWithChildren = AppRouteRoute._addFileChildren(
@@ -543,7 +544,6 @@ const rootRouteChildren: RootRouteChildren = {
   AuthRouteRoute: AuthRouteRouteWithChildren,
   AboutRoute: AboutRoute,
   ArticlesSlugRoute: ArticlesSlugRoute,
-  UsersUsernameRoute: UsersUsernameRoute,
   ApiAuthSplatRoute: ApiAuthSplatRoute,
 }
 export const routeTree = rootRouteImport

@@ -76,3 +76,8 @@ export type Tag = Prisma.TagModel
  * 
  */
 export type ArticleTag = Prisma.ArticleTagModel
+/**
+ * Model Follow
+ * 
+ */
+export type Follow = Prisma.FollowModel

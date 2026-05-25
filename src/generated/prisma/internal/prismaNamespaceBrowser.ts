@@ -57,7 +57,8 @@ export const ModelName = {
   Verification: 'Verification',
   Article: 'Article',
   Tag: 'Tag',
-  ArticleTag: 'ArticleTag'
+  ArticleTag: 'ArticleTag',
+  Follow: 'Follow'
 } as const
 
 export type ModelName = (typeof ModelName)[keyof typeof ModelName]
@@ -169,6 +170,15 @@ export const ArticleTagScalarFieldEnum = {
 } as const
 
 export type ArticleTagScalarFieldEnum = (typeof ArticleTagScalarFieldEnum)[keyof typeof ArticleTagScalarFieldEnum]
+
+
+export const FollowScalarFieldEnum = {
+  followerId: 'followerId',
+  followingId: 'followingId',
+  createdAt: 'createdAt'
+} as const
+
+export type FollowScalarFieldEnum = (typeof FollowScalarFieldEnum)[keyof typeof FollowScalarFieldEnum]
 
 
 export const SortOrder = {

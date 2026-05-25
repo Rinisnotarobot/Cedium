@@ -530,13 +530,19 @@ export const getPublishedArticlesFn = createServerFn({ method: 'GET' })
           author: {
             select: { id: true, name: true, image: true },
           },
+          tags: {
+            include: { tag: true }
+          }
         },
       }),
       prisma.article.count({ where: { status: ArticleStatus.PUBLISHED } }),
     ])
 
     return {
-      articles,
+      articles: articles.map(article => ({
+        ...article,
+        tags: article.tags?.map(at => at.tag) as Tag[]
+      })),
       meta: { total, page: data.page, limit: data.limit },
     }
   })
@@ -580,6 +586,9 @@ export const getArticlesByAuthorFn = createServerFn({ method: 'GET' })
           author: {
             select: { id: true, name: true, image: true },
           },
+          tags: {
+            include: { tag: true }
+          }
         },
       }),
       prisma.article.count({
@@ -591,7 +600,10 @@ export const getArticlesByAuthorFn = createServerFn({ method: 'GET' })
     ])
 
     return {
-      articles,
+      articles: articles.map(article => ({
+        ...article,
+        tags: article.tags?.map(at => at.tag) as Tag[]
+      })),
       meta: { total, page: data.page, limit: data.limit },
       author: user,
     }
