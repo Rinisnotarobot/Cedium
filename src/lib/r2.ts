@@ -1,4 +1,4 @@
-import { S3Client, PutObjectCommand, DeleteObjectCommand } from '@aws-sdk/client-s3'
+import { S3Client, PutObjectCommand, DeleteObjectCommand, DeleteObjectsCommand } from '@aws-sdk/client-s3'
 
 const r2Client = new S3Client({
   region: 'auto',
@@ -112,6 +112,25 @@ export async function deleteAvatar(url: string): Promise<void> {
   const command = new DeleteObjectCommand({
     Bucket: BUCKET_NAME,
     Key: key,
+  })
+
+  await r2Client.send(command)
+}
+
+export async function deleteImages(urls: string[]): Promise<void> {
+  const r2Urls = urls.filter(url => url.startsWith(PUBLIC_URL))
+
+  if (r2Urls.length === 0) {
+    return
+  }
+
+  const command = new DeleteObjectsCommand({
+    Bucket: BUCKET_NAME,
+    Delete: {
+      Objects: r2Urls.map(url => ({
+        Key: url.replace(`${PUBLIC_URL}/`, ''),
+      })),
+    },
   })
 
   await r2Client.send(command)

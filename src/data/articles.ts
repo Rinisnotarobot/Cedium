@@ -4,6 +4,8 @@ import { prisma } from '#/db'
 import { auth } from '#/lib/auth'
 import { authMiddleware } from '#/middlewares/auth'
 import { ArticleStatus } from '#/generated/prisma/enums'
+import { deleteImages } from '#/lib/r2'
+import { findOrphanImages, extractR2ImageUrls } from '#/lib/utils/image'
 import {
   createArticleSchema,
   updateArticleSchema,
@@ -117,7 +119,7 @@ export const updateArticleFn = createServerFn({ method: 'POST' })
 
     const existing = await prisma.article.findUnique({
       where: { id: data.id },
-      select: { authorId: true },
+      select: { authorId: true, content: true, coverImage: true },
     })
 
     if (!existing) {
@@ -128,14 +130,16 @@ export const updateArticleFn = createServerFn({ method: 'POST' })
       throw new Error('无权限编辑此文章')
     }
 
-    // 处理标签更新：先删除现有关联，再批量创建新关联
+    const orphanImages = findOrphanImages(existing.content, data.content)
+    if (existing.coverImage && existing.coverImage !== data.coverImage) {
+      orphanImages.push(existing.coverImage)
+    }
+
     if (data.tags) {
       await prisma.articleTag.deleteMany({ where: { articleId: data.id } })
 
-      // 批量获取或创建标签 ID
       const tagIds = await ensureTagIds(data.tags)
 
-      // 批量创建关联
       await prisma.articleTag.createMany({
         data: tagIds.map(tagId => ({ articleId: data.id, tagId })),
         skipDuplicates: true,
@@ -155,7 +159,18 @@ export const updateArticleFn = createServerFn({ method: 'POST' })
       }
     })
 
-    // 转换 tags 格式
+    if (orphanImages.length > 0) {
+      try {
+        await deleteImages(orphanImages)
+      } catch (error) {
+        console.error('Failed to delete orphan images:', {
+          articleId: data.id,
+          urls: orphanImages,
+          error,
+        })
+      }
+    }
+
     const articleWithTags = {
       ...article,
       tags: article.tags?.map(at => at.tag) as Tag[]
@@ -360,7 +375,7 @@ export const deleteArticleFn = createServerFn({ method: 'POST' })
 
     const existing = await prisma.article.findUnique({
       where: { id: data.id },
-      select: { authorId: true, status: true },
+      select: { authorId: true, status: true, content: true, coverImage: true },
     })
 
     if (!existing) {
@@ -369,6 +384,11 @@ export const deleteArticleFn = createServerFn({ method: 'POST' })
 
     if (existing.authorId !== userId) {
       throw new Error('无权限删除此文章')
+    }
+
+    const imageUrls = extractR2ImageUrls(existing.content)
+    if (existing.coverImage) {
+      imageUrls.push(existing.coverImage)
     }
 
     if (existing.status === ArticleStatus.DRAFT) {
@@ -381,6 +401,18 @@ export const deleteArticleFn = createServerFn({ method: 'POST' })
       ])
     } else {
       await prisma.article.delete({ where: { id: data.id } })
+    }
+
+    if (imageUrls.length > 0) {
+      try {
+        await deleteImages(imageUrls)
+      } catch (error) {
+        console.error('Failed to delete article images:', {
+          articleId: data.id,
+          urls: imageUrls,
+          error,
+        })
+      }
     }
   })
 
