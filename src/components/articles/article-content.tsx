@@ -76,12 +76,16 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
 
   useEffect(() => {
     if (editor && content) {
-      try {
-        const parsedContent = JSON.parse(content)
-        editor.commands.setContent(parsedContent)
-      } catch {
-        editor.commands.setContent(content)
-      }
+      // 使用 queueMicrotask 避免 flushSync 警告
+      // Tiptap dispatches transactions synchronously，需要延迟到 React render cycle 之后
+      queueMicrotask(() => {
+        try {
+          const parsedContent = JSON.parse(content)
+          editor.commands.setContent(parsedContent)
+        } catch {
+          editor.commands.setContent(content)
+        }
+      })
     }
   }, [editor, content])
 
