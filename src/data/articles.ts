@@ -16,6 +16,7 @@ import {
   getArticleByIdSchema,
   getMyArticlesSchema,
   getPublishedArticlesSchema,
+  getPublishedArticlesInfiniteSchema,
   getArticlesByAuthorSchema,
   deleteArticleSchema,
 } from '#/lib/validators/article'
@@ -544,6 +545,42 @@ export const getPublishedArticlesFn = createServerFn({ method: 'GET' })
         tags: article.tags?.map(at => at.tag) as Tag[]
       })),
       meta: { total, page: data.page, limit: data.limit },
+    }
+  })
+
+/**
+ * 获取公开文章列表 (Cursor 分页 - 用于无限滚动)
+ * - 公开接口，无需认证
+ * - 使用 cursor-based pagination
+ * - 返回 nextCursor 和 hasMore
+ */
+export const getPublishedArticlesInfiniteFn = createServerFn({ method: 'GET' })
+  .inputValidator(getPublishedArticlesInfiniteSchema)
+  .handler(async ({ data }) => {
+    const take = data.limit + 1 // 多取一条判断是否有下一页
+
+    const articles = await prisma.article.findMany({
+      where: { status: ArticleStatus.PUBLISHED },
+      orderBy: { publishedAt: 'desc' },
+      cursor: data.cursor ? { id: data.cursor } : undefined,
+      skip: data.cursor ? 1 : 0, // cursor 时跳过第一条（已在上页末尾）
+      take,
+      include: {
+        author: { select: { id: true, name: true, image: true } },
+        tags: { include: { tag: true } }
+      },
+    })
+
+    const hasMore = articles.length > data.limit
+    const nextCursor = hasMore ? articles[articles.length - 1].id : undefined
+
+    return {
+      articles: articles.slice(0, data.limit).map(article => ({
+        ...article,
+        tags: article.tags?.map(at => at.tag) as Tag[]
+      })),
+      nextCursor,
+      hasMore,
     }
   })
 

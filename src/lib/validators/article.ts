@@ -63,6 +63,13 @@ export const paginationSchema = z.object({
 })
 export type PaginationInput = z.infer<typeof paginationSchema>
 
+// Cursor-based pagination (for infinite scroll)
+export const cursorPaginationSchema = z.object({
+  cursor: z.string().optional(),
+  limit: z.number().int().min(1).max(20).default(10),
+})
+export type CursorPaginationInput = z.infer<typeof cursorPaginationSchema>
+
 // 获取文章详情
 export const getArticleByIdSchema = z.object({
   id: z.string().min(1, '文章ID不能为空'),
@@ -78,6 +85,10 @@ export type GetMyArticlesInput = z.infer<typeof getMyArticlesSchema>
 // 获取公开文章列表
 export const getPublishedArticlesSchema = paginationSchema
 export type GetPublishedArticlesInput = z.infer<typeof getPublishedArticlesSchema>
+
+// 获取公开文章列表 (Cursor 分页 - 无限滚动)
+export const getPublishedArticlesInfiniteSchema = cursorPaginationSchema
+export type GetPublishedArticlesInfiniteInput = z.infer<typeof getPublishedArticlesInfiniteSchema>
 
 // 获取作者文章列表
 export const getArticlesByAuthorSchema = paginationSchema.extend({
