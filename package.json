@@ -8,6 +8,7 @@
   "scripts": {
     "dev": "vite dev --port 3000",
     "build": "vite build",
+    "start": "node .output/server/index.js",
     "preview": "vite preview",
     "test": "vitest run",
     "post-cta-init": "npx -y create-db@latest --user-agent tanstack/tsrouter",
