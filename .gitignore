@@ -16,4 +16,6 @@ todos.json
 # CodeGraph index (local tool cache)
 .codegraph/
 /.claude/PRPs/
+/.claude/reviews/
+docs/MODULE_COMPLETION_REPORT.md
 src/routeTree.gen.ts

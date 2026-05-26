@@ -67,16 +67,22 @@ pnpm dev
 src/
 ├── components/     # UI 组件
 │   ├── auth/       # 认证相关组件
+│   ├── editor/     # 编辑器组件
 │   ├── layout/     # 布局组件
 │   ├── settings/   # 设置页面组件
-│   └── ui/         # Shadcn/UI 基础组件
+│   └── ui/         # Shadcn/UI 基础组件 + minimal-tiptap
+├── data/           # Server Functions (TanStack Start)
 ├── hooks/          # 自定义 Hooks
 │   ├── mutations/  # TanStack Query mutations
+│   ├── queries/    # TanStack Query queries
 │   └── utils/      # 工具 Hooks
 ├── lib/            # 工具函数和配置
 │   ├── auth.ts     # Better Auth 配置
-│   ├── email.ts    # Resend 邮件服务
+│   ├── auth-client.ts # 认证客户端
+│   ├── email.ts    # Resend 酵件服务
+│   ├── r2.ts       # Cloudflare R2 存储
 │   └── validators/ # Zod 验证器
+├── middlewares/    # 中间件（认证等）
 ├── routes/         # 路由文件（文件路由）
 │   ├── _app/       # 需认证的路由组
 │   ├── _auth/      # 认证页面路由组
@@ -118,21 +124,26 @@ src/routes/
 ├── __root.tsx       # 根布局
 ├── index.tsx        # / 首页
 ├── about.tsx        # /about
+├── articles.$slug.tsx # /articles/:slug 文章详情（公开）
 ├── _auth/           # 未认证路由组（登录页自动重定向）
 │   ├── route.tsx    # 认证守卫
 │   ├── login.tsx    # /login
 │   ├── sign-up.tsx  # /sign-up
-│   └── forgot-password.tsx
+│   ├── forgot-password.tsx  # /forgot-password
+│   └── reset-password.tsx   # /reset-password
 ├── _app/            # 需认证路由组
 │   ├── route.tsx    # 认证守卫 + AppLayout
 │   ├── search.tsx   # /search
 │   ├── write.tsx    # /write
-│   ├── articles.tsx # /articles
+│   ├── articles.tsx # /articles 文章列表
+│   ├── users.$username.tsx # /users/:username 用户主页
 │   └── me/          # 个人中心
+│       ├── route.tsx      # /me 路由组布局
 │       ├── index.tsx      # /me
+│       ├── articles.tsx   # /me/articles 我的文章
 │       ├── favorites.tsx  # /me/favorites
-│       ├── drafts.tsx     # /me/drafts
 │       └── settings/      # /me/settings
+│           ├── route.tsx       # 设置布局
 │           ├── index.tsx       # 设置首页
 │           ├── security.tsx    # 安全设置
 │           ├── notifications.tsx
