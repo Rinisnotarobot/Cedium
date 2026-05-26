@@ -13,8 +13,8 @@ COPY prisma ./prisma/
 # 安装依赖
 RUN pnpm install --frozen-lockfile
 
-# 生成 Prisma Client
-RUN pnpm db:generate
+# 生成 Prisma Client (直接调用 prisma generate，绕过 dotenv-cli)
+RUN pnpm exec prisma generate
 
 # 复制源码
 COPY . .
@@ -34,10 +34,10 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY --from=builder /app/package.json ./
 COPY --from=builder /app/pnpm-lock.yaml ./
 COPY --from=builder /app/pnpm-workspace.yaml ./
-COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/.output ./output
 COPY --from=builder /app/src/generated ./src/generated
 
-# 安装生产依赖
+# 安装生产依赖 (Prisma adapter 需要)
 RUN pnpm install --prod --frozen-lockfile
 
 # 环境变量
@@ -46,5 +46,5 @@ ENV PORT=3000
 
 EXPOSE 3000
 
-# 启动服务
-CMD ["pnpm", "start"]
+# 启动 Nitro 服务
+CMD ["node", "output/server/index.mjs"]
