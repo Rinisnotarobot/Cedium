@@ -9,14 +9,24 @@ import { estimateReadTime } from "#/lib/utils/article-content"
 import { Button } from "#/components/ui/button"
 import { cn } from "#/lib/utils"
 import { Route } from "#/routes/articles.$slug"
+import { useQuery } from "@tanstack/react-query"
+import { articleKeys } from "#/hooks/keys/article-keys"
 import { useBookmarkStatus, useLikeStatus } from "#/hooks/queries"
 import { useBookmarkArticle, useUnbookmarkArticle, useLikeArticle, useUnlikeArticle } from "#/hooks/mutations"
 import { authClient } from "#/lib/auth-client"
 
 export function ArticleDetailPage() {
-  const { article } = Route.useLoaderData()
+  const loaderData = Route.useLoaderData()
   const navigate = useNavigate()
   const { data: session } = authClient.useSession()
+
+  // 使用 useQuery 获取文章数据，以响应实时更新（如点赞计数）
+  // loader 已将数据放入缓存，所以这里不会重复请求
+  const { data: article } = useQuery({
+    queryKey: articleKeys.detail(loaderData.article.id),
+    initialData: loaderData.article,
+    staleTime: 1000 * 60 * 5, // 5 分钟内不重新请求
+  })
 
   // 获取收藏和点赞状态
   const { data: bookmarkStatus } = useBookmarkStatus(article.id)
