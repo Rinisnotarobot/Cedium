@@ -11,8 +11,7 @@ COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 
 # 安装依赖（允许构建脚本）
-RUN pnpm config set auto-install-peers true && \
-    pnpm install --frozen-lockfile --ignore-scripts=false
+RUN pnpm install --frozen-lockfile --ignore-scripts=false
 
 # 生成 Prisma Client
 RUN pnpm db:generate
