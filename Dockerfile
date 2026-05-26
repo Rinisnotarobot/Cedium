@@ -10,8 +10,8 @@ RUN corepack enable && corepack prepare pnpm@latest --activate
 COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 
-# 安装依赖（允许构建脚本）
-RUN pnpm install --frozen-lockfile --ignore-scripts=false
+# 安装依赖
+RUN pnpm install --frozen-lockfile
 
 # 生成 Prisma Client
 RUN pnpm db:generate
