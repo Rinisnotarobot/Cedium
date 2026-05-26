@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router"
 import { PageContainer, PageHeader } from "#/components/layout"
 import { VirtualArticleList } from "#/components/articles/virtual-article-list"
 
-export const Route = createFileRoute("/_app/articles")({
+export const Route = createFileRoute("/_app/articles/")({
   component: ArticlesPage,
 })
 

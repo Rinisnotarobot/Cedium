@@ -1,12 +1,12 @@
-import { useEffect } from "react"
-import { EditorContent, useEditor } from "@tiptap/react"
-import { StarterKit } from "@tiptap/starter-kit"
-import { Typography } from "@tiptap/extension-typography"
-import { TextStyle } from "@tiptap/extension-text-style"
-import { Selection } from "@tiptap/extensions"
-import { TaskItem, TaskList } from "@tiptap/extension-list"
-import { TableKit } from "@tiptap/extension-table"
-import { cn } from "#/lib/utils"
+import { useEffect } from "react";
+import { EditorContent, useEditor } from "@tiptap/react";
+import { StarterKit } from "@tiptap/starter-kit";
+import { Typography } from "@tiptap/extension-typography";
+import { TextStyle } from "@tiptap/extension-text-style";
+import { Selection } from "@tiptap/extensions";
+import { TaskItem, TaskList } from "@tiptap/extension-list";
+import { TableKit } from "@tiptap/extension-table";
+import { cn } from "#/lib/utils";
 import {
   Image,
   HorizontalRule,
@@ -14,11 +14,11 @@ import {
   Color,
   UnsetAllMarks,
   ResetMarksOnEnter,
-} from "#/components/ui/minimal-tiptap/extensions"
+} from "#/components/ui/minimal-tiptap/extensions";
 
 interface ArticleContentProps {
-  content: string
-  className?: string
+  content: string;
+  className?: string;
 }
 
 const createReadonlyExtensions = () => [
@@ -60,7 +60,7 @@ const createReadonlyExtensions = () => [
       HTMLAttributes: { class: "table-node" },
     },
   }),
-]
+];
 
 export function ArticleContent({ content, className }: ArticleContentProps) {
   const editor = useEditor({
@@ -72,7 +72,7 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
         class: cn("focus:outline-hidden prose prose-lg max-w-none", className),
       },
     },
-  })
+  });
 
   useEffect(() => {
     if (editor && content) {
@@ -80,17 +80,17 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
       // Tiptap dispatches transactions synchronously，需要延迟到 React render cycle 之后
       queueMicrotask(() => {
         try {
-          const parsedContent = JSON.parse(content)
-          editor.commands.setContent(parsedContent)
+          const parsedContent = JSON.parse(content);
+          editor.commands.setContent(parsedContent);
         } catch {
-          editor.commands.setContent(content)
+          editor.commands.setContent(content);
         }
-      })
+      });
     }
-  }, [editor, content])
+  }, [editor, content]);
 
   if (!editor) {
-    return null
+    return null;
   }
 
   return (
@@ -98,5 +98,5 @@ export function ArticleContent({ content, className }: ArticleContentProps) {
       editor={editor}
       className="minimal-tiptap-editor prose prose-lg dark:prose-invert max-w-none prose-headings:font-semibold prose-headings:tracking-tight prose-p:text-muted-foreground prose-p:leading-relaxed prose-a:text-primary prose-a:no-underline hover:prose-a:underline prose-blockquote:border-primary prose-code:bg-muted prose-code:px-2 prose-code:py-0.5 prose-code:rounded prose-code:before:content-none prose-code:after:content-none prose-img:rounded-lg prose-img:shadow-md"
     />
-  )
+  );
 }

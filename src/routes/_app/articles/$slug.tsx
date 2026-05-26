@@ -3,7 +3,7 @@ import { getArticleByIdFn } from "#/data/articles"
 import { ArticleDetailPage } from "#/components/articles"
 import { articleKeys } from "#/hooks/keys/article-keys"
 
-export const Route = createFileRoute("/articles/$slug")({
+export const Route = createFileRoute("/_app/articles/$slug")({
   loader: async ({ params, context }) => {
     const article = await getArticleByIdFn({ data: { id: params.slug } })
     if (!article) {

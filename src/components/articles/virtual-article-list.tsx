@@ -1,22 +1,22 @@
-import { useRef, useEffect } from 'react'
-import { useVirtualizer } from '@tanstack/react-virtual'
+import { useRef, useEffect } from "react";
+import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   usePublishedArticlesInfinite,
   useMultipleBookmarkStatus,
   useMultipleLikeStatus,
-} from '#/hooks/queries'
-import { MediumArticleCard } from './medium-article-card'
+} from "#/hooks/queries";
+import { MediumArticleCard } from "./medium-article-card";
 
 interface VirtualArticleListProps {
-  containerHeight?: number | string
-  estimatedItemHeight?: number
+  containerHeight?: number | string;
+  estimatedItemHeight?: number;
 }
 
 export function VirtualArticleList({
-  containerHeight = 'calc(100vh - 200px)',
+  containerHeight = "calc(100vh - 200px)",
   estimatedItemHeight = 120,
 }: VirtualArticleListProps) {
-  const parentRef = useRef<HTMLDivElement>(null)
+  const parentRef = useRef<HTMLDivElement>(null);
 
   const {
     data,
@@ -25,22 +25,24 @@ export function VirtualArticleList({
     isFetchingNextPage,
     isLoading,
     isError,
-  } = usePublishedArticlesInfinite(10)
+  } = usePublishedArticlesInfinite(10);
 
   // 展平所有页面的文章
-  const allArticles = data?.pages.flatMap((page) => page.articles) ?? []
+  const allArticles = data?.pages.flatMap((page) => page.articles) ?? [];
 
   // 批量获取收藏/点赞状态
-  const articleIds = allArticles.map((a) => a.id)
+  const articleIds = allArticles.map((a) => a.id);
   const { data: bookmarkStatuses } = useMultipleBookmarkStatus(articleIds, {
     enabled: allArticles.length > 0,
-  })
+  });
   const { data: likeStatuses } = useMultipleLikeStatus(articleIds, {
     enabled: allArticles.length > 0,
-  })
+  });
 
-  const bookmarkMap = new Map(bookmarkStatuses?.map((s) => [s.articleId, s.isBookmarked]))
-  const likeMap = new Map(likeStatuses?.map((s) => [s.articleId, s.isLiked]))
+  const bookmarkMap = new Map(
+    bookmarkStatuses?.map((s) => [s.articleId, s.isBookmarked]),
+  );
+  const likeMap = new Map(likeStatuses?.map((s) => [s.articleId, s.isLiked]));
 
   // 虚拟滚动配置
   const virtualizer = useVirtualizer({
@@ -48,20 +50,20 @@ export function VirtualArticleList({
     getScrollElement: () => parentRef.current,
     estimateSize: () => estimatedItemHeight,
     overscan: 3,
-  })
+  });
 
   // 滚动到底部时触发加载
   useEffect(() => {
-    const virtualItems = virtualizer.getVirtualItems()
-    const lastItem = virtualItems.at(-1)
-    if (!lastItem) return
+    const virtualItems = virtualizer.getVirtualItems();
+    const lastItem = virtualItems.at(-1);
+    if (!lastItem) return;
 
     if (
       lastItem.index >= allArticles.length - 1 &&
       hasNextPage &&
       !isFetchingNextPage
     ) {
-      fetchNextPage()
+      fetchNextPage();
     }
   }, [
     virtualizer.getVirtualItems(),
@@ -69,14 +71,14 @@ export function VirtualArticleList({
     isFetchingNextPage,
     allArticles.length,
     fetchNextPage,
-  ])
+  ]);
 
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
-    )
+    );
   }
 
   if (isError) {
@@ -84,7 +86,7 @@ export function VirtualArticleList({
       <div className="text-center py-12">
         <p className="text-muted-foreground">加载失败</p>
       </div>
-    )
+    );
   }
 
   if (allArticles.length === 0) {
@@ -95,37 +97,37 @@ export function VirtualArticleList({
           等待第一篇文章的发布...
         </p>
       </div>
-    )
+    );
   }
 
-  const virtualItems = virtualizer.getVirtualItems()
+  const virtualItems = virtualizer.getVirtualItems();
 
   return (
     <div
       ref={parentRef}
-      style={{ height: containerHeight, overflow: 'auto' }}
+      style={{ height: containerHeight, overflow: "auto" }}
       className="scrollbar-thin scrollbar-thumb-border scrollbar-track-transparent"
     >
       <div
         style={{
           height: `${virtualizer.getTotalSize()}px`,
-          position: 'relative',
+          position: "relative",
         }}
       >
         {/* Block-translate wrapper for better performance */}
         <div
           style={{
-            position: 'absolute',
+            position: "absolute",
             top: 0,
             left: 0,
-            width: '100%',
+            width: "100%",
             transform: `translateY(${virtualItems[0]?.start ?? 0}px)`,
           }}
           className="px-3"
         >
           {virtualItems.map((virtualItem) => {
-            const isLoader = virtualItem.index > allArticles.length - 1
-            const article = allArticles[virtualItem.index]
+            const isLoader = virtualItem.index > allArticles.length - 1;
+            const article = allArticles[virtualItem.index];
 
             return (
               <div
@@ -155,10 +157,10 @@ export function VirtualArticleList({
                   />
                 )}
               </div>
-            )
+            );
           })}
         </div>
       </div>
     </div>
-  )
+  );
 }

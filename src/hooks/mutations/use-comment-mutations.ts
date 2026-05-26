@@ -8,7 +8,7 @@ import {
   deleteCommentFn,
 } from '#/data/comment'
 import { getErrorMessage } from '#/hooks/utils/get-error-message'
-import type { Comment, CommentSortType } from '#/types/comment'
+import type { Comment, CommentListResponse, CommentSortType } from '#/types/comment'
 
 interface UseCreateCommentOptions {
   onSuccess?: (comment: Comment) => void
@@ -51,7 +51,7 @@ export function useCreateComment(options?: UseCreateCommentOptions) {
       queryClient.cancelQueries({ queryKey })
 
       // 保存旧值用于回滚
-      const previousData = queryClient.getQueryData<Comment[]>(queryKey)
+      const previousData = queryClient.getQueryData<CommentListResponse>(queryKey)
 
       // 创建临时评论
       const tempId = `temp-${Date.now()}`
@@ -74,32 +74,40 @@ export function useCreateComment(options?: UseCreateCommentOptions) {
       // 乐观更新：如果是顶层评论，添加到列表；如果是回复，添加到父评论的 replies
       if (params.parentId) {
         // 回复：更新父评论的 replies
-        queryClient.setQueryData(queryKey, (old: Comment[] | undefined) => {
+        queryClient.setQueryData(queryKey, (old: CommentListResponse | undefined) => {
           if (!old) return old
-          return old.map((comment) => {
-            if (comment.id === params.parentId) {
-              return {
-                ...comment,
-                replies: [...(comment.replies ?? []), tempComment],
+          return {
+            ...old,
+            comments: old.comments.map((comment) => {
+              if (comment.id === params.parentId) {
+                return {
+                  ...comment,
+                  replies: [...(comment.replies ?? []), tempComment],
+                }
               }
-            }
-            return comment
-          })
+              return comment
+            }),
+          }
         })
       } else {
         // 顶层评论：添加到列表开头或末尾（根据排序）
-        queryClient.setQueryData(queryKey, (old: Comment[] | undefined) => {
-          if (!old) return [tempComment]
-          return params.sort === 'newest'
-            ? [tempComment, ...old]
-            : [...old, tempComment]
+        queryClient.setQueryData(queryKey, (old: CommentListResponse | undefined) => {
+          if (!old) return { comments: [tempComment], meta: { total: 1, page: 1, limit: 20 } }
+          const newComments = params.sort === 'newest'
+            ? [tempComment, ...old.comments]
+            : [...old.comments, tempComment]
+          return {
+            ...old,
+            comments: newComments,
+            meta: { ...old.meta, total: old.meta.total + 1 },
+          }
         })
       }
 
       return { previousData, tempId }
     },
     onError: (error, params, context) => {
-      // 回滚
+      // 回滚到之前的数据
       if (context?.previousData) {
         const queryKey = commentKeys.list(params.articleId, params.sort)
         queryClient.setQueryData(queryKey, context.previousData)
@@ -114,26 +122,34 @@ export function useCreateComment(options?: UseCreateCommentOptions) {
 
       // 替换临时评论为真实评论
       if (params.parentId) {
-        queryClient.setQueryData(queryKey, (old: Comment[] | undefined) => {
+        // 回复：替换父评论的 replies 中的临时评论
+        queryClient.setQueryData(queryKey, (old: CommentListResponse | undefined) => {
           if (!old) return old
-          return old.map((comment) => {
-            if (comment.id === params.parentId) {
-              return {
-                ...comment,
-                replies: (comment.replies ?? []).map((reply) =>
-                  reply.id === context?.tempId ? newComment : reply
-                ),
+          return {
+            ...old,
+            comments: old.comments.map((comment) => {
+              if (comment.id === params.parentId) {
+                return {
+                  ...comment,
+                  replies: (comment.replies ?? []).map((reply) =>
+                    reply.id === context?.tempId ? newComment : reply
+                  ),
+                }
               }
-            }
-            return comment
-          })
+              return comment
+            }),
+          }
         })
       } else {
-        queryClient.setQueryData(queryKey, (old: Comment[] | undefined) => {
-          if (!old) return [newComment]
-          return old.map((comment) =>
-            comment.id === context?.tempId ? newComment : comment
-          )
+        // 顶层评论：替换列表中的临时评论
+        queryClient.setQueryData(queryKey, (old: CommentListResponse | undefined) => {
+          if (!old) return { comments: [newComment], meta: { total: 1, page: 1, limit: 20 } }
+          return {
+            ...old,
+            comments: old.comments.map((comment) =>
+              comment.id === context?.tempId ? newComment : comment
+            ),
+          }
         })
       }
 
@@ -170,26 +186,29 @@ export function useUpdateComment(options?: UseUpdateCommentOptions) {
       queryClient.cancelQueries({ queryKey })
 
       // 保存旧值
-      const previousData = queryClient.getQueryData<Comment[]>(queryKey)
+      const previousData = queryClient.getQueryData<CommentListResponse>(queryKey)
 
       // 乐观更新：更新评论内容
-      queryClient.setQueryData(queryKey, (old: Comment[] | undefined) => {
+      queryClient.setQueryData(queryKey, (old: CommentListResponse | undefined) => {
         if (!old) return old
-        return old.map((comment) => {
-          if (comment.id === params.id) {
-            return { ...comment, content: params.content }
-          }
-          // 检查 replies
-          if (comment.replies) {
-            return {
-              ...comment,
-              replies: comment.replies.map((reply) =>
-                reply.id === params.id ? { ...reply, content: params.content } : reply
-              ),
+        return {
+          ...old,
+          comments: old.comments.map((comment) => {
+            if (comment.id === params.id) {
+              return { ...comment, content: params.content }
             }
-          }
-          return comment
-        })
+            // 检查 replies
+            if (comment.replies) {
+              return {
+                ...comment,
+                replies: comment.replies.map((reply) =>
+                  reply.id === params.id ? { ...reply, content: params.content } : reply
+                ),
+              }
+            }
+            return comment
+          }),
+        }
       })
 
       return { previousData }
@@ -232,29 +251,36 @@ export function useDeleteComment(options?: UseDeleteCommentOptions) {
       queryClient.cancelQueries({ queryKey })
 
       // 保存旧值
-      const previousData = queryClient.getQueryData<Comment[]>(queryKey)
+      const previousData = queryClient.getQueryData<CommentListResponse>(queryKey)
 
       // 乐观更新：移除评论及其子回复
-      queryClient.setQueryData(queryKey, (old: Comment[] | undefined) => {
+      queryClient.setQueryData(queryKey, (old: CommentListResponse | undefined) => {
         if (!old) return old
 
         // 检查是否是顶层评论
-        const targetComment = old.find((c) => c.id === params.id)
+        const targetComment = old.comments.find((c) => c.id === params.id)
         if (targetComment) {
           // 移除顶层评论
-          return old.filter((c) => c.id !== params.id)
+          return {
+            ...old,
+            comments: old.comments.filter((c) => c.id !== params.id),
+            meta: { ...old.meta, total: old.meta.total - 1 },
+          }
         }
 
         // 检查是否是回复
-        return old.map((comment) => {
-          if (comment.replies) {
-            return {
-              ...comment,
-              replies: comment.replies.filter((reply) => reply.id !== params.id),
+        return {
+          ...old,
+          comments: old.comments.map((comment) => {
+            if (comment.replies) {
+              return {
+                ...comment,
+                replies: comment.replies.filter((reply) => reply.id !== params.id),
+              }
             }
-          }
-          return comment
-        })
+            return comment
+          }),
+        }
       })
 
       return { previousData }
