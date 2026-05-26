@@ -66,20 +66,27 @@ pnpm dev
 ```
 src/
 ├── components/     # UI 组件
+│   ├── articles/   # 文章相关组件
 │   ├── auth/       # 认证相关组件
+│   ├── comments/   # 评论组件
 │   ├── editor/     # 编辑器组件
+│   ├── favorites/  # 收藏组件
+│   ├── home/       # 首页组件
 │   ├── layout/     # 布局组件
 │   ├── settings/   # 设置页面组件
+│   ├── theme/      # 主题切换组件
+│   ├── users/      # 用户相关组件
 │   └── ui/         # Shadcn/UI 基础组件 + minimal-tiptap
 ├── data/           # Server Functions (TanStack Start)
 ├── hooks/          # 自定义 Hooks
+│   ├── keys/       # Query keys
 │   ├── mutations/  # TanStack Query mutations
 │   ├── queries/    # TanStack Query queries
 │   └── utils/      # 工具 Hooks
 ├── lib/            # 工具函数和配置
 │   ├── auth.ts     # Better Auth 配置
 │   ├── auth-client.ts # 认证客户端
-│   ├── email.ts    # Resend 酵件服务
+│   ├── email.ts    # Resend 邮件服务
 │   ├── r2.ts       # Cloudflare R2 存储
 │   └── validators/ # Zod 验证器
 ├── middlewares/    # 中间件（认证等）
@@ -90,6 +97,7 @@ src/
 ├── generated/      # Prisma 生成的类型
 ├── types/          # TypeScript 类型定义
 ├── router.tsx      # 路由配置
+├── server.ts       # 服务器入口
 ├── db.ts           # 数据库连接
 └── styles.css      # 全局样式
 prisma/
@@ -105,6 +113,7 @@ prisma/
 |------|------|
 | `pnpm dev` | 启动开发服务器 (端口 3000) |
 | `pnpm build` | 构建生产版本 |
+| `pnpm start` | 启动生产服务器 (需要先 build) |
 | `pnpm preview` | 预览生产构建 |
 | `pnpm test` | 运行 Vitest 测试 |
 | `pnpm db:generate` | 生成 Prisma Client |
@@ -235,7 +244,7 @@ pnpm test
 pnpm build
 ```
 
-输出目录为 `dist/`。
+输出目录为 `.output/`。
 
 ## 学习资源
 

@@ -5,6 +5,7 @@ interface SessionUser {
   name: string | null;
   email: string;
   image?: string | null;
+  emailVerified: boolean;
 }
 
 interface Session {
@@ -41,4 +42,19 @@ export function assertSession(context: unknown): Session {
   }
 
   return session;
+}
+
+/**
+ * 检查邮箱是否已验证
+ * 如果未验证，抛出 redirect 到设置页面
+ */
+export function requireEmailVerified(context: AuthContext, redirectTo: string) {
+  requireAuth(context, redirectTo);
+
+  if (!context.session?.user?.emailVerified) {
+    throw redirect({
+      to: "/me/settings",
+      search: { message: "写作功能需要验证邮箱后才能使用" },
+    });
+  }
 }
