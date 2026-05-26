@@ -34,7 +34,7 @@ export async function sendEmail({ to, subject, html }: SendEmailOptions) {
   // 开发模式：使用测试发件人和收件人地址
   const isDev = process.env.NODE_ENV !== 'production'
   const recipient = isDev ? TEST_EMAIL : to
-  const sender = isDev ? TEST_FROM : 'Cedium <noreply@cedium.app>'
+  const sender = isDev ? TEST_FROM : 'Cedium <noreply@cedium.inari-jinja.org>'
 
   if (isDev && to !== TEST_EMAIL) {
     console.log(`[DEV] Email to "${to}" redirected to "${TEST_EMAIL}"`)
