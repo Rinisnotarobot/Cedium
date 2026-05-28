@@ -84,7 +84,7 @@ export function CommentCard({
     <div className={cn('group relative', isReply ? 'py-3' : 'py-4')}>
       <div className="flex items-start gap-3">
         {/* 用户头像 */}
-        <Avatar size={isReply ? 'sm' : 'lg'}>
+        <Avatar size={isReply ? 'default' : 'lg'} className="ring-2 ring-white/20">
           <AvatarImage src={comment.user?.image || undefined} alt={comment.user?.name || ''} />
           <AvatarFallback className={cn('text-white font-semibold', avatarColor)}>
             {comment.user?.name?.charAt(0) || '?'}
