@@ -90,6 +90,12 @@ export type GetPublishedArticlesInput = z.infer<typeof getPublishedArticlesSchem
 export const getPublishedArticlesInfiniteSchema = cursorPaginationSchema
 export type GetPublishedArticlesInfiniteInput = z.infer<typeof getPublishedArticlesInfiniteSchema>
 
+// 搜索文章参数 (Cursor 分页)
+export const searchArticlesSchema = cursorPaginationSchema.extend({
+  query: z.string().min(1, '搜索关键词不能为空').max(100, '搜索关键词不能超过100个字符'),
+})
+export type SearchArticlesInput = z.infer<typeof searchArticlesSchema>
+
 // 获取作者文章列表
 export const getArticlesByAuthorSchema = paginationSchema.extend({
   username: z.string().optional(),

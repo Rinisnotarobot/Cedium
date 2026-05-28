@@ -17,6 +17,7 @@ import {
   getMyArticlesSchema,
   getPublishedArticlesSchema,
   getPublishedArticlesInfiniteSchema,
+  searchArticlesSchema,
   getArticlesByAuthorSchema,
   deleteArticleSchema,
 } from '#/lib/validators/article'
@@ -572,7 +573,7 @@ export const getPublishedArticlesInfiniteFn = createServerFn({ method: 'GET' })
     })
 
     const hasMore = articles.length > data.limit
-    const nextCursor = hasMore ? articles[articles.length - 1].id : undefined
+    const nextCursor = hasMore ? articles[data.limit - 1].id : undefined
 
     return {
       articles: articles.slice(0, data.limit).map(article => ({
@@ -581,6 +582,51 @@ export const getPublishedArticlesInfiniteFn = createServerFn({ method: 'GET' })
       })),
       nextCursor,
       hasMore,
+    }
+  })
+
+/**
+ * 搜索文章 (Cursor 分页)
+ * - 公开接口，无需认证
+ * - 搜索标题、摘要、内容、标签（不区分大小写）
+ */
+export const searchArticlesFn = createServerFn({ method: 'GET' })
+  .inputValidator(searchArticlesSchema)
+  .handler(async ({ data }) => {
+    const take = data.limit + 1
+    const searchQuery = data.query.toLowerCase()
+
+    const articles = await prisma.article.findMany({
+      where: {
+        status: ArticleStatus.PUBLISHED,
+        OR: [
+          { title: { contains: searchQuery, mode: 'insensitive' } },
+          { excerpt: { contains: searchQuery, mode: 'insensitive' } },
+          { content: { contains: searchQuery, mode: 'insensitive' } },
+          { tags: { some: { tag: { name: { contains: searchQuery, mode: 'insensitive' } } } } },
+        ],
+      },
+      orderBy: { publishedAt: 'desc' },
+      cursor: data.cursor ? { id: data.cursor } : undefined,
+      skip: data.cursor ? 1 : 0,
+      take,
+      include: {
+        author: { select: { id: true, name: true, image: true } },
+        tags: { include: { tag: true } }
+      },
+    })
+
+    const hasMore = articles.length > data.limit
+    const nextCursor = hasMore ? articles[data.limit - 1].id : undefined
+
+    return {
+      articles: articles.slice(0, data.limit).map(article => ({
+        ...article,
+        tags: article.tags?.map(at => at.tag) as Tag[]
+      })),
+      nextCursor,
+      hasMore,
+      query: data.query,
     }
   })
 

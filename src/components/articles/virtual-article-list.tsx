@@ -2,21 +2,30 @@ import { useRef, useEffect } from "react";
 import { useVirtualizer } from "@tanstack/react-virtual";
 import {
   usePublishedArticlesInfinite,
+  useSearchArticlesInfinite,
   useMultipleBookmarkStatus,
   useMultipleLikeStatus,
 } from "#/hooks/queries";
 import { MediumArticleCard } from "./medium-article-card";
 
 interface VirtualArticleListProps {
+  query?: string;
   containerHeight?: number | string;
   estimatedItemHeight?: number;
+  emptyMessage?: string;
 }
 
 export function VirtualArticleList({
+  query,
   containerHeight = "calc(100vh - 200px)",
   estimatedItemHeight = 120,
+  emptyMessage = "暂无文章",
 }: VirtualArticleListProps) {
   const parentRef = useRef<HTMLDivElement>(null);
+
+  // 根据 query 选择数据源
+  const publishedQuery = usePublishedArticlesInfinite(10);
+  const searchQuery = useSearchArticlesInfinite(query || "", 10);
 
   const {
     data,
@@ -25,7 +34,7 @@ export function VirtualArticleList({
     isFetchingNextPage,
     isLoading,
     isError,
-  } = usePublishedArticlesInfinite(10);
+  } = query ? searchQuery : publishedQuery;
 
   // 展平所有页面的文章
   const allArticles = data?.pages.flatMap((page) => page.articles) ?? [];
@@ -92,10 +101,12 @@ export function VirtualArticleList({
   if (allArticles.length === 0) {
     return (
       <div className="text-center py-12">
-        <p className="text-muted-foreground">暂无文章</p>
-        <p className="text-sm text-muted-foreground/60 mt-2">
-          等待第一篇文章的发布...
-        </p>
+        <p className="text-muted-foreground">{emptyMessage}</p>
+        {!query && (
+          <p className="text-sm text-muted-foreground/60 mt-2">
+            等待第一篇文章的发布...
+          </p>
+        )}
       </div>
     );
   }
