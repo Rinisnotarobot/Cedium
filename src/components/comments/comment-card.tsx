@@ -10,6 +10,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '#/components/ui/dropdown-menu'
+import { Avatar, AvatarImage, AvatarFallback } from '#/components/ui/avatar'
 import { getAvatarColor } from '#/lib/utils/avatar-color'
 import { CommentInput } from './comment-input'
 import { useUpdateComment, useCreateComment } from '#/hooks/mutations/use-comment-mutations'
@@ -83,15 +84,12 @@ export function CommentCard({
     <div className={cn('group relative', isReply ? 'py-3' : 'py-4')}>
       <div className="flex items-start gap-3">
         {/* 用户头像 */}
-        <div
-          className={cn(
-            'size-10 rounded-full flex items-center justify-center text-white font-semibold ring-2 ring-white/20',
-            avatarColor,
-            isReply && 'size-8 text-sm'
-          )}
-        >
-          {comment.user?.name?.charAt(0) || '?'}
-        </div>
+        <Avatar size={isReply ? 'default' : 'lg'} className="ring-2 ring-white/20">
+          <AvatarImage src={comment.user?.image || undefined} alt={comment.user?.name || ''} />
+          <AvatarFallback className={cn('text-white font-semibold', avatarColor)}>
+            {comment.user?.name?.charAt(0) || '?'}
+          </AvatarFallback>
+        </Avatar>
 
         {/* 评论内容 */}
         <div className="flex-1 min-w-0">
