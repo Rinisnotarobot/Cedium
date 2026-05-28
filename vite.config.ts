@@ -13,7 +13,23 @@ const config = defineConfig({
   plugins: [
     devtools(),
     tailwindcss(),
-    tanstackStart(),
+    tanstackStart({
+      importProtection: {
+        client: {
+          specifiers: [
+            '@prisma/client',
+            '@prisma/adapter-pg',
+            'better-auth',
+          ],
+          files: [
+            '**/db.ts',
+            '**/lib/auth.ts',
+            '**/lib/r2.ts',
+            '**/lib/email.ts',
+          ],
+        },
+      },
+    }),
     nitro(),
     viteReact(),
     babel({ presets: [reactCompilerPreset()] }),

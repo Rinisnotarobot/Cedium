@@ -10,4 +10,6 @@ export const articleKeys = {
   byAuthor: (username: string) => [...articleKeys.all, 'by-author', username] as const,
   byTag: (slug: string) => [...articleKeys.lists(), { tag: slug }] as const,
   stats: () => [...articleKeys.all, 'my', 'stats'] as const,
+  search: (query: string) => [...articleKeys.all, 'search', query] as const,
+  searchInfinite: (query: string) => [...articleKeys.search(query), 'infinite'] as const,
 }

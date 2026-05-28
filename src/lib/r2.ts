@@ -1,3 +1,5 @@
+import '@tanstack/react-start/server-only'
+
 import { S3Client, PutObjectCommand, DeleteObjectCommand, DeleteObjectsCommand } from '@aws-sdk/client-s3'
 
 const r2Client = new S3Client({

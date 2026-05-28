@@ -1,6 +1,6 @@
 import { useInfiniteQuery } from '@tanstack/react-query'
 import { articleKeys } from '#/hooks/keys/article-keys'
-import { getPublishedArticlesInfiniteFn } from '#/data/articles'
+import { getPublishedArticlesInfiniteFn, searchArticlesFn } from '#/data/articles'
 
 const STALE_TIME_MS = 30_000
 
@@ -36,5 +36,22 @@ export function usePublishedArticlesInfinite(limit = 10) {
     getNextPageParam: (lastPage: InfiniteArticlesResult) =>
       lastPage.hasMore ? lastPage.nextCursor : undefined,
     staleTime: STALE_TIME_MS,
+  })
+}
+
+interface SearchArticlesResult extends InfiniteArticlesResult {
+  query: string
+}
+
+export function useSearchArticlesInfinite(query: string, limit = 10) {
+  return useInfiniteQuery({
+    queryKey: articleKeys.searchInfinite(query),
+    queryFn: ({ pageParam }) =>
+      searchArticlesFn({ data: { query, cursor: pageParam as string | undefined, limit } }),
+    initialPageParam: undefined as string | undefined,
+    getNextPageParam: (lastPage: SearchArticlesResult) =>
+      lastPage.hasMore ? lastPage.nextCursor : undefined,
+    staleTime: STALE_TIME_MS,
+    enabled: query.length > 0,
   })
 }

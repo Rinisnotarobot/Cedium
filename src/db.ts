@@ -1,3 +1,5 @@
+import '@tanstack/react-start/server-only'
+
 import { PrismaClient } from './generated/prisma/client.js'
 
 import { PrismaPg } from '@prisma/adapter-pg'
