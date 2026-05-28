@@ -11,7 +11,7 @@ export function NavbarActions({ isWriteRoute }: NavbarActionsProps) {
     <div className="flex items-center gap-3">
       {/* 移动端搜索图标 */}
       <Button variant="ghost" size="icon" asChild className="lg:hidden">
-        <Link to="/search">
+        <Link to="/search" search={{ q: '' }}>
           <Search className="size-5" />
         </Link>
       </Button>

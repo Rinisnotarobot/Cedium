@@ -152,8 +152,8 @@ export function ArticleDetailPage() {
               {article.tags.map((tag) => (
                 <Link
                   key={tag.slug}
-                  to="/articles"
-                  search={{ tag: tag.slug }}
+                  to="/search"
+                  search={{ q: tag.slug }}
                   className="transition-colors"
                 >
                   <Badge
