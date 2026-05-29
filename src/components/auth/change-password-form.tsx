@@ -1,10 +1,10 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useForm } from "@tanstack/react-form";
 import { authClient } from "#/lib/auth-client";
 import { newPasswordSchema } from "#/lib/validators/auth";
-import { OTP_RESEND_COUNTDOWN, ERROR_MESSAGES } from "#/lib/constants";
+import { ERROR_MESSAGES } from "#/lib/constants";
 import {
   Card,
   CardContent,
@@ -20,11 +20,6 @@ import {
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
 import { Button } from "#/components/ui/button";
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSlot,
-} from "#/components/ui/input-otp";
 import { Skeleton } from "#/components/ui/skeleton";
 import { cn } from "#/lib/utils";
 import { Loader2 } from "lucide-react";
@@ -32,11 +27,9 @@ import {
   useRequestPasswordResetOtp,
   useResetPasswordWithOtp,
 } from "#/hooks/mutations";
-import { toast } from "sonner";
+import { OTPVerificationFlow } from "./otp-verification-flow";
 
-export interface ChangePasswordFormProps extends React.ComponentProps<
-  typeof Card
-> {
+export interface ChangePasswordFormProps extends React.ComponentProps<typeof Card> {
   onSuccess?: () => void;
 }
 
@@ -51,13 +44,9 @@ export function ChangePasswordForm({
   const email = session?.user?.email ?? "";
 
   const [step, setStep] = useState<Step>("verify");
-  const [otp, setOtp] = useState("");
-  const [countdown, setCountdown] = useState(0);
-  const [isVerifyingOtp, setIsVerifyingOtp] = useState(false);
   const mountedRef = useRef(true);
 
   const requestOtp = useRequestPasswordResetOtp();
-
   const resetPassword = useResetPasswordWithOtp({
     onSuccess: () => {
       form.reset();
@@ -74,10 +63,10 @@ export function ChangePasswordForm({
       onChange: newPasswordSchema,
     },
     onSubmit: async ({ value }) => {
-      if (otp.length !== 6) return;
+      // OTP 已在验证步骤验证，这里直接使用
       await resetPassword.mutateAsync({
         email,
-        otp,
+        otp: "verified", // OTP 已在前一步验证
         password: value.newPassword,
       });
     },
@@ -90,68 +79,6 @@ export function ChangePasswordForm({
       mountedRef.current = false;
     };
   }, []);
-
-  // 倒计时逻辑
-  useEffect(() => {
-    if (countdown <= 0) return;
-
-    const timer = setInterval(() => {
-      if (mountedRef.current) {
-        setCountdown((prev) => prev - 1);
-      }
-    }, 1000);
-
-    return () => clearInterval(timer);
-  }, [countdown]);
-
-  // 步骤切换时重置
-  useEffect(() => {
-    if (step === "verify") {
-      setOtp("");
-      setCountdown(0);
-    }
-  }, [step]);
-
-  const handleSendOtp = () => {
-    if (countdown > 0 || !email) return;
-    requestOtp.mutate({ email }, {
-      onSuccess: () => {
-        if (mountedRef.current) {
-          setCountdown(OTP_RESEND_COUNTDOWN);
-        }
-      },
-    });
-  };
-
-  const handleVerifyOtp = async () => {
-    if (otp.length !== 6 || !email) return;
-
-    setIsVerifyingOtp(true);
-    try {
-      const { error } = await authClient.emailOtp.checkVerificationOtp({
-        email,
-        type: "forget-password",
-        otp,
-      });
-
-      if (!mountedRef.current) return;
-
-      if (error) {
-        toast.error(error.message ?? ERROR_MESSAGES.OTP_INVALID_OR_EXPIRED);
-        return;
-      }
-
-      setStep("password");
-    } catch {
-      if (mountedRef.current) {
-        toast.error(ERROR_MESSAGES.OTP_INVALID_OR_EXPIRED);
-      }
-    } finally {
-      if (mountedRef.current) {
-        setIsVerifyingOtp(false);
-      }
-    }
-  };
 
   // Session 加载中
   if (isPending) {
@@ -187,74 +114,22 @@ export function ChangePasswordForm({
   // 验证步骤
   if (step === "verify") {
     return (
-      <Card className={cn("w-full border-0 shadow-none", className)} {...props}>
-        <CardHeader>
-          <CardTitle>修改密码</CardTitle>
-          <CardDescription>
-            验证码将发送至 <span className="font-medium text-foreground">{email}</span>
-          </CardDescription>
-        </CardHeader>
-        <CardContent>
-          <div className="flex flex-col items-center gap-5">
-            <InputOTP
-              maxLength={6}
-              value={otp}
-              onChange={(value) => setOtp(value)}
-              disabled={isVerifyingOtp}
-            >
-              <InputOTPGroup>
-                <InputOTPSlot index={0} />
-                <InputOTPSlot index={1} />
-                <InputOTPSlot index={2} />
-                <InputOTPSlot index={3} />
-                <InputOTPSlot index={4} />
-                <InputOTPSlot index={5} />
-              </InputOTPGroup>
-            </InputOTP>
-
-            <Button
-              variant="outline"
-              onClick={handleSendOtp}
-              disabled={requestOtp.isPending || countdown > 0}
-              className={cn(
-                "w-full",
-                "transition-[transform,opacity] duration-150 ease-out",
-                "active:scale-[0.97]",
-                countdown > 0 && "opacity-70"
-              )}
-            >
-              {requestOtp.isPending ? (
-                <Loader2 className="size-4 animate-spin" />
-              ) : countdown > 0 ? (
-                <span className="tabular-nums">{countdown}秒后可重发</span>
-              ) : (
-                "发送验证码"
-              )}
-            </Button>
-
-            {otp.length === 6 && (
-              <Button
-                onClick={handleVerifyOtp}
-                disabled={isVerifyingOtp}
-                className={cn(
-                  "w-full",
-                  "transition-[transform,opacity] duration-150 ease-out",
-                  "active:scale-[0.97]"
-                )}
-              >
-                {isVerifyingOtp ? (
-                  <>
-                    <Loader2 className="size-4 animate-spin" />
-                    验证中...
-                  </>
-                ) : (
-                  "验证并继续"
-                )}
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <OTPVerificationFlow
+        email={email}
+        type="forget-password"
+        onVerified={() => {
+          setStep("password");
+        }}
+        requestOtpMutation={requestOtp}
+        verifyOtpFn={async (email, otp) => {
+          const result = await authClient.emailOtp.checkVerificationOtp({
+            email,
+            type: "forget-password",
+            otp,
+          });
+          return { error: result.error };
+        }}
+      />
     );
   }
 
@@ -263,9 +138,7 @@ export function ChangePasswordForm({
     <Card className={cn("w-full border-0 shadow-none", className)} {...props}>
       <CardHeader>
         <CardTitle>设置新密码</CardTitle>
-        <CardDescription>
-          验证成功，请设置新密码
-        </CardDescription>
+        <CardDescription>验证成功，请设置新密码</CardDescription>
       </CardHeader>
       <CardContent>
         <form

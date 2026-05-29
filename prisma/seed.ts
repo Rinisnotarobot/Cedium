@@ -1,9 +1,22 @@
 import { PrismaClient } from '../src/generated/prisma/client.js'
 import { PrismaPg } from '@prisma/adapter-pg'
+import { scrypt, randomBytes } from 'crypto'
 
 // Simple ID generator
 function generateId(): string {
   return Math.random().toString(36).substring(2, 15) + Math.random().toString(36).substring(2, 15)
+}
+
+// Hash password using scrypt (Better Auth default)
+async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(16).toString('hex')
+  const derivedKey = await new Promise<Buffer>((resolve, reject) => {
+    scrypt(password, salt, 64, (err, key) => {
+      if (err) reject(err)
+      else resolve(key)
+    })
+  })
+  return `${salt}:${derivedKey.toString('hex')}`
 }
 
 const adapter = new PrismaPg({
@@ -41,6 +54,9 @@ async function main() {
   }
 
   // Create test users
+  const hashedTestPassword = await hashPassword(TEST_USER.password)
+  const hashedAuthorPassword = await hashPassword(TEST_AUTHOR.password)
+
   const testUser = await prisma.user.create({
     data: {
       id: generateId(),
@@ -52,7 +68,7 @@ async function main() {
           id: generateId(),
           accountId: TEST_USER.email,
           providerId: 'credential',
-          password: TEST_USER.password,
+          password: hashedTestPassword,
         }
       }
     }
@@ -71,7 +87,7 @@ async function main() {
           id: generateId(),
           accountId: TEST_AUTHOR.email,
           providerId: 'credential',
-          password: TEST_AUTHOR.password,
+          password: hashedAuthorPassword,
         }
       }
     }
