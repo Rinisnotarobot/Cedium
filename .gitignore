@@ -21,3 +21,7 @@ docs/MODULE_COMPLETION_REPORT.md
 src/routeTree.gen.ts
 .reports/
 tanstack-start/
+
+# Test outputs
+coverage/
+test-results/
