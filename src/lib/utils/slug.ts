@@ -12,4 +12,5 @@ export function generateSlug(name: string): string {
     .replace(/\s+/g, '-')
     .replace(/[^\w\-一-龥]/g, '')
     .replace(/-+/g, '-')
+    .replace(/^-+|-+$/g, '')
 }

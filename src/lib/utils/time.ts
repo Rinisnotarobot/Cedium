@@ -12,7 +12,6 @@ export function timeAgo(date: Date | string): string {
   // Handle future dates with proper semantics
   if (diffDays < 0) {
     const futureDays = Math.abs(diffDays)
-    if (futureDays === 0) return "今天"
     if (futureDays === 1) return "明天"
     if (futureDays < 7) return `${futureDays} 天后`
     if (futureDays < 30) return `${Math.floor(futureDays / 7)} 周后`

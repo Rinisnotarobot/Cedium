@@ -34,14 +34,10 @@ export async function login(page: Page, user: typeof TEST_USER = TEST_USER) {
  * Logout the current user
  */
 export async function logout(page: Page) {
-  // Navigate to settings or find logout button
   await page.goto('/me/settings')
 
-  // Find and click logout button
   const logoutButton = page.getByRole('button', { name: /退出|logout|登出/i })
-  if (await logoutButton.isVisible()) {
-    await logoutButton.click()
-  }
+  await logoutButton.click()
 
   await page.waitForURL('/')
 }

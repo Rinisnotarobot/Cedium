@@ -1,7 +1,7 @@
 import { PageContainer } from "#/components/layout";
 import { Badge } from "#/components/ui/badge";
 import { Clock, ArrowLeft, Heart, Bookmark, MessageCircle } from "lucide-react";
-import { Link, useNavigate } from "@tanstack/react-router";
+import { Link } from "@tanstack/react-router";
 import { ArticleContent } from "./article-content";
 import { CommentList } from "#/components/comments";
 import { getAvatarColor } from "#/lib/utils/avatar-color";
@@ -12,20 +12,11 @@ import { cn } from "#/lib/utils";
 import { Route } from "#/routes/_app/articles/$slug";
 import { useQuery } from "@tanstack/react-query";
 import { articleKeys } from "#/hooks/keys/article-keys";
-import { useBookmarkStatus, useLikeStatus } from "#/hooks/queries";
-import {
-  useBookmarkArticle,
-  useUnbookmarkArticle,
-  useLikeArticle,
-  useUnlikeArticle,
-} from "#/hooks/mutations";
+import { useArticleInteraction } from "#/hooks";
 import { getArticleByIdFn } from "#/data/articles";
-import { authClient } from "#/lib/auth-client";
 
 export function ArticleDetailPage() {
   const loaderData = Route.useLoaderData();
-  const navigate = useNavigate();
-  const { data: session } = authClient.useSession();
 
   // 使用 useQuery 获取文章数据，以响应实时更新（如点赞计数）
   // loader 已将数据放入缓存，这里配合 queryFn 实现数据刷新
@@ -36,47 +27,11 @@ export function ArticleDetailPage() {
     staleTime: 1000 * 60 * 5, // 5 分钟内不重新请求
   });
 
-  // 获取收藏和点赞状态
-  const { data: bookmarkStatus } = useBookmarkStatus(article.id);
-  const { data: likeStatus } = useLikeStatus(article.id);
-
-  // 获取 mutation hooks
-  const bookmarkMutation = useBookmarkArticle();
-  const unbookmarkMutation = useUnbookmarkArticle();
-  const likeMutation = useLikeArticle();
-  const unlikeMutation = useUnlikeArticle();
-
-  const isBookmarked = bookmarkStatus?.isBookmarked ?? false;
-  const isLiked = likeStatus?.isLiked ?? false;
+  // 使用统一的交互 hook
+  const { state, actions } = useArticleInteraction({ articleId: article.id });
 
   const avatarColor = getAvatarColor(article.author?.name || "");
   const readTime = estimateReadTime(article.content);
-
-  const toggleBookmark = () => {
-    if (!session) {
-      navigate({ to: "/login" });
-      return;
-    }
-
-    if (isBookmarked) {
-      unbookmarkMutation.mutate(article.id);
-    } else {
-      bookmarkMutation.mutate(article.id);
-    }
-  };
-
-  const toggleLike = () => {
-    if (!session) {
-      navigate({ to: "/login" });
-      return;
-    }
-
-    if (isLiked) {
-      unlikeMutation.mutate(article.id);
-    } else {
-      likeMutation.mutate(article.id);
-    }
-  };
 
   return (
     <PageContainer width="3xl" variant="spaced">
@@ -185,13 +140,13 @@ export function ArticleDetailPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={toggleLike}
+                onClick={actions.toggleLike}
                 className={cn(
                   "gap-1.5",
-                  isLiked && "text-red-500 hover:text-red-500",
+                  state.isLiked && "text-red-500 hover:text-red-500",
                 )}
               >
-                <Heart className={cn("size-4", isLiked && "fill-current")} />
+                <Heart className={cn("size-4", state.isLiked && "fill-current")} />
                 <span className="tabular-nums">{article.likeCount || 0}</span>
               </Button>
 
@@ -199,16 +154,16 @@ export function ArticleDetailPage() {
               <Button
                 variant="ghost"
                 size="sm"
-                onClick={toggleBookmark}
+                onClick={actions.toggleBookmark}
                 className={cn(
                   "gap-1.5",
-                  isBookmarked && "text-primary hover:text-primary",
+                  state.isBookmarked && "text-primary hover:text-primary",
                 )}
               >
                 <Bookmark
-                  className={cn("size-4", isBookmarked && "fill-current")}
+                  className={cn("size-4", state.isBookmarked && "fill-current")}
                 />
-                <span>{isBookmarked ? "已收藏" : "收藏"}</span>
+                <span>{state.isBookmarked ? "已收藏" : "收藏"}</span>
               </Button>
 
               {/* 评论计数 */}

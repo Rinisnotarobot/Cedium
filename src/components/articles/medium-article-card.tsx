@@ -9,14 +9,7 @@ import {
   DropdownMenuTrigger,
 } from "#/components/ui/dropdown-menu";
 import type { Article } from "#/types/article";
-import { useBookmarkStatus, useLikeStatus } from "#/hooks/queries";
-import {
-  useBookmarkArticle,
-  useUnbookmarkArticle,
-  useLikeArticle,
-  useUnlikeArticle,
-} from "#/hooks/mutations";
-import { authClient } from "#/lib/auth-client";
+import { useArticleInteraction } from "#/hooks";
 
 interface MediumArticleCardProps {
   article: Article;
@@ -33,28 +26,13 @@ export function MediumArticleCard({
   isLiked: propLiked,
 }: MediumArticleCardProps) {
   const navigate = useNavigate();
-  const { data: session } = authClient.useSession();
 
-  // 仅在父组件未提供状态时启用个体查询（避免 N+1）
-  const shouldFetchBookmark = propBookmarked === undefined;
-  const shouldFetchLike = propLiked === undefined;
-
-  const { data: bookmarkStatus } = useBookmarkStatus(article.id, {
-    enabled: shouldFetchBookmark,
+  // 使用统一的交互 hook，支持 prop 传入状态避免 N+1
+  const { state, actions } = useArticleInteraction({
+    articleId: article.id,
+    initialBookmarked: propBookmarked,
+    initialLiked: propLiked,
   });
-  const { data: likeStatus } = useLikeStatus(article.id, {
-    enabled: shouldFetchLike,
-  });
-
-  // 获取 mutation hooks（带错误回调以回滚乐观更新）
-  const bookmarkMutation = useBookmarkArticle();
-  const unbookmarkMutation = useUnbookmarkArticle();
-  const likeMutation = useLikeArticle();
-  const unlikeMutation = useUnlikeArticle();
-
-  // 状态来自 prop 或查询结果
-  const isBookmarked = propBookmarked ?? bookmarkStatus?.isBookmarked ?? false;
-  const isLiked = propLiked ?? likeStatus?.isLiked ?? false;
 
   const handleUserClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -63,38 +41,6 @@ export function MediumArticleCard({
       to: "/users/$username",
       params: { username: article.author?.name || "" },
     });
-  };
-
-  const toggleBookmark = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!session) {
-      navigate({ to: "/login" });
-      return;
-    }
-
-    if (isBookmarked) {
-      unbookmarkMutation.mutate(article.id);
-    } else {
-      bookmarkMutation.mutate(article.id);
-    }
-  };
-
-  const toggleLike = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-
-    if (!session) {
-      navigate({ to: "/login" });
-      return;
-    }
-
-    if (isLiked) {
-      unlikeMutation.mutate(article.id);
-    } else {
-      likeMutation.mutate(article.id);
-    }
   };
 
   return (
@@ -161,17 +107,17 @@ export function MediumArticleCard({
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={toggleLike}
+                onClick={actions.toggleLike}
                 className={cn(
                   "flex items-center gap-1",
                   "text-muted-foreground hover:text-red-500 transition-colors",
-                  isLiked && "text-red-500",
+                  state.isLiked && "text-red-500",
                 )}
               >
                 <Heart
                   className={cn(
                     "size-3.5 lg:size-4",
-                    isLiked && "fill-current",
+                    state.isLiked && "fill-current",
                   )}
                 />
               </button>
@@ -184,18 +130,18 @@ export function MediumArticleCard({
             <div className="flex items-center gap-0.5">
               <button
                 type="button"
-                onClick={toggleBookmark}
+                onClick={actions.toggleBookmark}
                 className={cn(
                   "size-7 lg:size-9 flex items-center justify-center rounded-md",
                   "text-muted-foreground hover:text-foreground hover:bg-muted/60",
                   "transition-colors",
-                  isBookmarked && "text-primary",
+                  state.isBookmarked && "text-primary",
                 )}
               >
                 <Bookmark
                   className={cn(
                     "size-3.5 lg:size-4",
-                    isBookmarked && "fill-current",
+                    state.isBookmarked && "fill-current",
                   )}
                 />
               </button>

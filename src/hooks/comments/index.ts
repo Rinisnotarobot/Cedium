@@ -1,0 +1,1 @@
+export { useCommentInteraction } from "./use-comment-interaction";

@@ -41,4 +41,10 @@ describe('generateSlug', () => {
   test('collapses consecutive hyphens', () => {
     expect(generateSlug('test---article')).toBe('test-article')
   })
+
+  test('trims leading and trailing hyphens', () => {
+    expect(generateSlug('---test---')).toBe('test')
+    expect(generateSlug('-test-')).toBe('test')
+    expect(generateSlug('--test-article--')).toBe('test-article')
+  })
 })
