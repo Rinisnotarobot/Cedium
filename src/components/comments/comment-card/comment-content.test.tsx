@@ -120,4 +120,35 @@ describe('CommentContent', () => {
       expect(container.firstChild).toBeInTheDocument()
     })
   })
+
+  describe('avatar rendering', () => {
+    test('renders avatar component with image prop', () => {
+      const comment = createMockComment({
+        user: { id: 'user-1', name: 'Test', image: 'https://example.com/avatar.png' }
+      })
+      const { container } = render(
+        <CommentContent comment={comment} articleAuthorId="author-1" />
+      )
+
+      // Avatar fallback should show initial when image fails to load in test
+      expect(screen.getByText('T')).toBeInTheDocument()
+    })
+
+    test('shows fallback with initial when image is null', () => {
+      const comment = createMockComment({ user: { id: 'user-1', name: 'Test', image: null } })
+      render(<CommentContent comment={comment} articleAuthorId="author-1" />)
+
+      expect(screen.getByText('T')).toBeInTheDocument()
+    })
+
+    test('applies avatar color class', () => {
+      const comment = createMockComment()
+      const { container } = render(
+        <CommentContent comment={comment} articleAuthorId="author-1" />
+      )
+
+      // Avatar should have a color class applied (mocked as bg-blue-500)
+      expect(container.querySelector('.bg-blue-500')).toBeInTheDocument()
+    })
+  })
 })

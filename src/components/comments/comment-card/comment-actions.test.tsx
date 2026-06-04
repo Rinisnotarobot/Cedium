@@ -84,6 +84,53 @@ describe('CommentActions', () => {
 
       expect(container.querySelector('.text-red-500')).toBeInTheDocument()
     })
+
+    test('does not show red color when not liked', () => {
+      const comment = createMockComment({ isLiked: false })
+      const { container } = render(
+        <CommentActions
+          comment={comment}
+          canEdit={false}
+          canDelete={false}
+          dropdownOpen={false}
+          {...mockCallbacks}
+        />
+      )
+
+      expect(container.querySelector('.text-red-500')).not.toBeInTheDocument()
+    })
+
+    test('shows filled heart icon when liked', () => {
+      const comment = createMockComment({ isLiked: true })
+      const { container } = render(
+        <CommentActions
+          comment={comment}
+          canEdit={false}
+          canDelete={false}
+          dropdownOpen={false}
+          {...mockCallbacks}
+        />
+      )
+
+      // Heart icon should have fill-current class when liked
+      const heartIcon = container.querySelector('.fill-current')
+      expect(heartIcon).toBeInTheDocument()
+    })
+
+    test('does not show filled heart when not liked', () => {
+      const comment = createMockComment({ isLiked: false })
+      const { container } = render(
+        <CommentActions
+          comment={comment}
+          canEdit={false}
+          canDelete={false}
+          dropdownOpen={false}
+          {...mockCallbacks}
+        />
+      )
+
+      expect(container.querySelector('.fill-current')).not.toBeInTheDocument()
+    })
   })
 
   describe('reply button', () => {
@@ -168,6 +215,39 @@ describe('CommentActions', () => {
 
       // Only like and reply buttons visible, no dropdown trigger
       expect(screen.queryByLabelText('更多')).not.toBeInTheDocument()
+    })
+
+    test('shows dropdown when canDelete only is true', () => {
+      const comment = createMockComment()
+      render(
+        <CommentActions
+          comment={comment}
+          canEdit={false}
+          canDelete={true}
+          dropdownOpen={false}
+          {...mockCallbacks}
+        />
+      )
+
+      // Dropdown trigger should exist
+      const buttons = screen.getAllByRole('button')
+      expect(buttons.length).toBeGreaterThan(2) // like + reply + dropdown
+    })
+
+    test('shows dropdown when both canEdit and canDelete are true', () => {
+      const comment = createMockComment()
+      render(
+        <CommentActions
+          comment={comment}
+          canEdit={true}
+          canDelete={true}
+          dropdownOpen={false}
+          {...mockCallbacks}
+        />
+      )
+
+      // Both edit and delete should be available when dropdown opens
+      expect(screen.getAllByRole('button').length).toBeGreaterThan(2)
     })
 
     test('shows edit option when canEdit is true', async () => {
