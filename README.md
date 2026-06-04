@@ -153,7 +153,10 @@ src/
 │   ├── keys/           # Query Keys
 │   ├── mutations/      # TanStack Query mutations
 │   ├── queries/        # TanStack Query queries
-│   └── utils/          # useDebounce, useMobile 等
+│   ├── editor/         # 编辑器 hooks (useDraftState, useAutosave)
+│   ├── comments/       # 评论 hooks (useCommentInteraction)
+│   ├── utils/          # 交互 hooks (useArticleInteraction, useOtpCountdown)
+│   └── use-*.ts        # 工具 hooks (useDebounce, useMobile 等)
 ├── lib/                # 核心配置
 │   ├── auth.ts         # Better Auth 服务端
 │   ├── auth-client.ts  # Better Auth 客户端

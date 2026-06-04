@@ -83,5 +83,25 @@ describe('SavedStatus', () => {
       const minutes = String(lastSaved.getMinutes()).padStart(2, '0')
       expect(screen.getByText(`${hours}:${minutes}`)).toBeInTheDocument()
     })
+
+    test('shows correct time at exactly 60 seconds boundary', () => {
+      const lastSaved = new Date('2024-01-01T12:00:00Z')
+      vi.setSystemTime(new Date('2024-01-01T12:01:00Z')) // exactly 60 seconds
+
+      render(<SavedStatus lastSaved={lastSaved} isSaving={false} />)
+
+      expect(screen.getByText('1分钟前')).toBeInTheDocument()
+    })
+
+    test('shows correct time at exactly 3600 seconds boundary', () => {
+      const lastSaved = new Date('2024-01-01T12:00:00Z')
+      vi.setSystemTime(new Date('2024-01-01T13:00:00Z')) // exactly 1 hour
+
+      render(<SavedStatus lastSaved={lastSaved} isSaving={false} />)
+
+      const hours = String(lastSaved.getHours()).padStart(2, '0')
+      const minutes = String(lastSaved.getMinutes()).padStart(2, '0')
+      expect(screen.getByText(`${hours}:${minutes}`)).toBeInTheDocument()
+    })
   })
 })
