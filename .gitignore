@@ -24,4 +24,8 @@ tanstack-start/
 
 # Test outputs
 coverage/
+coverage.json
 test-results/
+
+# Generated docs
+docs/CODEMAPS/
