@@ -41,6 +41,12 @@ export function StarfieldBackground({
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
 
+    // Respect user's motion preference — vestibular-sensitive users get a
+    // static starfield instead of the flying-through-space animation.
+    const prefersReducedMotion =
+      typeof window !== "undefined" &&
+      window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     const rect = container.getBoundingClientRect();
     let width = rect.width;
     let height = rect.height;
@@ -79,6 +85,9 @@ export function StarfieldBackground({
     const animate = () => {
       tick++;
 
+      // When reduced motion is requested, hold the stars in place.
+      const frameSpeed = prefersReducedMotion ? 0 : speed;
+
       // Fade effect for trails
       ctx.fillStyle = "rgba(10, 10, 15, 0.2)";
       ctx.fillRect(0, 0, width, height);
@@ -88,7 +97,7 @@ export function StarfieldBackground({
 
       for (const star of stars) {
         // Move star toward camera
-        star.z -= speed * 2;
+        star.z -= frameSpeed * 2;
 
         // Reset if passed camera
         if (star.z <= 0) {
@@ -164,12 +173,12 @@ export function StarfieldBackground({
     >
       <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" />
 
-      {/* Subtle blue nebula glow */}
+      {/* Subtle warm nebula glow */}
       <div
         className="pointer-events-none absolute inset-0 opacity-30"
         style={{
           background:
-            "radial-gradient(ellipse at 30% 40%, rgba(56, 100, 180, 0.15) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(100, 60, 150, 0.1) 0%, transparent 50%)",
+            "radial-gradient(ellipse at 30% 40%, rgba(180, 90, 50, 0.12) 0%, transparent 50%), radial-gradient(ellipse at 70% 60%, rgba(140, 70, 40, 0.1) 0%, transparent 50%)",
         }}
       />
 

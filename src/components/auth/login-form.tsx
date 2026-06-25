@@ -20,6 +20,7 @@ import {
   FieldLabel,
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
+import { PasswordInput } from "#/components/ui/password-input";
 import { toast } from "sonner";
 
 export function LoginForm({
@@ -101,9 +102,8 @@ export function LoginForm({
                         忘记密码？
                       </Link>
                     </div>
-                    <Input
+                    <PasswordInput
                       id="password"
-                      type="password"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
