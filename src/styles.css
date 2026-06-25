@@ -175,6 +175,13 @@ body {
 }
 
 @layer base {
+  /* Tailwind v4 defaults bare `border-*` utilities to currentColor, which in
+     dark mode inherits the light foreground and renders as a white line
+     (e.g. navbar border-b). Pin all borders to the --border token, matching
+     the shadcn base layer convention. */
+  * {
+    border-color: var(--border);
+  }
   body {
     letter-spacing: var(--tracking-normal);
   }
