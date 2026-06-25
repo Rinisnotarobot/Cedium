@@ -19,6 +19,7 @@ import {
   FieldLabel,
 } from "#/components/ui/field";
 import { Input } from "#/components/ui/input";
+import { PasswordInput } from "#/components/ui/password-input";
 import { toast } from "sonner";
 
 export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
@@ -112,9 +113,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               {(field) => (
                 <Field>
                   <FieldLabel htmlFor="password">密码</FieldLabel>
-                  <Input
+                  <PasswordInput
                     id="password"
-                    type="password"
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}
@@ -131,9 +131,8 @@ export function SignupForm({ ...props }: React.ComponentProps<typeof Card>) {
               {(field) => (
                 <Field>
                   <FieldLabel htmlFor="confirm-password">确认密码</FieldLabel>
-                  <Input
+                  <PasswordInput
                     id="confirm-password"
-                    type="password"
                     value={field.state.value}
                     onBlur={field.handleBlur}
                     onChange={(e) => field.handleChange(e.target.value)}

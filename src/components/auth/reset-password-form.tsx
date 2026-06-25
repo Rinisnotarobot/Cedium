@@ -20,7 +20,7 @@ import {
   FieldGroup,
   FieldLabel,
 } from "#/components/ui/field";
-import { Input } from "#/components/ui/input";
+import { PasswordInput } from "#/components/ui/password-input";
 
 export interface ResetPasswordFormProps extends React.ComponentProps<"div"> {}
 
@@ -112,9 +112,8 @@ export function ResetPasswordForm({
                 {(field) => (
                   <Field>
                     <FieldLabel htmlFor="password">新密码</FieldLabel>
-                    <Input
+                    <PasswordInput
                       id="password"
-                      type="password"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
@@ -131,9 +130,8 @@ export function ResetPasswordForm({
                 {(field) => (
                   <Field>
                     <FieldLabel htmlFor="confirm-password">确认密码</FieldLabel>
-                    <Input
+                    <PasswordInput
                       id="confirm-password"
-                      type="password"
                       value={field.state.value}
                       onBlur={field.handleBlur}
                       onChange={(e) => field.handleChange(e.target.value)}
